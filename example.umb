@@ -1,0 +1,24 @@
+# this is a sample code just for testing
+
+package umbra_test
+
+str world = "World" # create an string constant with value "World"
+num year := 2022 # create a number mutable with value 2022
+
+obj person = {
+   name: "cleiton"
+}
+
+obj another = {
+   name: "cleiton"
+}
+
+obj merged = person<-another
+
+arr year = [ ]
+
+person.name = "Peam"
+
+def main() {
+   out("Hello, $world!")
+}

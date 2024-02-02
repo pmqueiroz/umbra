@@ -18,3 +18,22 @@ func (e *UmbraError) prettyCtx() string {
    code: '%s'		
 }`, e.Code)
 }
+
+type SyntaxError struct {
+	message string
+	line    int
+	column  int
+	raw     string
+}
+
+func (e *SyntaxError) Error() string {
+	return fmt.Sprintf("SyntaxError: %s %s", e.message, e.prettyCtx())
+}
+
+func (e *SyntaxError) prettyCtx() string {
+	return fmt.Sprintf(`{
+   line: %d		
+   column: %d		
+   raw: %s		
+}`, e.line, e.column, e.raw)
+}
