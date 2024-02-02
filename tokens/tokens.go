@@ -1,8 +1,10 @@
-package main
+package tokens
 
 import (
 	"fmt"
 	"unicode"
+
+	umbra_error "github.com/umbra-lang/umbra/error"
 )
 
 type TokenType string
@@ -53,10 +55,10 @@ var combinedPunctuators = [...]Punctuator{
 }
 
 type Token struct {
-	id     TokenType
-	value  string
-	line   int
-	column int
+	Id     TokenType
+	Value  string
+	Line   int
+	Column int
 }
 
 func isKeyword(lexis string) bool {
@@ -115,89 +117,80 @@ func generateToken(lexis string, line int, column int) (Token, error) {
 	if unicode.IsLetter([]rune(lexis)[0]) {
 		if isKeyword(lexis) {
 			return Token{
-				id:     KEYWORD,
-				value:  lexis,
-				line:   line,
-				column: column,
+				Id:     KEYWORD,
+				Value:  lexis,
+				Line:   line,
+				Column: column,
 			}, nil
 		}
 
 		return Token{
-			id:     IDENTIFIER,
-			value:  lexis,
-			line:   line,
-			column: column,
+			Id:     IDENTIFIER,
+			Value:  lexis,
+			Line:   line,
+			Column: column,
 		}, nil
 	}
 
 	if isPunctuator(lexis) {
 		return Token{
-			id:     PUNCTUATOR,
-			value:  lexis,
-			line:   line,
-			column: column,
+			Id:     PUNCTUATOR,
+			Value:  lexis,
+			Line:   line,
+			Column: column,
 		}, nil
 	}
 
 	if lexis[0] == '"' {
 		if isValidString(lexis) {
 			return Token{
-				id:     STRING,
-				value:  lexis,
-				line:   line,
-				column: column,
+				Id:     STRING,
+				Value:  lexis,
+				Line:   line,
+				Column: column,
 			}, nil
 		} else {
 			return Token{
-					id:     UNKNOWN,
-					value:  lexis,
-					line:   line,
-					column: column,
-				}, &SyntaxError{
-					message: "Unterminated string",
-					line:    line,
-					column:  column,
-					raw:     lexis,
-				}
+					Id:     UNKNOWN,
+					Value:  lexis,
+					Line:   line,
+					Column: column,
+				}, umbra_error.NewSyntaxError(
+					"Unterminated string",
+					line,
+					column,
+					lexis,
+				)
 		}
 	}
 
 	if unicode.IsNumber([]rune(lexis)[0]) {
 		if isValidNumeric(lexis) {
 			return Token{
-				id:     NUMERIC,
-				value:  lexis,
-				line:   line,
-				column: column,
+				Id:     NUMERIC,
+				Value:  lexis,
+				Line:   line,
+				Column: column,
 			}, nil
 		} else {
 			return Token{
-					id:     UNKNOWN,
-					value:  lexis,
-					line:   line,
-					column: column,
-				}, &SyntaxError{
-					message: "Invalid number",
-					line:    line,
-					column:  column,
-				}
+				Id:     UNKNOWN,
+				Value:  lexis,
+				Line:   line,
+				Column: column,
+			}, umbra_error.NewSyntaxError("Invalid number", line, column, lexis)
 		}
 	}
 
 	return Token{
-			id:     UNKNOWN,
-			value:  lexis,
-			line:   line,
-			column: column,
-		}, &SyntaxError{
-			message: fmt.Sprintf("Unexpected lexis '%s'", lexis),
-			line:    line,
-			column:  column,
-			raw:     lexis,
-		}
+		Id:     UNKNOWN,
+		Value:  lexis,
+		Line:   line,
+		Column: column,
+	}, umbra_error.NewSyntaxError(fmt.Sprintf("Unexpected lexis '%s'", lexis), line, column, lexis)
 }
 
-func tokenizer(code string) ([]Token, error) {
+func Tokenizer(code string) ([]Token, error) {
 	var tokens []Token
 	var lexis string
 	var line, column int = 1, 1
@@ -295,12 +288,7 @@ func tokenizer(code string) ([]Token, error) {
 
 			if char == '\n' {
 				if stringInProgress {
-					return tokens, &SyntaxError{
-						message: "Breaking the line before terminating the string",
-						line:    line,
-						column:  column,
-						raw:     lexis,
-					}
+					return tokens, umbra_error.NewSyntaxError("Breaking the line before terminating the string", line, column, lexis)
 				}
 
 				line++
@@ -320,10 +308,7 @@ func tokenizer(code string) ([]Token, error) {
 	}
 
 	if len(lexis) != 0 {
-		return tokens, &UmbraError{
-			Code:    "INTERNAL_ERROR",
-			Message: "Could not resolve entire file",
-		}
+		return tokens, umbra_error.NewGenericError("INTERNAL_ERROR", "Could not resolve entire file")
 	}
 
 	return tokens, nil
