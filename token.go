@@ -41,6 +41,7 @@ var isolatedPunctuators = [...]Punctuator{
 	"]",
 	".",
 	":",
+	",",
 }
 
 var combinedPunctuators = [...]Punctuator{
@@ -228,6 +229,15 @@ func tokenizer(code string) ([]Token, error) {
 
 			if closingQuote {
 				stringInProgress = false
+
+				token, err := generateToken(lexis+string(char), line, column-len(lexis))
+				if err != nil {
+					return tokens, err
+				}
+				tokens = append(tokens, token)
+				lexis = ""
+				column++
+				continue
 			}
 		}
 

@@ -6,7 +6,8 @@ str world = "World" # create an string constant with value "World"
 num year := 2022 # create a number mutable with value 2022
 
 obj person = {
-   name: "cleiton"
+   name: "cleiton",
+   valid: true
 }
 
 person.name = "Peam"
