@@ -42,6 +42,10 @@ var isolatedPunctuators = [...]Punctuator{
 	".",
 	":",
 	",",
+	"+",
+	"-",
+	"/",
+	"*",
 }
 
 var combinedPunctuators = [...]Punctuator{

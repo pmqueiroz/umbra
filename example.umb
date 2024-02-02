@@ -4,6 +4,7 @@ package umbra_test
 
 str world = "World" # create an string constant with value "World"
 num year := 2022 # create a number mutable with value 2022
+num result = (5 + 3) * 2 - 4 / 2
 
 obj person = {
    name: "cleiton",
