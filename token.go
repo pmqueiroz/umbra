@@ -27,17 +27,24 @@ var reservedKeywords = [...]Keyword{
 	"obj",
 	"arr",
 	"def",
+	"if",
+	"else",
 }
 
-var validPunctuators = [...]Punctuator{
+var isolatedPunctuators = [...]Punctuator{
 	"=",
-	":=",
 	"{",
 	"}",
 	"(",
 	")",
 	"[",
 	"]",
+	".",
+	":",
+}
+
+var combinedPunctuators = [...]Punctuator{
+	":=",
 }
 
 type Token struct {
@@ -57,8 +64,22 @@ func isKeyword(lexis string) bool {
 	return false
 }
 
+func isIsolatedPunctuator(lexis string) bool {
+	for _, punctuator := range isolatedPunctuators {
+		if punctuator == Punctuator(lexis) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func isPunctuator(lexis string) bool {
-	for _, punctuator := range validPunctuators {
+	if isIsolatedPunctuator(lexis) {
+		return true
+	}
+
+	for _, punctuator := range combinedPunctuators {
 		if punctuator == Punctuator(lexis) {
 			return true
 		}
@@ -179,11 +200,6 @@ func tokenizer(code string) ([]Token, error) {
 	var stringInProgress bool
 
 	for index, char := range code {
-		if char == '#' {
-			comment = true
-			continue
-		}
-
 		if comment {
 			if char == '\n' {
 				line++
@@ -192,6 +208,63 @@ func tokenizer(code string) ([]Token, error) {
 			}
 
 			continue
+		}
+
+		if char == '"' {
+			var closingQuote = stringInProgress && !(code[index-1] == '\\') // is closing quote if isn´t escaped
+
+			if !stringInProgress {
+				if lexis != "" {
+					token, err := generateToken(lexis, line, column-len(lexis))
+					if err != nil {
+						return tokens, err
+					}
+					tokens = append(tokens, token)
+					lexis = ""
+				}
+
+				stringInProgress = true
+			}
+
+			if closingQuote {
+				stringInProgress = false
+			}
+		}
+
+		if char == '#' && !stringInProgress {
+			if !comment {
+				comment = true
+			}
+			continue
+		}
+
+		if (unicode.IsPunct(char) || unicode.IsSymbol(char)) && !stringInProgress {
+			if isIsolatedPunctuator(string(char)) {
+				if lexis != "" {
+					token, err := generateToken(lexis, line, column-len(lexis))
+					if err != nil {
+						return tokens, err
+					}
+
+					isolatedToken, err := generateToken(string(char), line, column)
+					if err != nil {
+						return tokens, err
+					}
+					tokens = append(tokens, token, isolatedToken)
+					lexis = ""
+					column++
+					continue
+				} else {
+					token, err := generateToken(string(char), line, column-len(lexis))
+					if err != nil {
+						return tokens, err
+					}
+					tokens = append(tokens, token)
+					lexis = ""
+					column++
+					continue
+				}
+			}
 		}
 
 		if unicode.IsSpace(char) {
@@ -226,28 +299,6 @@ func tokenizer(code string) ([]Token, error) {
 			}
 
 			continue
-		}
-
-		if char == '"' {
-			var closingQuote = stringInProgress && !(code[index-1] == '\\') // is closing quote if isn´t escaped
-			// fmt.Println(string(char), line, column, stringInProgress, closingQuote)
-
-			if !stringInProgress {
-				if lexis != "" {
-					token, err := generateToken(lexis, line, column-len(lexis))
-					if err != nil {
-						return tokens, err
-					}
-					tokens = append(tokens, token)
-					lexis = ""
-				}
-
-				stringInProgress = true
-			}
-
-			if closingQuote {
-				stringInProgress = false
-			}
 		}
 
 		lexis += string(char)

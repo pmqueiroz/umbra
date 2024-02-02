@@ -1,4 +1,3 @@
-str world = "Hello World"
 # this is a sample code just for testing
 
 package umbra_test
@@ -10,16 +9,10 @@ obj person = {
    name: "cleiton"
 }
 
-obj another = {
-   name: "cleiton"
-}
-
-obj merged = person<-another
-
-arr year = [ ]
-
 person.name = "Peam"
 
+arr year = []
+
 def main() {
-   out("Hello, $world!")
+   out("Hello, $world! here'is some quotes: \"")
 }
