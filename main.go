@@ -18,6 +18,6 @@ func main() {
 	}
 
 	for _, tok := range tokens {
-		fmt.Printf("Token { type: '%s', value: '%s', start: %d, end: %d }\n", tok.id, tok.value, tok.line, tok.column)
+		fmt.Printf("Token { type: '%s', value: '%s', line: %d, column: %d }\n", tok.id, tok.value, tok.line, tok.column)
 	}
 }

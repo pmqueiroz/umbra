@@ -1,3 +1,4 @@
+str world = "Hello World"
 # this is a sample code just for testing
 
 package umbra_test

@@ -68,7 +68,7 @@ func isPunctuator(lexis string) bool {
 }
 
 func isValidString(lexis string) bool {
-	if lexis[len(lexis)-1] == '"' {
+	if len(lexis) >= 2 && lexis[len(lexis)-1] == '"' {
 		return true
 	}
 	return false
@@ -178,26 +178,13 @@ func tokenizer(code string) ([]Token, error) {
 	var comment bool
 	var stringInProgress bool
 
-	for _, char := range code {
+	for index, char := range code {
 		if char == '#' {
 			comment = true
 			continue
 		}
 
-		if unicode.IsSpace(char) || comment || stringInProgress {
-			if lexis != "" {
-				token, err := generateToken(lexis, line, column-len(lexis))
-
-				if err != nil {
-					return tokens, err
-				}
-
-				tokens = append(tokens, token)
-				lexis = ""
-			}
-
-			column++
-
+		if comment {
 			if char == '\n' {
 				line++
 				column = 1
@@ -207,24 +194,71 @@ func tokenizer(code string) ([]Token, error) {
 			continue
 		}
 
-		// if char == '"' {
-		// 	var closingQuote = !stringInProgress && !(code[index-1] == '\\') // is closing quote if isn´t escaped
+		if unicode.IsSpace(char) {
+			if lexis != "" && !stringInProgress {
+				token, err := generateToken(lexis, line, column-len(lexis))
+				if err != nil {
+					return tokens, err
+				}
+				tokens = append(tokens, token)
+				lexis = ""
+			}
 
-		// 	if !stringInProgress || closingQuote {
+			column++
 
-		// 		// terminar anterior
+			if char == '\n' {
+				if stringInProgress {
+					return tokens, &SyntaxError{
+						message: "Breaking the line before terminating the string",
+						line:    line,
+						column:  column,
+						raw:     lexis,
+					}
+				}
 
-		// 		if !stringInProgress {
-		// 			stringInProgress = true
-		// 		} else if closingQuote {
-		// 			stringInProgress = false
-		// 		}
+				line++
+				column = 1
+			}
 
-		// 	}
-		// }
+			if stringInProgress {
+				lexis += string(char)
+				column++
+			}
+
+			continue
+		}
+
+		if char == '"' {
+			var closingQuote = stringInProgress && !(code[index-1] == '\\') // is closing quote if isn´t escaped
+			// fmt.Println(string(char), line, column, stringInProgress, closingQuote)
+
+			if !stringInProgress {
+				if lexis != "" {
+					token, err := generateToken(lexis, line, column-len(lexis))
+					if err != nil {
+						return tokens, err
+					}
+					tokens = append(tokens, token)
+					lexis = ""
+				}
+
+				stringInProgress = true
+			}
+
+			if closingQuote {
+				stringInProgress = false
+			}
+		}
 
 		lexis += string(char)
 		column++
+	}
+
+	if len(lexis) != 0 {
+		return tokens, &UmbraError{
+			Code:    "INTERNAL_ERROR",
+			Message: "Could not resolve entire file",
+		}
 	}
 
 	return tokens, nil
