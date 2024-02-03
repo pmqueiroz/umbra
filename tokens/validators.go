@@ -53,3 +53,7 @@ func isValidNumeric(lexis string) bool {
 
 	return true
 }
+
+func isBoolean(lexis string) bool {
+	return lexis == "true" || lexis == "false"
+}

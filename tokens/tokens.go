@@ -33,6 +33,20 @@ func generateToken(lexis string, line int, column int) (Token, error) {
 			}, nil
 		}
 
+		if isBoolean(lexis) {
+			return Token{
+				Id:  BOOLEAN,
+				Raw: rawToken,
+			}, nil
+		}
+
+		if lexis == "null" {
+			return Token{
+				Id:  NULL,
+				Raw: rawToken,
+			}, nil
+		}
+
 		return Token{
 			Id:  IDENTIFIER,
 			Raw: rawToken,
