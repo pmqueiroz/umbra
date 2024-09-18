@@ -127,5 +127,12 @@ func Tokenizer(code string) ([]Token, error) {
 		return tokens, umbra_error.NewGenericError("INTERNAL_ERROR", "Could not resolve entire file")
 	}
 
-	return tokens, nil
+	return append(tokens, Token{
+		Id: EOF,
+		Raw: RawToken{
+			Value:  "",
+			Line:   line,
+			Column: column,
+		},
+	}), nil
 }

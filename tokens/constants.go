@@ -13,6 +13,7 @@ const (
 	BOOLEAN    TokenType = "BOOLEAN"
 	NUMERIC    TokenType = "NUMERIC"
 	NULL       TokenType = "NULL"
+	EOF        TokenType = "EOF"
 )
 
 var reservedKeywords = [...]Keyword{
