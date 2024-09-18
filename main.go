@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	"os"
 
+	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
@@ -15,15 +16,7 @@ func run(content string) {
 		fmt.Printf("%s\n", err.Error())
 	}
 
-	for _, tok := range tokens {
-		fmt.Printf(
-			"Token { type: '%s', value: '%s', line: %d, column: %d }\n",
-			tok.Id,
-			tok.Raw.Value,
-			tok.Raw.Line,
-			tok.Raw.Column,
-		)
-	}
+	ast.Parse(tokens)
 }
 
 func runFile(path string) {
