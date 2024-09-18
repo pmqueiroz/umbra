@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	umbra_error "github.com/umbra-lang/umbra/error"
+	umbra_error "github.com/pmqueiroz/umbra/error"
 )
 
 func readFile(path string) (string, error) {

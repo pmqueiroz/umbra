@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"unicode"
 
-	umbra_error "github.com/umbra-lang/umbra/error"
+	umbra_error "github.com/pmqueiroz/umbra/error"
 )
 
 type RawToken struct {

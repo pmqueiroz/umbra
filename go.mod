@@ -1,3 +1,3 @@
-module github.com/umbra-lang/umbra
+module github.com/pmqueiroz/umbra
 
 go 1.21.6

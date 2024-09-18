@@ -5,7 +5,7 @@ import (
 	"bufio"
 	"os"
 
-	"github.com/umbra-lang/umbra/tokens"
+	"github.com/pmqueiroz/umbra/tokens"
 )
 
 func run(content string) {

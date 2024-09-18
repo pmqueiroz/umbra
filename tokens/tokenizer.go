@@ -3,7 +3,7 @@ package tokens
 import (
 	"unicode"
 
-	umbra_error "github.com/umbra-lang/umbra/error"
+	umbra_error "github.com/pmqueiroz/umbra/error"
 )
 
 func Tokenizer(code string) ([]Token, error) {
