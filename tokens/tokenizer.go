@@ -1,138 +1,261 @@
 package tokens
 
 import (
+	// "golang.org/x/text/cases"
+	"fmt"
 	"unicode"
 
 	umbra_error "github.com/pmqueiroz/umbra/error"
 )
 
-func Tokenizer(code string) ([]Token, error) {
-	var tokens []Token
-	var lexis string
-	var line, column int = 1, 1
-	var comment bool
-	var stringInProgress bool
+func isAlpha(char rune) bool {
+	return unicode.IsLetter(char) || char == '_'
+}
 
-	for index, char := range code {
-		if comment {
-			if char == '\n' {
-				line++
-				column = 1
-				comment = false
-			}
+func isDigit(char rune) bool {
+	return unicode.IsDigit(char)
+}
 
-			continue
-		}
+func isAlphaNumeric(char rune) bool {
+	return isAlpha(char) || unicode.IsDigit(char)
+}
 
-		if char == '"' {
-			var closingQuote = stringInProgress && !(code[index-1] == '\\') // is closing quote if isn´t escaped
+type Tokenizer struct {
+	tokens                               []Token
+	current, beginOfLexeme, line, column int
+	source                               string
+}
 
-			if !stringInProgress {
-				if lexis != "" {
-					token, err := generateToken(lexis, line, column-len(lexis))
-					if err != nil {
-						return tokens, err
-					}
-					tokens = append(tokens, token)
-					lexis = ""
-				}
+func (t *Tokenizer) isAtEnd() bool {
+	return t.current >= len(t.source)
+}
 
-				stringInProgress = true
-			}
+func (t *Tokenizer) add(token Token) {
+	t.tokens = append(t.tokens, token)
+}
 
-			if closingQuote {
-				stringInProgress = false
+func (t *Tokenizer) advance() rune {
+	t.current++
+	t.column++
+	return []rune(t.source)[t.current-1]
+}
 
-				token, err := generateToken(lexis+string(char), line, column-len(lexis))
-				if err != nil {
-					return tokens, err
-				}
-				tokens = append(tokens, token)
-				lexis = ""
-				column++
-				continue
-			}
-		}
+func (t *Tokenizer) previous() rune {
+	return []rune(t.source)[t.current-1]
+}
 
-		if char == '#' && !stringInProgress {
-			if !comment {
-				comment = true
-			}
-			continue
-		}
-
-		if (unicode.IsPunct(char) || unicode.IsSymbol(char)) && !stringInProgress {
-			if isIsolatedPunctuator(string(char)) {
-				if lexis != "" {
-					token, err := generateToken(lexis, line, column-len(lexis))
-					if err != nil {
-						return tokens, err
-					}
-
-					isolatedToken, err := generateToken(string(char), line, column)
-					if err != nil {
-						return tokens, err
-					}
-					tokens = append(tokens, token, isolatedToken)
-					lexis = ""
-					column++
-					continue
-				} else {
-					token, err := generateToken(string(char), line, column-len(lexis))
-					if err != nil {
-						return tokens, err
-					}
-					tokens = append(tokens, token)
-					lexis = ""
-					column++
-					continue
-				}
-			}
-		}
-
-		if unicode.IsSpace(char) {
-			if lexis != "" && !stringInProgress {
-				token, err := generateToken(lexis, line, column-len(lexis))
-				if err != nil {
-					return tokens, err
-				}
-				tokens = append(tokens, token)
-				lexis = ""
-			}
-
-			column++
-
-			if char == '\n' {
-				if stringInProgress {
-					return tokens, umbra_error.NewSyntaxError("Breaking the line before terminating the string", line, column, lexis)
-				}
-
-				line++
-				column = 1
-			}
-
-			if stringInProgress {
-				lexis += string(char)
-				column++
-			}
-
-			continue
-		}
-
-		lexis += string(char)
-		column++
+func (t *Tokenizer) peek() rune {
+	if t.isAtEnd() {
+		return '\000'
 	}
 
-	if len(lexis) != 0 {
-		return tokens, umbra_error.NewGenericError("INTERNAL_ERROR", "Could not resolve entire file")
+	return []rune(t.source)[t.current]
+}
+
+func (t *Tokenizer) peekNext() rune {
+	if t.current+1 >= len(t.source) {
+		return '\000'
 	}
 
-	return append(tokens, Token{
+	return []rune(t.source)[t.current+1]
+}
+
+func (t *Tokenizer) match(expected rune) bool {
+	if t.isAtEnd() {
+		return false
+	}
+
+	if []rune(t.source)[t.current] != expected {
+		return false
+	}
+
+	t.current++
+	return true
+}
+
+func (t *Tokenizer) addNonLiteralToken(tokenType TokenType) {
+	t.add(Token{
+		Id: tokenType,
+		Raw: RawToken{
+			Value:  string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Line:   t.line,
+			Column: t.column,
+		},
+	})
+}
+
+func (t *Tokenizer) advanceLine() {
+	t.line++
+	t.column = 0
+}
+
+func (t *Tokenizer) string() {
+	for (t.peek() != '"' || (t.peek() == '"' && t.previous() == '\\')) && !t.isAtEnd() {
+		if t.peek() == '\n' {
+			t.advanceLine()
+		}
+
+		t.advance()
+	}
+
+	if t.isAtEnd() {
+		fmt.Println(
+			umbra_error.NewSyntaxError("Unterminated string", t.line, t.column, string([]rune(t.source)[t.beginOfLexeme:t.current])),
+		)
+		return
+	}
+
+	t.advance()
+
+	t.add(Token{
+		Id: STRING,
+		Raw: RawToken{
+			Value:  string([]rune(t.source)[t.beginOfLexeme+1 : t.current-1]),
+			Line:   t.line,
+			Column: t.column,
+		},
+	})
+}
+
+func (t *Tokenizer) numeric() {
+	for isDigit(t.peek()) {
+		t.advance()
+	}
+
+	if t.peek() == '.' && isDigit(t.peekNext()) {
+		t.advance()
+
+		for isDigit(t.peek()) {
+			t.advance()
+		}
+	}
+
+	t.add(Token{
+		Id: NUMERIC,
+		Raw: RawToken{
+			Value:  string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Line:   t.line,
+			Column: t.column,
+		},
+	})
+}
+
+func (t *Tokenizer) identifier() {
+	for isAlphaNumeric(t.peek()) {
+		t.advance()
+	}
+
+	keyword := getKeyword(string([]rune(t.source)[t.beginOfLexeme:t.current]))
+
+	if keyword != UNKNOWN {
+		t.addNonLiteralToken(keyword)
+		return
+	}
+
+	t.add(Token{
+		Id: IDENTIFIER,
+		Raw: RawToken{
+			Value:  string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Line:   t.line,
+			Column: t.column,
+		},
+	})
+}
+
+func (t *Tokenizer) scan() {
+	char := t.advance()
+
+	switch char {
+	case '#':
+		for !t.isAtEnd() && t.peek() != '\n' {
+			t.advance()
+		}
+	case '(':
+		t.addNonLiteralToken(LEFT_PAREN)
+	case ')':
+		t.addNonLiteralToken(RIGHT_PAREN)
+	case '{':
+		t.addNonLiteralToken(LEFT_BRACE)
+	case '}':
+		t.addNonLiteralToken(RIGHT_BRACE)
+	case ',':
+		t.addNonLiteralToken(COMMA)
+	case '.':
+		t.addNonLiteralToken(DOT)
+	case '-':
+		t.addNonLiteralToken(MINUS)
+	case '+':
+		t.addNonLiteralToken(PLUS)
+	case ';':
+		t.addNonLiteralToken(SEMICOLON)
+	case '*':
+		t.addNonLiteralToken(STAR)
+	case '/':
+		t.addNonLiteralToken(SLASH)
+	case '!':
+		if t.match('=') {
+			t.addNonLiteralToken(BANG_EQUAL)
+		} else {
+			t.addNonLiteralToken(NOT)
+		}
+	case '=':
+		if t.match('=') {
+			t.addNonLiteralToken(EQUAL_EQUAL)
+		} else {
+			t.addNonLiteralToken(EQUAL)
+		}
+	case '<':
+		if t.match('=') {
+			t.addNonLiteralToken(LESS_THAN_EQUAL)
+		} else {
+			t.addNonLiteralToken(LESS_THAN)
+		}
+	case '>':
+		if t.match('=') {
+			t.addNonLiteralToken(GREATER_THAN_EQUAL)
+		} else {
+			t.addNonLiteralToken(GREATER_THAN)
+		}
+	case ' ', '\r', '\t':
+	case '\n':
+		t.advanceLine()
+	case '"':
+		t.string()
+	default:
+		if isDigit(char) {
+			t.numeric()
+		} else if isAlpha(char) {
+			t.identifier()
+		} else {
+			umbra_error.NewSyntaxError("Unexpected character", t.line, t.column, string(char))
+		}
+	}
+}
+
+func Tokenize(source string) ([]Token, error) {
+	tokenizer := Tokenizer{
+		tokens:        []Token{},
+		current:       0,
+		beginOfLexeme: 0,
+		line:          1,
+		column:        0,
+		source:        source,
+	}
+
+	for !tokenizer.isAtEnd() {
+		tokenizer.beginOfLexeme = tokenizer.current
+
+		tokenizer.scan()
+	}
+
+	tokenizer.add(Token{
 		Id: EOF,
 		Raw: RawToken{
 			Value:  "",
-			Line:   line,
-			Column: column,
+			Line:   tokenizer.line,
+			Column: tokenizer.column,
 		},
-	}), nil
+	})
+
+	return tokenizer.tokens, nil
 }

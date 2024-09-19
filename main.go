@@ -10,7 +10,7 @@ import (
 )
 
 func run(content string) {
-	tokens, err := tokens.Tokenizer(content)
+	tokens, err := tokens.Tokenize(content)
 
 	if err != nil {
 		fmt.Printf("%s\n", err.Error())

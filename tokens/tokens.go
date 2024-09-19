@@ -1,11 +1,79 @@
 package tokens
 
-import (
-	"fmt"
-	"unicode"
+type TokenType string
 
-	umbra_error "github.com/pmqueiroz/umbra/error"
+const (
+	UNKNOWN            TokenType = "UNKNOWN"
+	EOF                TokenType = "EOF"
+	IDENTIFIER         TokenType = "IDENTIFIER"
+	STRING             TokenType = "STRING"
+	NUMERIC            TokenType = "NUMERIC"
+	LEFT_PAREN         TokenType = "LEFT_PAREN"
+	RIGHT_PAREN        TokenType = "RIGHT_PAREN"
+	LEFT_BRACE         TokenType = "LEFT_BRACE"
+	RIGHT_BRACE        TokenType = "RIGHT_BRACE"
+	COMMA              TokenType = "COMMA"
+	DOT                TokenType = "DOT"
+	MINUS              TokenType = "MINUS"
+	PLUS               TokenType = "PLUS"
+	SEMICOLON          TokenType = "SEMICOLON"
+	SLASH              TokenType = "SLASH"
+	STAR               TokenType = "STAR"
+	EQUAL              TokenType = "EQUAL"
+	EQUAL_EQUAL        TokenType = "EQUAL_EQUAL"
+	BANG_EQUAL         TokenType = "BANG_EQUAL"
+	GREATER_THAN       TokenType = "GREATER_THAN"
+	GREATER_THAN_EQUAL TokenType = "GREATER_THAN_EQUAL"
+	LESS_THAN          TokenType = "LESS_THAN"
+	LESS_THAN_EQUAL    TokenType = "LESS_THAN_EQUAL"
+	NOT                TokenType = "NOT"
+	AND                TokenType = "AND"
+	ELSE               TokenType = "ELSE"
+	FUN                TokenType = "FUN"
+	FOR                TokenType = "FOR"
+	IF                 TokenType = "IF"
+	NULL               TokenType = "NULL"
+	OR                 TokenType = "OR"
+	PRINT              TokenType = "PRINT"
+	RETURN             TokenType = "RETURN"
+	THIS               TokenType = "THIS"
+	TRUE               TokenType = "TRUE"
+	FALSE              TokenType = "FALSE"
+	STR_VAR            TokenType = "STR_VAR"
+	ARR_VAR            TokenType = "ARR_VAR"
+	OBJ_VAR            TokenType = "OBJ_VAR"
+	NUM_VAR            TokenType = "NUM_VAR"
+	WHILE              TokenType = "WHILE"
 )
+
+var reservedKeywordsMap = map[string]TokenType{
+	"not":    NOT,
+	"and":    AND,
+	"else":   ELSE,
+	"def":    FUN,
+	"for":    FOR,
+	"if":     IF,
+	"null":   NULL,
+	"or":     OR,
+	"print":  PRINT,
+	"return": RETURN,
+	"this":   THIS,
+	"true":   TRUE,
+	"false":  FALSE,
+	"str":    STR_VAR,
+	"arr":    ARR_VAR,
+	"obj":    OBJ_VAR,
+	"num":    NUM_VAR,
+	"while":  WHILE,
+}
+
+func getKeyword(lexis string) TokenType {
+	if tokenType, exists := reservedKeywordsMap[lexis]; exists {
+		return tokenType
+	}
+
+	return UNKNOWN
+}
 
 type RawToken struct {
 	Value  string
@@ -16,85 +84,4 @@ type RawToken struct {
 type Token struct {
 	Raw RawToken
 	Id  TokenType
-}
-
-func generateToken(lexis string, line int, column int) (Token, error) {
-	rawToken := RawToken{
-		Value:  lexis,
-		Line:   line,
-		Column: column,
-	}
-
-	if unicode.IsLetter([]rune(lexis)[0]) {
-		if isKeyword(lexis) {
-			return Token{
-				Id:  KEYWORD,
-				Raw: rawToken,
-			}, nil
-		}
-
-		if isBoolean(lexis) {
-			return Token{
-				Id:  BOOLEAN,
-				Raw: rawToken,
-			}, nil
-		}
-
-		if lexis == "null" {
-			return Token{
-				Id:  NULL,
-				Raw: rawToken,
-			}, nil
-		}
-
-		return Token{
-			Id:  IDENTIFIER,
-			Raw: rawToken,
-		}, nil
-	}
-
-	if isPunctuator(lexis) {
-		return Token{
-			Id:  PUNCTUATOR,
-			Raw: rawToken,
-		}, nil
-	}
-
-	if lexis[0] == '"' {
-		if isValidString(lexis) {
-			return Token{
-				Id:  STRING,
-				Raw: rawToken,
-			}, nil
-		} else {
-			return Token{
-					Id:  UNKNOWN,
-					Raw: rawToken,
-				}, umbra_error.NewSyntaxError(
-					"Unterminated string",
-					line,
-					column,
-					lexis,
-				)
-		}
-	}
-
-	if unicode.IsNumber([]rune(lexis)[0]) {
-		if isValidNumeric(lexis) {
-			return Token{
-				Id:  NUMERIC,
-				Raw: rawToken,
-			}, nil
-		} else {
-			return Token{
-				Id:  UNKNOWN,
-				Raw: rawToken,
-			}, umbra_error.NewSyntaxError("Invalid number", line, column, lexis)
-		}
-	}
-
-	return Token{
-		Id:  UNKNOWN,
-		Raw: rawToken,
-	}, umbra_error.NewSyntaxError(fmt.Sprintf("Unexpected lexis '%s'", lexis), line, column, lexis)
 }

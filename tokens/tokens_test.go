@@ -7,29 +7,29 @@ import (
 
 func TestGenerateTokenSingleCases(t *testing.T) {
 	var tests = []struct {
-		lexis string
-		want  TokenType
+		source string
+		want   TokenType
 	}{
 		{"cleiton", IDENTIFIER},
-		{".", PUNCTUATOR},
+		{".", DOT},
 		{`"something string"`, STRING},
-		{"true", BOOLEAN},
-		{"false", BOOLEAN},
+		{"true", TRUE},
+		{"false", FALSE},
 		{"123", NUMERIC},
 		{"null", NULL},
 	}
 
 	for _, testCase := range tests {
-		testName := fmt.Sprintf("should return type %s when lexis is %s", testCase.lexis, testCase.want)
+		testName := fmt.Sprintf("should return type %s when lexis is %s", testCase.source, testCase.want)
 		t.Run(testName, func(t *testing.T) {
-			result, err := generateToken(testCase.lexis, 0, 0)
+			result, err := Tokenize(testCase.source)
 
-			if err != nil {
+			if err != nil || len(result) != 1 {
 				t.Fatal("return an unexpected error")
 			}
 
-			if result.Id != testCase.want {
-				t.Errorf("got %s, want %s", result.Id, testCase.want)
+			if result[0].Id != testCase.want {
+				t.Errorf("got %s, want %s", result[0].Id, testCase.want)
 			}
 		})
 	}
