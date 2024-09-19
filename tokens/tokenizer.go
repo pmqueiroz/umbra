@@ -171,9 +171,9 @@ func (t *Tokenizer) scan() {
 			t.advance()
 		}
 	case '(':
-		t.addNonLiteralToken(LEFT_PAREN)
+		t.addNonLiteralToken(LEFT_PARENTHESIS)
 	case ')':
-		t.addNonLiteralToken(RIGHT_PAREN)
+		t.addNonLiteralToken(RIGHT_PARENTHESIS)
 	case '{':
 		t.addNonLiteralToken(LEFT_BRACE)
 	case '}':

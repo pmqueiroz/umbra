@@ -73,11 +73,11 @@ func (p *Parser) block() Statement {
 func (p *Parser) function() Statement {
 	name := p.consume(tokens.IDENTIFIER, "Expect function name.")
 
-	p.consume(tokens.LEFT_PAREN, "Expect '(' after function name.")
+	p.consume(tokens.LEFT_PARENTHESIS, "Expect '(' after function name.")
 
 	var params []tokens.Token
 
-	if !p.check(tokens.RIGHT_PAREN) {
+	if !p.check(tokens.RIGHT_PARENTHESIS) {
 		for {
 			if len(params) >= 3 {
 				panic("Can't have more than 3 parameters.")
@@ -91,7 +91,7 @@ func (p *Parser) function() Statement {
 		}
 	}
 
-	p.consume(tokens.RIGHT_PAREN, "Expect ')' after parameters.")
+	p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after parameters.")
 
 	p.consume(tokens.LEFT_BRACE, "Expect '{' before function body.")
 
@@ -129,9 +129,9 @@ func (p *Parser) primary() Expression {
 		}
 	}
 
-	if p.match(tokens.LEFT_PAREN) {
+	if p.match(tokens.LEFT_PARENTHESIS) {
 		expr := p.assignment()
-		p.consume(tokens.RIGHT_PAREN, "Expect ')' after expression.")
+		p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after expression.")
 		return GroupingExpression{
 			Expression: expr,
 		}
@@ -143,7 +143,7 @@ func (p *Parser) primary() Expression {
 func (p *Parser) finishCall(expr Expression) Expression {
 	var arguments []Expression
 
-	if !p.check(tokens.RIGHT_PAREN) {
+	if !p.check(tokens.RIGHT_PARENTHESIS) {
 		for {
 			if len(arguments) >= 3 {
 				panic("Can't have more than 3 arguments.")
@@ -157,12 +157,12 @@ func (p *Parser) finishCall(expr Expression) Expression {
 		}
 	}
 
-	paren := p.consume(tokens.RIGHT_PAREN, "Expect ')' after arguments.")
+	parenthesis := p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after arguments.")
 
 	return CallExpression{
-		Callee:    expr,
-		Paren:     paren,
-		Arguments: arguments,
+		Callee:      expr,
+		Parenthesis: parenthesis,
+		Arguments:   arguments,
 	}
 }
 
@@ -170,7 +170,7 @@ func (p *Parser) call() Expression {
 	expr := p.primary()
 
 	for {
-		if p.match(tokens.LEFT_PAREN) {
+		if p.match(tokens.LEFT_PARENTHESIS) {
 			expr = p.finishCall(expr)
 		} else {
 			break
@@ -314,9 +314,9 @@ func (p *Parser) varDeclaration(tokenType tokens.TokenType) Statement {
 }
 
 func (p *Parser) whileStatement() Statement {
-	p.consume(tokens.LEFT_PAREN, "Expect '(' after 'while'.")
+	p.consume(tokens.LEFT_PARENTHESIS, "Expect '(' after 'while'.")
 	condition := p.assignment()
-	p.consume(tokens.RIGHT_PAREN, "Expect ')' after condition.")
+	p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after condition.")
 	body := p.statement()
 
 	return WhileStatement{
@@ -343,9 +343,9 @@ func (p *Parser) printStatement() Statement {
 }
 
 func (p *Parser) ifStatement() Statement {
-	p.consume(tokens.LEFT_PAREN, "Expect '(' after 'if'.")
+	p.consume(tokens.LEFT_PARENTHESIS, "Expect '(' after 'if'.")
 	condition := p.assignment()
-	p.consume(tokens.RIGHT_PAREN, "Expect ')' after if condition.")
+	p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after if condition.")
 
 	thenBranch := p.statement()
 	var elseBranch Statement
@@ -362,7 +362,7 @@ func (p *Parser) ifStatement() Statement {
 }
 
 func (p *Parser) forStatement() Statement {
-	p.consume(tokens.LEFT_PAREN, "Expect '(' after 'for'.")
+	p.consume(tokens.LEFT_PARENTHESIS, "Expect '(' after 'for'.")
 
 	var initializer Statement
 	if p.match(tokens.SEMICOLON) {
@@ -380,10 +380,10 @@ func (p *Parser) forStatement() Statement {
 	p.consume(tokens.SEMICOLON, "Expect ';' after loop condition.")
 
 	var increment Expression
-	if !p.check(tokens.RIGHT_PAREN) {
+	if !p.check(tokens.RIGHT_PARENTHESIS) {
 		increment = p.assignment()
 	}
-	p.consume(tokens.RIGHT_PAREN, "Expect ')' after for clauses.")
+	p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after for clauses.")
 
 	body := p.statement()
 	if increment != nil {
