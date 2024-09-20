@@ -4,19 +4,23 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
-func run(content string) {
+func run(contents ...string) {
+	content := strings.Join(contents, "\n")
 	tokens, err := tokens.Tokenize(content)
 
 	if err != nil {
 		fmt.Printf("%s\n", err.Error())
 	}
 
-	ast.Parse(tokens)
+	module := ast.Parse(tokens)
+
+	fmt.Printf("%#v\n", module)
 }
 
 func runFile(path string) {
@@ -41,7 +45,10 @@ func runPrompt() {
 			break
 		}
 
-		run(line)
+		run(
+			"package main",
+			line,
+		)
 	}
 }
 

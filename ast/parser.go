@@ -474,18 +474,24 @@ func (p *Parser) declaration() Statement {
 	return p.statement()
 }
 
-func Parse(tokenList []tokens.Token) {
-	var statements []Statement
+func Parse(tokenList []tokens.Token) PackageStatement {
+	var declarations []Statement
 	parser := Parser{
 		tokenList: tokenList,
 		current:   0,
 	}
 
+	parser.consume("Expect package at start of file", tokens.PACKAGE)
+	name := parser.consume("Expect package module", tokens.IDENTIFIER)
+
 	for !parser.isAtEOF() {
-		statements = append(statements, parser.declaration())
+		declarations = append(declarations, parser.declaration())
 	}
 
-	for _, stmt := range statements {
-		fmt.Printf("%#v\n", stmt)
+	module := PackageStatement{
+		Name:         name,
+		Declarations: declarations,
 	}
+
+	return module
 }

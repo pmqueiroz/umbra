@@ -94,7 +94,8 @@ func (stmt WhileStatement) Accept(visitor StatementVisitor) {
 }
 
 type PackageStatement struct {
-	Name tokens.Token
+	Name         tokens.Token
+	Declarations []Statement
 }
 
 func (stmt PackageStatement) Accept(visitor StatementVisitor) {
