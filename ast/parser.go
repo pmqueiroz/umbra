@@ -304,14 +304,6 @@ func (p *Parser) assignment() Expression {
 	return expr
 }
 
-func (p *Parser) packageDeclaration() Statement {
-	name := p.consume("Expect package name.", tokens.IDENTIFIER)
-
-	return ModuleStatement{
-		Name: name,
-	}
-}
-
 func (p *Parser) varDeclaration() Statement {
 	isMutable := p.previous().Id == tokens.MUT
 	name := p.consume("Expect variable name.", tokens.IDENTIFIER)
@@ -459,10 +451,6 @@ func (p *Parser) statement() Statement {
 }
 
 func (p *Parser) declaration() Statement {
-	if p.match(tokens.MODULE) {
-		return p.packageDeclaration()
-	}
-
 	if p.match(tokens.FUN) {
 		return p.function()
 	}
