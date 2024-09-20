@@ -1,20 +1,20 @@
 # this is a sample code just for testing
 
-package umbra_test
+package main
 
-str world = "World" # create an string constant with value "World"
-num year := 2022 # create a number mutable with value 2022
-num result = (5 + 3) * 2 - 4 / 2
+var hello str = "World" # create a constant string with value "World"
+mut year num = 2022 # create a mutable number with value 2022
+var result num = (5 + 3) * 2 - 4 / 2
+# hashmap person = {
+#   name: "cleiton",
+#   valid: true
+# }
+# arr year = []
 
-obj person = {
-   name: "cleiton",
-   valid: true
-}
-
-person.name = "Peam"
-
-arr year = []
+def top_level() {}
 
 def main() {
-   out("Hello, $world! here'is some quotes: \"")
+  var some_variable str = "oi"
+
+  # top_level()
 }

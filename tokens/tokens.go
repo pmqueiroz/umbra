@@ -39,10 +39,12 @@ const (
 	THIS               TokenType = "THIS"
 	TRUE               TokenType = "TRUE"
 	FALSE              TokenType = "FALSE"
-	STR_VAR            TokenType = "STR_VAR"
-	ARR_VAR            TokenType = "ARR_VAR"
-	OBJ_VAR            TokenType = "OBJ_VAR"
-	NUM_VAR            TokenType = "NUM_VAR"
+	VAR                TokenType = "VAR"
+	MUT                TokenType = "MUT"
+	STR_TYPE           TokenType = "STR_TYPE"
+	ARR_TYPE           TokenType = "ARR_TYPE"
+	HASHMAP_TYPE       TokenType = "HASHMAP_TYPE"
+	NUM_TYPE           TokenType = "NUM_TYPE"
 	WHILE              TokenType = "WHILE"
 	PACKAGE            TokenType = "PACKAGE"
 )
@@ -61,10 +63,12 @@ var reservedKeywordsMap = map[string]TokenType{
 	"this":    THIS,
 	"true":    TRUE,
 	"false":   FALSE,
-	"str":     STR_VAR,
-	"arr":     ARR_VAR,
-	"obj":     OBJ_VAR,
-	"num":     NUM_VAR,
+	"str":     STR_TYPE,
+	"arr":     ARR_TYPE,
+	"hashmap": HASHMAP_TYPE,
+	"num":     NUM_TYPE,
+	"var":     VAR,
+	"mut":     MUT,
 	"while":   WHILE,
 	"package": PACKAGE,
 }

@@ -49,12 +49,14 @@ func (p *Parser) match(types ...tokens.TokenType) bool {
 	return false
 }
 
-func (p *Parser) consume(tokenType tokens.TokenType, message string) tokens.Token {
-	if p.check(tokenType) {
-		return p.advance()
+func (p *Parser) consume(errorMessage string, types ...tokens.TokenType) tokens.Token {
+	for _, t := range types {
+		if p.check(t) {
+			return p.advance()
+		}
 	}
 
-	panic(message)
+	panic(errorMessage)
 }
 
 func (p *Parser) block() (Statement, []Statement) {
@@ -64,7 +66,7 @@ func (p *Parser) block() (Statement, []Statement) {
 		statements = append(statements, p.declaration())
 	}
 
-	p.consume(tokens.RIGHT_BRACE, "Expect '}' after block.")
+	p.consume("Expect '}' after block.", tokens.RIGHT_BRACE)
 
 	return BlockStatement{
 		Statements: statements,
@@ -72,9 +74,9 @@ func (p *Parser) block() (Statement, []Statement) {
 }
 
 func (p *Parser) function() Statement {
-	name := p.consume(tokens.IDENTIFIER, "Expect function name.")
+	name := p.consume("Expect function name.", tokens.IDENTIFIER)
 
-	p.consume(tokens.LEFT_PARENTHESIS, "Expect '(' after function name.")
+	p.consume("Expect '(' after function name.", tokens.LEFT_PARENTHESIS)
 
 	var params []tokens.Token
 
@@ -84,7 +86,7 @@ func (p *Parser) function() Statement {
 				panic("Can't have more than 3 parameters.")
 			}
 
-			params = append(params, p.consume(tokens.IDENTIFIER, "Expect parameter name."))
+			params = append(params, p.consume("Expect parameter name.", tokens.IDENTIFIER))
 
 			if !p.match(tokens.COMMA) {
 				break
@@ -92,9 +94,9 @@ func (p *Parser) function() Statement {
 		}
 	}
 
-	p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after parameters.")
+	p.consume("Expect ')' after parameters.", tokens.RIGHT_PARENTHESIS)
 
-	p.consume(tokens.LEFT_BRACE, "Expect '{' before function body.")
+	p.consume("Expect '{' before function body.", tokens.LEFT_BRACE)
 
 	_, body := p.block()
 
@@ -132,7 +134,7 @@ func (p *Parser) primary() Expression {
 
 	if p.match(tokens.LEFT_PARENTHESIS) {
 		expr := p.assignment()
-		p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after expression.")
+		p.consume("Expect ')' after expression.", tokens.RIGHT_PARENTHESIS)
 		return GroupingExpression{
 			Expression: expr,
 		}
@@ -162,7 +164,7 @@ func (p *Parser) finishCall(expr Expression) Expression {
 		}
 	}
 
-	parenthesis := p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after arguments.")
+	parenthesis := p.consume("Expect ')' after arguments.", tokens.RIGHT_PARENTHESIS)
 
 	return CallExpression{
 		Callee:      expr,
@@ -303,15 +305,17 @@ func (p *Parser) assignment() Expression {
 }
 
 func (p *Parser) packageDeclaration() Statement {
-	name := p.consume(tokens.IDENTIFIER, "Expect package name.")
+	name := p.consume("Expect package name.", tokens.IDENTIFIER)
 
 	return PackageStatement{
 		Name: name,
 	}
 }
 
-func (p *Parser) varDeclaration(tokenType tokens.TokenType) Statement {
-	name := p.consume(tokens.IDENTIFIER, "Expect variable name.")
+func (p *Parser) varDeclaration() Statement {
+	isMutable := p.previous().Id == tokens.MUT
+	name := p.consume("Expect variable name.", tokens.IDENTIFIER)
+	variableType := p.consume("Expect variable type.", tokens.STR_TYPE, tokens.NUM_TYPE, tokens.HASHMAP_TYPE, tokens.ARR_TYPE)
 
 	var initializer Expression
 
@@ -322,14 +326,15 @@ func (p *Parser) varDeclaration(tokenType tokens.TokenType) Statement {
 	return VarStatement{
 		Name:        name,
 		Initializer: initializer,
-		Type:        tokenType,
+		Mutable:     isMutable,
+		Type:        variableType,
 	}
 }
 
 func (p *Parser) whileStatement() Statement {
-	p.consume(tokens.LEFT_PARENTHESIS, "Expect '(' after 'while'.")
+	p.consume("Expect '(' after 'while'.", tokens.LEFT_PARENTHESIS)
 	condition := p.assignment()
-	p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after condition.")
+	p.consume("Expect ')' after condition.", tokens.RIGHT_PARENTHESIS)
 	body := p.statement()
 
 	return WhileStatement{
@@ -356,9 +361,9 @@ func (p *Parser) printStatement() Statement {
 }
 
 func (p *Parser) ifStatement() Statement {
-	p.consume(tokens.LEFT_PARENTHESIS, "Expect '(' after 'if'.")
+	p.consume("Expect '(' after 'if'.", tokens.LEFT_PARENTHESIS)
 	condition := p.assignment()
-	p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after if condition.")
+	p.consume("Expect ')' after if condition.", tokens.RIGHT_PARENTHESIS)
 
 	thenBranch := p.statement()
 	var elseBranch Statement
@@ -375,13 +380,13 @@ func (p *Parser) ifStatement() Statement {
 }
 
 func (p *Parser) forStatement() Statement {
-	p.consume(tokens.LEFT_PARENTHESIS, "Expect '(' after 'for'.")
+	p.consume("Expect '(' after 'for'.", tokens.LEFT_PARENTHESIS)
 
 	var initializer Statement
 	if p.match(tokens.SEMICOLON) {
 		initializer = nil
-	} else if p.match(tokens.STR_VAR, tokens.NUM_VAR, tokens.OBJ_VAR, tokens.ARR_VAR) {
-		initializer = p.varDeclaration(p.previous().Id)
+	} else if p.match(tokens.STR_TYPE, tokens.NUM_TYPE, tokens.HASHMAP_TYPE, tokens.ARR_TYPE) {
+		initializer = p.varDeclaration()
 	} else {
 		initializer = p.expressionStatement()
 	}
@@ -390,13 +395,13 @@ func (p *Parser) forStatement() Statement {
 	if !p.check(tokens.SEMICOLON) {
 		condition = p.assignment()
 	}
-	p.consume(tokens.SEMICOLON, "Expect ';' after loop condition.")
+	p.consume("Expect ';' after loop condition.", tokens.SEMICOLON)
 
 	var increment Expression
 	if !p.check(tokens.RIGHT_PARENTHESIS) {
 		increment = p.assignment()
 	}
-	p.consume(tokens.RIGHT_PARENTHESIS, "Expect ')' after for clauses.")
+	p.consume("Expect ')' after for clauses.", tokens.RIGHT_PARENTHESIS)
 
 	body := p.statement()
 	if increment != nil {
@@ -462,20 +467,8 @@ func (p *Parser) declaration() Statement {
 		return p.function()
 	}
 
-	if p.match(tokens.STR_VAR) {
-		return p.varDeclaration(tokens.STR_VAR)
-	}
-
-	if p.match(tokens.NUM_VAR) {
-		return p.varDeclaration(tokens.NUM_VAR)
-	}
-
-	if p.match(tokens.OBJ_VAR) {
-		return p.varDeclaration(tokens.OBJ_VAR)
-	}
-
-	if p.match(tokens.ARR_VAR) {
-		return p.varDeclaration(tokens.ARR_VAR)
+	if p.match(tokens.VAR, tokens.MUT) {
+		return p.varDeclaration()
 	}
 
 	return p.statement()

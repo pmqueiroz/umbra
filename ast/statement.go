@@ -76,7 +76,8 @@ func (stmt ReturnStatement) Accept(visitor StatementVisitor) {
 type VarStatement struct {
 	Name        tokens.Token
 	Initializer Expression
-	Type        tokens.TokenType
+	Mutable     bool
+	Type        tokens.Token
 }
 
 func (stmt VarStatement) Accept(visitor StatementVisitor) {
