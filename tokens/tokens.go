@@ -44,27 +44,29 @@ const (
 	OBJ_VAR            TokenType = "OBJ_VAR"
 	NUM_VAR            TokenType = "NUM_VAR"
 	WHILE              TokenType = "WHILE"
+	PACKAGE            TokenType = "PACKAGE"
 )
 
 var reservedKeywordsMap = map[string]TokenType{
-	"not":    NOT,
-	"and":    AND,
-	"else":   ELSE,
-	"def":    FUN,
-	"for":    FOR,
-	"if":     IF,
-	"null":   NULL,
-	"or":     OR,
-	"print":  PRINT,
-	"return": RETURN,
-	"this":   THIS,
-	"true":   TRUE,
-	"false":  FALSE,
-	"str":    STR_VAR,
-	"arr":    ARR_VAR,
-	"obj":    OBJ_VAR,
-	"num":    NUM_VAR,
-	"while":  WHILE,
+	"not":     NOT,
+	"and":     AND,
+	"else":    ELSE,
+	"def":     FUN,
+	"for":     FOR,
+	"if":      IF,
+	"null":    NULL,
+	"or":      OR,
+	"print":   PRINT,
+	"return":  RETURN,
+	"this":    THIS,
+	"true":    TRUE,
+	"false":   FALSE,
+	"str":     STR_VAR,
+	"arr":     ARR_VAR,
+	"obj":     OBJ_VAR,
+	"num":     NUM_VAR,
+	"while":   WHILE,
+	"package": PACKAGE,
 }
 
 func getKeyword(lexis string) TokenType {

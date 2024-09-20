@@ -3,6 +3,7 @@ package ast
 import (
 	"fmt"
 
+	umbra_error "github.com/pmqueiroz/umbra/error"
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
@@ -56,7 +57,7 @@ func (p *Parser) consume(tokenType tokens.TokenType, message string) tokens.Toke
 	panic(message)
 }
 
-func (p *Parser) block() Statement {
+func (p *Parser) block() (Statement, []Statement) {
 	var statements []Statement
 
 	for !p.check(tokens.RIGHT_BRACE) && !p.isAtEOF() {
@@ -67,7 +68,7 @@ func (p *Parser) block() Statement {
 
 	return BlockStatement{
 		Statements: statements,
-	}
+	}, statements
 }
 
 func (p *Parser) function() Statement {
@@ -95,7 +96,7 @@ func (p *Parser) function() Statement {
 
 	p.consume(tokens.LEFT_BRACE, "Expect '{' before function body.")
 
-	var body []Statement
+	_, body := p.block()
 
 	return FunctionStatement{
 		Name:   name,
@@ -137,7 +138,11 @@ func (p *Parser) primary() Expression {
 		}
 	}
 
-	panic("Expect expression.")
+	current_token := p.peek()
+
+	panic(
+		umbra_error.NewSyntaxError("Expect expression.", current_token.Raw.Line, current_token.Raw.Column, fmt.Sprintf("%#v", p.peek())),
+	)
 }
 
 func (p *Parser) finishCall(expr Expression) Expression {
@@ -297,6 +302,14 @@ func (p *Parser) assignment() Expression {
 	return expr
 }
 
+func (p *Parser) packageDeclaration() Statement {
+	name := p.consume(tokens.IDENTIFIER, "Expect package name.")
+
+	return PackageStatement{
+		Name: name,
+	}
+}
+
 func (p *Parser) varDeclaration(tokenType tokens.TokenType) Statement {
 	name := p.consume(tokens.IDENTIFIER, "Expect variable name.")
 
@@ -433,13 +446,18 @@ func (p *Parser) statement() Statement {
 		return p.whileStatement()
 	}
 	if p.match(tokens.LEFT_BRACE) {
-		return p.block()
+		blockStatement, _ := p.block()
+		return blockStatement
 	}
 
 	return p.expressionStatement()
 }
 
 func (p *Parser) declaration() Statement {
+	if p.match(tokens.PACKAGE) {
+		return p.packageDeclaration()
+	}
+
 	if p.match(tokens.FUN) {
 		return p.function()
 	}
