@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -9,6 +10,16 @@ import (
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/tokens"
 )
+
+func jsonASTPrint(module ast.ModuleStatement) {
+	astJson, err := json.MarshalIndent(module, "", "  ")
+	if err != nil {
+		fmt.Println("Failed to format ast JSON:", err)
+		return
+	}
+
+	fmt.Println(string(astJson))
+}
 
 func run(contents ...string) {
 	content := strings.Join(contents, "\n")
@@ -20,7 +31,7 @@ func run(contents ...string) {
 
 	module := ast.Parse(tokens)
 
-	fmt.Printf("%#v\n", module)
+	jsonASTPrint(module)
 }
 
 func runFile(path string) {

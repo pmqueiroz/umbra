@@ -2,6 +2,7 @@ package ast
 
 import (
 	"fmt"
+	"strconv"
 
 	umbra_error "github.com/pmqueiroz/umbra/error"
 	"github.com/pmqueiroz/umbra/tokens"
@@ -107,33 +108,100 @@ func (p *Parser) function() Statement {
 	}
 }
 
+func (p *Parser) array() Expression {
+	var elements []Expression
+
+	if !p.check(tokens.RIGHT_BRACKET) {
+		for {
+			elements = append(elements, p.expression())
+
+			if !p.match(tokens.COMMA) || p.check(tokens.RIGHT_BRACKET) {
+				break
+			}
+		}
+	}
+
+	p.consume("Expect ']' after expression.", tokens.RIGHT_BRACKET)
+
+	return ArrayExpression{
+		Elements: elements,
+	}
+}
+
+func (p *Parser) hashmap() Expression {
+	var properties []KeyValueExpression
+
+	if !p.check(tokens.RIGHT_BRACE) {
+		for {
+			name := p.consume("Expect property name.", tokens.IDENTIFIER)
+			p.consume("Expect ':' after property identifier in hashmap", tokens.COLON)
+
+			properties = append(properties, KeyValueExpression{
+				Key:   name,
+				Value: p.expression(),
+			})
+
+			if !p.match(tokens.COMMA) || p.check(tokens.RIGHT_BRACE) {
+				break
+			}
+		}
+	}
+
+	p.consume("Expect '}' after expression.", tokens.RIGHT_BRACE)
+
+	return HashmapExpression{
+		Properties: properties,
+	}
+}
+
 func (p *Parser) primary() Expression {
 	if p.match(tokens.FALSE) {
-		return LiteralExpression{
-			Value: "false",
+		return BooleanExpression{
+			Value: false,
 		}
 	}
 
 	if p.match(tokens.TRUE) {
-		return LiteralExpression{
-			Value: "true",
+		return BooleanExpression{
+			Value: true,
 		}
 	}
 
 	if p.match(tokens.NULL) {
-		return LiteralExpression{
-			Value: "null",
+		return NullLiteral{}
+	}
+
+	if p.match(tokens.NUMERIC) {
+		value, err := strconv.ParseFloat(p.previous().Raw.Value, 64)
+
+		if err != nil {
+			current_token := p.peek()
+			panic(
+				umbra_error.NewSyntaxError("Unable to convert number.", current_token.Raw.Line, current_token.Raw.Column, fmt.Sprintf("%#v", p.peek())),
+			)
+		}
+
+		return NumericLiteral{
+			Value: value,
 		}
 	}
 
-	if p.match(tokens.NUMERIC, tokens.STRING) {
-		return LiteralExpression{
+	if p.match(tokens.STRING) {
+		return StringLiteral{
 			Value: p.previous().Raw.Value,
 		}
 	}
 
+	if p.match(tokens.LEFT_BRACE) {
+		return p.hashmap()
+	}
+
+	if p.match(tokens.LEFT_BRACKET) {
+		return p.array()
+	}
+
 	if p.match(tokens.LEFT_PARENTHESIS) {
-		expr := p.assignment()
+		expr := p.expression()
 		p.consume("Expect ')' after expression.", tokens.RIGHT_PARENTHESIS)
 		return GroupingExpression{
 			Expression: expr,
@@ -156,7 +224,7 @@ func (p *Parser) finishCall(expr Expression) Expression {
 				panic("Can't have more than 3 arguments.")
 			}
 
-			arguments = append(arguments, p.assignment())
+			arguments = append(arguments, p.expression())
 
 			if !p.match(tokens.COMMA) {
 				break
@@ -284,11 +352,11 @@ func (p *Parser) or() Expression {
 	return expr
 }
 
-func (p *Parser) assignment() Expression {
+func (p *Parser) expression() Expression {
 	expr := p.or()
 
 	if p.match(tokens.EQUAL) {
-		value := p.assignment()
+		value := p.expression()
 
 		if assign, ok := expr.(VariableExpression); ok {
 			name := assign.Name
@@ -312,7 +380,7 @@ func (p *Parser) varDeclaration() Statement {
 	var initializer Expression
 
 	if p.match(tokens.EQUAL) {
-		initializer = p.assignment()
+		initializer = p.expression()
 	}
 
 	return VarStatement{
@@ -325,7 +393,7 @@ func (p *Parser) varDeclaration() Statement {
 
 func (p *Parser) whileStatement() Statement {
 	p.consume("Expect '(' after 'while'.", tokens.LEFT_PARENTHESIS)
-	condition := p.assignment()
+	condition := p.expression()
 	p.consume("Expect ')' after condition.", tokens.RIGHT_PARENTHESIS)
 	body := p.statement()
 
@@ -337,7 +405,7 @@ func (p *Parser) whileStatement() Statement {
 
 func (p *Parser) returnStatement() Statement {
 	keyword := p.previous()
-	value := p.assignment()
+	value := p.expression()
 
 	return ReturnStatement{
 		Keyword: keyword,
@@ -346,7 +414,7 @@ func (p *Parser) returnStatement() Statement {
 }
 
 func (p *Parser) printStatement() Statement {
-	value := p.assignment()
+	value := p.expression()
 	return PrintStatement{
 		Expression: value,
 	}
@@ -354,7 +422,7 @@ func (p *Parser) printStatement() Statement {
 
 func (p *Parser) ifStatement() Statement {
 	p.consume("Expect '(' after 'if'.", tokens.LEFT_PARENTHESIS)
-	condition := p.assignment()
+	condition := p.expression()
 	p.consume("Expect ')' after if condition.", tokens.RIGHT_PARENTHESIS)
 
 	thenBranch := p.statement()
@@ -385,13 +453,13 @@ func (p *Parser) forStatement() Statement {
 
 	var condition Expression
 	if !p.check(tokens.SEMICOLON) {
-		condition = p.assignment()
+		condition = p.expression()
 	}
 	p.consume("Expect ';' after loop condition.", tokens.SEMICOLON)
 
 	var increment Expression
 	if !p.check(tokens.RIGHT_PARENTHESIS) {
-		increment = p.assignment()
+		increment = p.expression()
 	}
 	p.consume("Expect ')' after for clauses.", tokens.RIGHT_PARENTHESIS)
 
@@ -403,7 +471,7 @@ func (p *Parser) forStatement() Statement {
 	}
 
 	if condition == nil {
-		condition = LiteralExpression{Value: "true"}
+		condition = BooleanExpression{Value: true}
 	}
 	body = WhileStatement{
 		Condition: condition,
@@ -420,7 +488,7 @@ func (p *Parser) forStatement() Statement {
 }
 
 func (p *Parser) expressionStatement() Statement {
-	expr := p.assignment()
+	expr := p.expression()
 	return ExpressionStatement{
 		Expression: expr,
 	}

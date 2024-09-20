@@ -178,6 +178,10 @@ func (t *Tokenizer) scan() {
 		t.addNonLiteralToken(LEFT_BRACE)
 	case '}':
 		t.addNonLiteralToken(RIGHT_BRACE)
+	case '[':
+		t.addNonLiteralToken(LEFT_BRACKET)
+	case ']':
+		t.addNonLiteralToken(RIGHT_BRACKET)
 	case ',':
 		t.addNonLiteralToken(COMMA)
 	case '.':
@@ -186,6 +190,8 @@ func (t *Tokenizer) scan() {
 		t.addNonLiteralToken(MINUS)
 	case '+':
 		t.addNonLiteralToken(PLUS)
+	case ':':
+		t.addNonLiteralToken(COLON)
 	case ';':
 		t.addNonLiteralToken(SEMICOLON)
 	case '*':

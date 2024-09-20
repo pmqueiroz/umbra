@@ -9,10 +9,16 @@ type ExpressionVisitor interface {
 	VisitBinaryExpression(expr Expression)
 	VisitCallExpression(expr CallExpression)
 	VisitGroupingExpression(expr GroupingExpression)
-	VisitLiteralExpression(expr LiteralExpression)
+	VisitStringLiteral(expr StringLiteral)
+	VisitNumericLiteral(expr NumericLiteral)
+	VisitNullLiteral(expr NullLiteral)
+	VisitBooleanExpression(expr BooleanExpression)
+	VisitHashmapExpression(expr HashmapExpression)
+	VisitArrayExpression(expr ArrayExpression)
 	VisitLogicalExpression(expr LogicalExpression)
 	VisitUnaryExpression(expr UnaryExpression)
 	VisitVariableExpression(expr VariableExpression)
+	VisitKeyValueExpression(expr KeyValueExpression)
 }
 
 type Expression interface {
@@ -56,12 +62,34 @@ func (expr GroupingExpression) Accept(visitor ExpressionVisitor) {
 	visitor.VisitGroupingExpression(expr)
 }
 
-type LiteralExpression struct {
+type StringLiteral struct {
 	Value string
 }
 
-func (expr LiteralExpression) Accept(visitor ExpressionVisitor) {
-	visitor.VisitLiteralExpression(expr)
+func (expr StringLiteral) Accept(visitor ExpressionVisitor) {
+	visitor.VisitStringLiteral(expr)
+}
+
+type NumericLiteral struct {
+	Value float64
+}
+
+func (expr NumericLiteral) Accept(visitor ExpressionVisitor) {
+	visitor.VisitNumericLiteral(expr)
+}
+
+type NullLiteral struct{}
+
+func (expr NullLiteral) Accept(visitor ExpressionVisitor) {
+	visitor.VisitNullLiteral(expr)
+}
+
+type BooleanExpression struct {
+	Value bool
+}
+
+func (expr BooleanExpression) Accept(visitor ExpressionVisitor) {
+	visitor.VisitBooleanExpression(expr)
 }
 
 type LogicalExpression struct {
@@ -89,4 +117,29 @@ type VariableExpression struct {
 
 func (expr VariableExpression) Accept(visitor ExpressionVisitor) {
 	visitor.VisitVariableExpression(expr)
+}
+
+type ArrayExpression struct {
+	Elements []Expression
+}
+
+func (expr ArrayExpression) Accept(visitor ExpressionVisitor) {
+	visitor.VisitArrayExpression(expr)
+}
+
+type HashmapExpression struct {
+	Properties []KeyValueExpression
+}
+
+func (expr HashmapExpression) Accept(visitor ExpressionVisitor) {
+	visitor.VisitHashmapExpression(expr)
+}
+
+type KeyValueExpression struct {
+	Key   tokens.Token
+	Value Expression
+}
+
+func (expr KeyValueExpression) Accept(visitor ExpressionVisitor) {
+	visitor.VisitKeyValueExpression(expr)
 }
