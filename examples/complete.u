@@ -1,6 +1,6 @@
 # this is a sample code just for testing
 
-package main
+module main
 
 var hello str = "World" # create a constant string with value "World"
 mut year num = 2022 # create a mutable number with value 2022

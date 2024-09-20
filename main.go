@@ -46,7 +46,7 @@ func runPrompt() {
 		}
 
 		run(
-			"package main",
+			"module main",
 			line,
 		)
 	}

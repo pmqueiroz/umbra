@@ -307,7 +307,7 @@ func (p *Parser) assignment() Expression {
 func (p *Parser) packageDeclaration() Statement {
 	name := p.consume("Expect package name.", tokens.IDENTIFIER)
 
-	return PackageStatement{
+	return ModuleStatement{
 		Name: name,
 	}
 }
@@ -459,7 +459,7 @@ func (p *Parser) statement() Statement {
 }
 
 func (p *Parser) declaration() Statement {
-	if p.match(tokens.PACKAGE) {
+	if p.match(tokens.MODULE) {
 		return p.packageDeclaration()
 	}
 
@@ -474,21 +474,21 @@ func (p *Parser) declaration() Statement {
 	return p.statement()
 }
 
-func Parse(tokenList []tokens.Token) PackageStatement {
+func Parse(tokenList []tokens.Token) ModuleStatement {
 	var declarations []Statement
 	parser := Parser{
 		tokenList: tokenList,
 		current:   0,
 	}
 
-	parser.consume("Expect package at start of file", tokens.PACKAGE)
+	parser.consume("Expect package at start of file", tokens.MODULE)
 	name := parser.consume("Expect package module", tokens.IDENTIFIER)
 
 	for !parser.isAtEOF() {
 		declarations = append(declarations, parser.declaration())
 	}
 
-	module := PackageStatement{
+	module := ModuleStatement{
 		Name:         name,
 		Declarations: declarations,
 	}

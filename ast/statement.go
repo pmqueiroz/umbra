@@ -13,7 +13,7 @@ type StatementVisitor interface {
 	VisitReturnStatement(stmt ReturnStatement)
 	VisitVarStatement(stmt VarStatement)
 	VisitWhileStatement(stmt WhileStatement)
-	VisitPackageStatement(stmt PackageStatement)
+	VisitPackageStatement(stmt ModuleStatement)
 }
 
 type Statement interface {
@@ -93,11 +93,11 @@ func (stmt WhileStatement) Accept(visitor StatementVisitor) {
 	visitor.VisitWhileStatement(stmt)
 }
 
-type PackageStatement struct {
+type ModuleStatement struct {
 	Name         tokens.Token
 	Declarations []Statement
 }
 
-func (stmt PackageStatement) Accept(visitor StatementVisitor) {
+func (stmt ModuleStatement) Accept(visitor StatementVisitor) {
 	visitor.VisitPackageStatement(stmt)
 }

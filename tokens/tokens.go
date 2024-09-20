@@ -46,7 +46,7 @@ const (
 	HASHMAP_TYPE       TokenType = "HASHMAP_TYPE"
 	NUM_TYPE           TokenType = "NUM_TYPE"
 	WHILE              TokenType = "WHILE"
-	PACKAGE            TokenType = "PACKAGE"
+	MODULE             TokenType = "MODULE"
 )
 
 var reservedKeywordsMap = map[string]TokenType{
@@ -70,7 +70,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"var":     VAR,
 	"mut":     MUT,
 	"while":   WHILE,
-	"package": PACKAGE,
+	"module":  MODULE,
 }
 
 func getKeyword(lexis string) TokenType {
