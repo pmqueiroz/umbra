@@ -9,10 +9,7 @@ type ExpressionVisitor interface {
 	VisitBinaryExpression(expr Expression)
 	VisitCallExpression(expr CallExpression)
 	VisitGroupingExpression(expr GroupingExpression)
-	VisitStringLiteral(expr StringLiteral)
-	VisitNumericLiteral(expr NumericLiteral)
-	VisitNullLiteral(expr NullLiteral)
-	VisitBooleanExpression(expr BooleanExpression)
+	VisitLiteralExpression(expr LiteralExpression)
 	VisitHashmapExpression(expr HashmapExpression)
 	VisitArrayExpression(expr ArrayExpression)
 	VisitLogicalExpression(expr LogicalExpression)
@@ -65,30 +62,12 @@ type StringLiteral struct {
 	Value string
 }
 
-func (expr StringLiteral) Accept(visitor ExpressionVisitor) {
-	visitor.VisitStringLiteral(expr)
+type LiteralExpression struct {
+	Value interface{}
 }
 
-type NumericLiteral struct {
-	Value float64
-}
-
-func (expr NumericLiteral) Accept(visitor ExpressionVisitor) {
-	visitor.VisitNumericLiteral(expr)
-}
-
-type NullLiteral struct{}
-
-func (expr NullLiteral) Accept(visitor ExpressionVisitor) {
-	visitor.VisitNullLiteral(expr)
-}
-
-type BooleanExpression struct {
-	Value bool
-}
-
-func (expr BooleanExpression) Accept(visitor ExpressionVisitor) {
-	visitor.VisitBooleanExpression(expr)
+func (expr LiteralExpression) Accept(visitor ExpressionVisitor) {
+	visitor.VisitLiteralExpression(expr)
 }
 
 type LogicalExpression struct {

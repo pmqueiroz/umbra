@@ -170,26 +170,28 @@ func (p *Parser) numeric() Expression {
 		p.throw("Unable to convert number.")
 	}
 
-	return NumericLiteral{
+	return LiteralExpression{
 		Value: value,
 	}
 }
 
 func (p *Parser) primary() Expression {
 	if p.match(tokens.FALSE) {
-		return BooleanExpression{
+		return LiteralExpression{
 			Value: false,
 		}
 	}
 
 	if p.match(tokens.TRUE) {
-		return BooleanExpression{
+		return LiteralExpression{
 			Value: true,
 		}
 	}
 
 	if p.match(tokens.NULL) {
-		return NullLiteral{}
+		return LiteralExpression{
+			Value: nil,
+		}
 	}
 
 	if p.match(tokens.NUMERIC) {
@@ -197,7 +199,7 @@ func (p *Parser) primary() Expression {
 	}
 
 	if p.match(tokens.STRING) {
-		return StringLiteral{
+		return LiteralExpression{
 			Value: p.previous().Raw.Value,
 		}
 	}
@@ -225,7 +227,9 @@ func (p *Parser) primary() Expression {
 	}
 
 	p.throw("Expect expression.")
-	return NullLiteral{}
+	return LiteralExpression{
+		Value: nil,
+	}
 }
 
 func (p *Parser) finishCall(expr Expression) Expression {
@@ -450,7 +454,7 @@ func (p *Parser) initializedForStatement() Statement {
 		p.consume("Expect step after stop.", tokens.NUMERIC)
 		step = p.numeric()
 	} else {
-		step = NumericLiteral{
+		step = LiteralExpression{
 			Value: 1,
 		}
 	}
@@ -470,7 +474,7 @@ func (p *Parser) conditionalForStatement() Statement {
 	var expr Expression
 
 	if p.check(tokens.LEFT_BRACE) {
-		expr = BooleanExpression{
+		expr = LiteralExpression{
 			Value: true,
 		}
 	} else {

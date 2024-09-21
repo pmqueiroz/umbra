@@ -4,7 +4,7 @@ module main
 
 const hello str = "World" # create a constant string with value "World"
 mut year num = 2022 # create a mutable number with value 2022
-const result num = (5 + 3) * 2 - 4 / 
+const result num = (5 + 3) * 2 - 4 / 2
 
 const empty_hashmap hashmap = {}
 const one_property_hashmap hashmap = {
