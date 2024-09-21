@@ -50,3 +50,15 @@ for {
   # infinite loop until break
   break
 }
+
+if i < 10 {
+  print "greater"
+}
+
+if true {
+  print "then"
+} else if true {
+  print "elseif"
+} else {
+  print "elf"
+}

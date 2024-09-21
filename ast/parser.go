@@ -414,9 +414,7 @@ func (p *Parser) printStatement() Statement {
 }
 
 func (p *Parser) ifStatement() Statement {
-	p.consume("Expect '(' after 'if'.", tokens.LEFT_PARENTHESIS)
 	condition := p.expression()
-	p.consume("Expect ')' after if condition.", tokens.RIGHT_PARENTHESIS)
 
 	thenBranch := p.statement()
 	var elseBranch Statement
