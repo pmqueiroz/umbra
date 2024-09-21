@@ -150,6 +150,21 @@ func (p *Parser) hashmap() Expression {
 	}
 }
 
+func (p *Parser) numeric() Expression {
+	value, err := strconv.ParseFloat(p.previous().Raw.Value, 64)
+
+	if err != nil {
+		current_token := p.peek()
+		panic(
+			umbra_error.NewSyntaxError("Unable to convert number.", current_token.Raw.Line, current_token.Raw.Column, fmt.Sprintf("%#v", p.peek())),
+		)
+	}
+
+	return NumericLiteral{
+		Value: value,
+	}
+}
+
 func (p *Parser) primary() Expression {
 	if p.match(tokens.FALSE) {
 		return BooleanExpression{
@@ -168,18 +183,7 @@ func (p *Parser) primary() Expression {
 	}
 
 	if p.match(tokens.NUMERIC) {
-		value, err := strconv.ParseFloat(p.previous().Raw.Value, 64)
-
-		if err != nil {
-			current_token := p.peek()
-			panic(
-				umbra_error.NewSyntaxError("Unable to convert number.", current_token.Raw.Line, current_token.Raw.Column, fmt.Sprintf("%#v", p.peek())),
-			)
-		}
-
-		return NumericLiteral{
-			Value: value,
-		}
+		return p.numeric()
 	}
 
 	if p.match(tokens.STRING) {
@@ -388,16 +392,8 @@ func (p *Parser) varDeclaration() Statement {
 	}
 }
 
-func (p *Parser) whileStatement() Statement {
-	p.consume("Expect '(' after 'while'.", tokens.LEFT_PARENTHESIS)
-	condition := p.expression()
-	p.consume("Expect ')' after condition.", tokens.RIGHT_PARENTHESIS)
-	body := p.statement()
-
-	return WhileStatement{
-		Condition: condition,
-		Body:      body,
-	}
+func (p *Parser) breakStatement() Statement {
+	return BreakStatement{}
 }
 
 func (p *Parser) returnStatement() Statement {
@@ -436,52 +432,60 @@ func (p *Parser) ifStatement() Statement {
 	}
 }
 
-func (p *Parser) forStatement() Statement {
-	p.consume("Expect '(' after 'for'.", tokens.LEFT_PARENTHESIS)
+func (p *Parser) initializedForStatement() Statement {
+	start := p.varDeclaration()
+	var step Expression
 
-	var initializer Statement
-	if p.match(tokens.SEMICOLON) {
-		initializer = nil
-	} else if p.match(tokens.STR_TYPE, tokens.NUM_TYPE, tokens.HASHMAP_TYPE, tokens.ARR_TYPE) {
-		initializer = p.varDeclaration()
+	p.consume("Expect ',' after start.", tokens.COMMA)
+	p.consume("Expect stop after start.", tokens.NUMERIC)
+
+	stop := p.numeric()
+
+	if p.match(tokens.COMMA) {
+		p.consume("Expect step after stop.", tokens.NUMERIC)
+		step = p.numeric()
 	} else {
-		initializer = p.expressionStatement()
+		step = NumericLiteral{
+			Value: 1,
+		}
 	}
-
-	var condition Expression
-	if !p.check(tokens.SEMICOLON) {
-		condition = p.expression()
-	}
-	p.consume("Expect ';' after loop condition.", tokens.SEMICOLON)
-
-	var increment Expression
-	if !p.check(tokens.RIGHT_PARENTHESIS) {
-		increment = p.expression()
-	}
-	p.consume("Expect ')' after for clauses.", tokens.RIGHT_PARENTHESIS)
 
 	body := p.statement()
-	if increment != nil {
-		body = BlockStatement{
-			Statements: []Statement{body, ExpressionStatement{Expression: increment}},
-		}
+
+	return InitializedForStatement{
+		Start: start,
+		Stop:  stop,
+		Step:  step,
+		Body:  body,
 	}
 
-	if condition == nil {
-		condition = BooleanExpression{Value: true}
+}
+
+func (p *Parser) conditionalForStatement() Statement {
+	var expr Expression
+
+	if p.check(tokens.LEFT_BRACE) {
+		expr = BooleanExpression{
+			Value: true,
+		}
+	} else {
+		expr = p.expression()
 	}
-	body = WhileStatement{
-		Condition: condition,
+
+	body := p.statement()
+
+	return ConditionalForStatement{
+		Condition: expr,
 		Body:      body,
 	}
+}
 
-	if initializer != nil {
-		body = BlockStatement{
-			Statements: []Statement{initializer, body},
-		}
+func (p *Parser) forStatement() Statement {
+	if p.match(tokens.VAR, tokens.MUT) {
+		return p.initializedForStatement()
 	}
 
-	return body
+	return p.conditionalForStatement()
 }
 
 func (p *Parser) expressionStatement() Statement {
@@ -504,8 +508,8 @@ func (p *Parser) statement() Statement {
 	if p.match(tokens.RETURN) {
 		return p.returnStatement()
 	}
-	if p.match(tokens.WHILE) {
-		return p.whileStatement()
+	if p.match(tokens.BREAK) {
+		return p.breakStatement()
 	}
 	if p.match(tokens.LEFT_BRACE) {
 		blockStatement, _ := p.block()
@@ -534,8 +538,8 @@ func Parse(tokenList []tokens.Token) ModuleStatement {
 		current:   0,
 	}
 
-	parser.consume("Expect package at start of file", tokens.MODULE)
-	name := parser.consume("Expect package module", tokens.IDENTIFIER)
+	parser.consume("Expect module at start of file", tokens.MODULE)
+	name := parser.consume("Expect module name", tokens.IDENTIFIER)
 
 	for !parser.isAtEOF() {
 		declarations = append(declarations, parser.declaration())

@@ -32,3 +32,21 @@ trailing_comma_call(1, 2,)
 def main() {
   var some_variable str = "oi"
 }
+
+for mut i num = 0, 10, 2 {
+  # initializing, stop, step
+}
+
+for mut i num = 0, 10 {
+  # initializing, stop
+}
+
+mut i num = 0
+for i < 10 {
+  # condition
+}
+
+for {
+  # infinite loop until break
+  break
+}

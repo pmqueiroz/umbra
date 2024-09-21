@@ -31,6 +31,8 @@ func run(contents ...string) {
 
 	module := ast.Parse(tokens)
 
+	fmt.Printf("%#v\n", module)
+
 	jsonASTPrint(module)
 }
 

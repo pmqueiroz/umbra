@@ -11,9 +11,11 @@ type StatementVisitor interface {
 	VisitIfStatement(stmt IfStatement)
 	VisitPrintStatement(stmt PrintStatement)
 	VisitReturnStatement(stmt ReturnStatement)
+	VisitBreakStatement(stmt BreakStatement)
 	VisitVarStatement(stmt VarStatement)
-	VisitWhileStatement(stmt WhileStatement)
 	VisitPackageStatement(stmt ModuleStatement)
+	VisitInitializedForStatement(stmt InitializedForStatement)
+	VisitConditionalForStatement(stmt ConditionalForStatement)
 }
 
 type Statement interface {
@@ -73,6 +75,12 @@ func (stmt ReturnStatement) Accept(visitor StatementVisitor) {
 	visitor.VisitReturnStatement(stmt)
 }
 
+type BreakStatement struct{}
+
+func (stmt BreakStatement) Accept(visitor StatementVisitor) {
+	visitor.VisitBreakStatement(stmt)
+}
+
 type VarStatement struct {
 	Name        tokens.Token
 	Initializer Expression
@@ -84,13 +92,24 @@ func (stmt VarStatement) Accept(visitor StatementVisitor) {
 	visitor.VisitVarStatement(stmt)
 }
 
-type WhileStatement struct {
+type InitializedForStatement struct {
+	Start Statement
+	Stop  Expression
+	Step  Expression
+	Body  Statement
+}
+
+func (stmt InitializedForStatement) Accept(visitor StatementVisitor) {
+	visitor.VisitInitializedForStatement(stmt)
+}
+
+type ConditionalForStatement struct {
 	Condition Expression
 	Body      Statement
 }
 
-func (stmt WhileStatement) Accept(visitor StatementVisitor) {
-	visitor.VisitWhileStatement(stmt)
+func (stmt ConditionalForStatement) Accept(visitor StatementVisitor) {
+	visitor.VisitConditionalForStatement(stmt)
 }
 
 type ModuleStatement struct {
