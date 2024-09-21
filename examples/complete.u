@@ -5,17 +5,30 @@ module main
 var hello str = "World" # create a constant string with value "World"
 mut year num = 2022 # create a mutable number with value 2022
 var result num = (5 + 3) * 2 - 4 / 2
-var person hashmap = {
-  name: "cleiton",
-  valid: true
+
+var empty_hashmap hashmap = {}
+var one_property_hashmap hashmap = {
+  name: "cleiton"
 }
-var list arr = []
+var many_property_hashmap hashmap = {
+  name: "cleiton",
+  age: 24
+}
+var trailing_comma_hashmap hashmap = {
+  name: "cleiton",
+  age: 24,
+}
+
+var empty_list arr = []
+var one_element_list arr = [1]
+var many_element_list arr = [1, 2, 3]
+var trailing_comma_list arr = [1, 2, 3,]
+
+empty_call()
+one_argument_call(1)
+many_arguments_call(1, 2)
+trailing_comma_call(1, 2,)
 
 def main() {
   var some_variable str = "oi"
-
-  empty_call()
-  one_argument_call(1)
-  many_arguments_call(1, 2)
-  trailing_comma_call(1, 2,)
 }
