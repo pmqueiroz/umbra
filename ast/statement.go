@@ -15,11 +15,18 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
-type FunctionStatement struct {
-	Name   tokens.Token
-	Params []tokens.Token
-	Body   []Statement
+type Parameter struct {
+	Name tokens.Token
+	Type tokens.Token
 }
+
+type FunctionStatement struct {
+	Name       tokens.Token
+	Params     []Parameter
+	ReturnType tokens.Token
+	Body       []Statement
+}
+
 type IfStatement struct {
 	Condition  Expression
 	ThenBranch Statement

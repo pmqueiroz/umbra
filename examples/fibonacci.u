@@ -1,26 +1,10 @@
 module fibonacci
 
-def fibonacci(n) {
-  if n < 0 {
-    return "Input must be a non-negative integer"
-  }
-  if n < 2 {
-    return n
-  }
-
-  mut a num = 0
-  mut b num = 1
-  mut temp num
-
-  for mut i num = 2, n {
-    temp = a + b
-    a = b
-    b = temp
-  }
-  return b
+def fib(n num) num {
+	if n <= 1 { return n }
+	return fib(n - 1) + fib(n - 2)
 }
 
 def main() {
-  var result num = fibonacci(10)
-  print result
+	print fib(47)
 }

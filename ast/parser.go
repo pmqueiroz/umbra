@@ -92,11 +92,16 @@ func (p *Parser) function() Statement {
 
 	p.consume("Expect '(' after function name.", tokens.LEFT_PARENTHESIS)
 
-	var params []tokens.Token
+	var params []Parameter
 
 	if !p.check(tokens.RIGHT_PARENTHESIS) {
 		for {
-			params = append(params, p.consume("Expect parameter name.", tokens.IDENTIFIER))
+			paramName := p.consume("Expect parameter name.", tokens.IDENTIFIER)
+			paramType := p.consume("Expect parameter type.", tokens.DATA_TYPES...)
+			params = append(params, Parameter{
+				Name: paramName,
+				Type: paramType,
+			})
 
 			if !p.match(tokens.COMMA) {
 				break
@@ -106,14 +111,26 @@ func (p *Parser) function() Statement {
 
 	p.consume("Expect ')' after parameters.", tokens.RIGHT_PARENTHESIS)
 
+	var returnType tokens.Token
+
+	if !p.check(tokens.LEFT_BRACE) {
+		returnType = p.consume("Expect return type.", append([]tokens.TokenType{tokens.VOID_TYPE}, tokens.DATA_TYPES...)...)
+	} else {
+		returnType = tokens.Token{
+			Id:  tokens.VOID_TYPE,
+			Raw: p.peek().Raw,
+		}
+	}
+
 	p.consume("Expect '{' before function body.", tokens.LEFT_BRACE)
 
 	_, body := p.block()
 
 	return FunctionStatement{
-		Name:   name,
-		Params: params,
-		Body:   body,
+		Name:       name,
+		Params:     params,
+		ReturnType: returnType,
+		Body:       body,
 	}
 }
 
@@ -387,7 +404,7 @@ func (p *Parser) expression() Expression {
 func (p *Parser) varDeclaration() Statement {
 	isMutable := p.previous().Id == tokens.MUT
 	name := p.consume("Expect variable name.", tokens.IDENTIFIER)
-	variableType := p.consume("Expect variable type.", tokens.STR_TYPE, tokens.NUM_TYPE, tokens.HASHMAP_TYPE, tokens.ARR_TYPE)
+	variableType := p.consume("Expect variable type.", tokens.DATA_TYPES...)
 
 	var initializer Expression
 

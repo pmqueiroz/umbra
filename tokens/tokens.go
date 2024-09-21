@@ -45,12 +45,26 @@ const (
 	CONST              TokenType = "VAR"
 	MUT                TokenType = "MUT"
 	STR_TYPE           TokenType = "STR_TYPE"
+	NUM_TYPE           TokenType = "NUM_TYPE"
+	BOOL_TYPE          TokenType = "BOOL_TYPE"
+	VOID_TYPE          TokenType = "VOID_TYPE"
 	ARR_TYPE           TokenType = "ARR_TYPE"
 	HASHMAP_TYPE       TokenType = "HASHMAP_TYPE"
-	NUM_TYPE           TokenType = "NUM_TYPE"
 	MODULE             TokenType = "MODULE"
 	BREAK              TokenType = "BREAK"
 )
+
+var DATA_TYPES = []TokenType{
+	STR_TYPE,
+	NUM_TYPE,
+	BOOL_TYPE,
+	HASHMAP_TYPE,
+	ARR_TYPE,
+}
+
+var SPECIAL_TYPES = []TokenType{
+	VOID_TYPE,
+}
 
 var reservedKeywordsMap = map[string]TokenType{
 	"not":     NOT,
@@ -67,9 +81,11 @@ var reservedKeywordsMap = map[string]TokenType{
 	"true":    TRUE,
 	"false":   FALSE,
 	"str":     STR_TYPE,
+	"num":     NUM_TYPE,
+	"bool":    BOOL_TYPE,
 	"arr":     ARR_TYPE,
 	"hashmap": HASHMAP_TYPE,
-	"num":     NUM_TYPE,
+	"void":    VOID_TYPE,
 	"const":   CONST,
 	"mut":     MUT,
 	"module":  MODULE,
