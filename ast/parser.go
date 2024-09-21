@@ -479,7 +479,7 @@ func (p *Parser) conditionalForStatement() Statement {
 }
 
 func (p *Parser) forStatement() Statement {
-	if p.match(tokens.VAR, tokens.MUT) {
+	if p.match(tokens.CONST, tokens.MUT) {
 		return p.initializedForStatement()
 	}
 
@@ -522,7 +522,7 @@ func (p *Parser) declaration() Statement {
 		return p.function()
 	}
 
-	if p.match(tokens.VAR, tokens.MUT) {
+	if p.match(tokens.CONST, tokens.MUT) {
 		return p.varDeclaration()
 	}
 

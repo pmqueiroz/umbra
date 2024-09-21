@@ -1,7 +1,6 @@
 package tokens
 
 import (
-	// "golang.org/x/text/cases"
 	"fmt"
 	"unicode"
 

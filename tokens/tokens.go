@@ -42,7 +42,7 @@ const (
 	THIS               TokenType = "THIS"
 	TRUE               TokenType = "TRUE"
 	FALSE              TokenType = "FALSE"
-	VAR                TokenType = "VAR"
+	CONST              TokenType = "VAR"
 	MUT                TokenType = "MUT"
 	STR_TYPE           TokenType = "STR_TYPE"
 	ARR_TYPE           TokenType = "ARR_TYPE"
@@ -70,7 +70,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"arr":     ARR_TYPE,
 	"hashmap": HASHMAP_TYPE,
 	"num":     NUM_TYPE,
-	"var":     VAR,
+	"const":   CONST,
 	"mut":     MUT,
 	"module":  MODULE,
 	"break":   BREAK,
