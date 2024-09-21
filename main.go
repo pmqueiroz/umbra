@@ -2,26 +2,17 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/pmqueiroz/umbra/ast"
+	"github.com/pmqueiroz/umbra/cli"
+	"github.com/pmqueiroz/umbra/interpreter"
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
-func jsonASTPrint(module ast.ModuleStatement) {
-	astJson, err := json.MarshalIndent(module, "", "  ")
-	if err != nil {
-		fmt.Println("Failed to format ast JSON:", err)
-		return
-	}
-
-	fmt.Println(string(astJson))
-}
-
-func run(contents ...string) {
+func run(options cli.Options, contents ...string) {
 	content := strings.Join(contents, "\n")
 	tokens, err := tokens.Tokenize(content)
 
@@ -31,22 +22,28 @@ func run(contents ...string) {
 
 	module := ast.Parse(tokens)
 
-	fmt.Printf("%#v\n", module)
+	if options.PrintAst {
+		cli.PrintAst(module)
+	}
 
-	jsonASTPrint(module)
+	env := interpreter.NewEnvironment(nil)
+
+	if err := interpreter.Interpret(module, env); err != nil {
+		fmt.Println("Erro:", err)
+	}
 }
 
-func runFile(path string) {
+func runFile(path string, options cli.Options) {
 	fileContent, err := readFile(path)
 
 	if err != nil {
 		fmt.Printf("%s\n", err.Error())
 	}
 
-	run(fileContent)
+	run(options, fileContent)
 }
 
-func runPrompt() {
+func runPrompt(options cli.Options) {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Print("Welcome to Umbra REPL!\nEnter :q to exit.\n")
@@ -59,6 +56,7 @@ func runPrompt() {
 		}
 
 		run(
+			options,
 			"module main",
 			line,
 		)
@@ -66,14 +64,11 @@ func runPrompt() {
 }
 
 func main() {
-	args := os.Args[1:]
+	args := cli.Parse()
 
-	if len(args) > 1 {
-		fmt.Println("Usage: umbra [script]")
-		os.Exit(64)
-	} else if len(args) == 1 {
-		runFile(args[0])
+	if args.Input != "" {
+		runFile(args.Input, args.Options)
 	} else {
-		runPrompt()
+		runPrompt(args.Options)
 	}
 }
