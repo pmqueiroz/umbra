@@ -11,10 +11,11 @@ var person hashmap = {
 }
 var list arr = []
 
-def top_level() {}
-
 def main() {
   var some_variable str = "oi"
 
-  # top_level()
+  empty_call()
+  one_argument_call(1)
+  many_arguments_call(1, 2)
+  trailing_comma_call(1, 2,)
 }

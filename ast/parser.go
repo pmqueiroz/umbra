@@ -83,10 +83,6 @@ func (p *Parser) function() Statement {
 
 	if !p.check(tokens.RIGHT_PARENTHESIS) {
 		for {
-			if len(params) >= 3 {
-				panic("Can't have more than 3 parameters.")
-			}
-
 			params = append(params, p.consume("Expect parameter name.", tokens.IDENTIFIER))
 
 			if !p.match(tokens.COMMA) {
@@ -192,6 +188,12 @@ func (p *Parser) primary() Expression {
 		}
 	}
 
+	if p.match(tokens.IDENTIFIER) {
+		return VariableExpression{
+			Name: p.previous(),
+		}
+	}
+
 	if p.match(tokens.LEFT_BRACE) {
 		return p.hashmap()
 	}
@@ -220,8 +222,8 @@ func (p *Parser) finishCall(expr Expression) Expression {
 
 	if !p.check(tokens.RIGHT_PARENTHESIS) {
 		for {
-			if len(arguments) >= 3 {
-				panic("Can't have more than 3 arguments.")
+			if p.check(tokens.RIGHT_PARENTHESIS) {
+				break
 			}
 
 			arguments = append(arguments, p.expression())
@@ -232,24 +234,19 @@ func (p *Parser) finishCall(expr Expression) Expression {
 		}
 	}
 
-	parenthesis := p.consume("Expect ')' after arguments.", tokens.RIGHT_PARENTHESIS)
+	p.consume("Expect ')' after arguments.", tokens.RIGHT_PARENTHESIS)
 
 	return CallExpression{
-		Callee:      expr,
-		Parenthesis: parenthesis,
-		Arguments:   arguments,
+		Callee:    expr,
+		Arguments: arguments,
 	}
 }
 
 func (p *Parser) call() Expression {
 	expr := p.primary()
 
-	for {
-		if p.match(tokens.LEFT_PARENTHESIS) {
-			expr = p.finishCall(expr)
-		} else {
-			break
-		}
+	if p.match(tokens.LEFT_PARENTHESIS) {
+		return p.finishCall(expr)
 	}
 
 	return expr

@@ -45,9 +45,8 @@ func (expr BinaryExpression) Accept(visitor ExpressionVisitor) {
 }
 
 type CallExpression struct {
-	Callee      Expression
-	Parenthesis tokens.Token
-	Arguments   []Expression
+	Callee    Expression
+	Arguments []Expression
 }
 
 func (expr CallExpression) Accept(visitor ExpressionVisitor) {
