@@ -5,6 +5,6 @@ def fib(n num) num {
 	return fib(n - 1) + fib(n - 2)
 }
 
-def main() {
-	print fib(47)
-}
+# i do not recommend going above 38
+# unless you want to wait a while
+print fib(38)

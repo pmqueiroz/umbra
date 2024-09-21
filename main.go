@@ -29,7 +29,7 @@ func run(options cli.Options, contents ...string) {
 	env := interpreter.NewEnvironment(nil)
 
 	if err := interpreter.Interpret(module, env); err != nil {
-		fmt.Println("Erro:", err)
+		fmt.Println("Error:", err)
 	}
 }
 
