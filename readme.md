@@ -6,8 +6,23 @@ made in go!
 ![code](https://img.shields.io/github/languages/code-size/umbra-lang/umbra)
 [![test-ci](https://github.com/pmqueiroz/umbra/actions/workflows/ci.yml/badge.svg)](https://github.com/pmqueiroz/umbra/actions/workflows/ci.yml)
 
-TODO: MAKE THIS WORK
+TODO:
+- Improve tokens structure
 
-```sh
-go run . examples/complete.u
+```go
+type ColumnRange struct {
+	from int
+	to   int
+}
+
+type Loc struct {
+	Line  int
+	Range ColumnRange
+}
+
+type Token struct {
+	Lexeme string
+	Type   TokenType
+	Loc
+}
 ```
