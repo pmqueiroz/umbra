@@ -2,6 +2,7 @@ package ast
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	umbra_error "github.com/pmqueiroz/umbra/error"
@@ -57,7 +58,19 @@ func (p *Parser) consume(errorMessage string, types ...tokens.TokenType) tokens.
 		}
 	}
 
-	panic(errorMessage)
+	p.throw(errorMessage)
+	return tokens.Token{}
+}
+
+func (p *Parser) throw(message string) {
+	current_token := p.peek()
+	fmt.Println(umbra_error.NewSyntaxError(
+		message,
+		current_token.Raw.Line,
+		current_token.Raw.Column,
+		fmt.Sprintf("%#v", p.peek()),
+	))
+	os.Exit(1)
 }
 
 func (p *Parser) block() (Statement, []Statement) {
@@ -154,10 +167,7 @@ func (p *Parser) numeric() Expression {
 	value, err := strconv.ParseFloat(p.previous().Raw.Value, 64)
 
 	if err != nil {
-		current_token := p.peek()
-		panic(
-			umbra_error.NewSyntaxError("Unable to convert number.", current_token.Raw.Line, current_token.Raw.Column, fmt.Sprintf("%#v", p.peek())),
-		)
+		p.throw("Unable to convert number.")
 	}
 
 	return NumericLiteral{
@@ -214,11 +224,8 @@ func (p *Parser) primary() Expression {
 		}
 	}
 
-	current_token := p.peek()
-
-	panic(
-		umbra_error.NewSyntaxError("Expect expression.", current_token.Raw.Line, current_token.Raw.Column, fmt.Sprintf("%#v", p.peek())),
-	)
+	p.throw("Expect expression.")
+	return NullLiteral{}
 }
 
 func (p *Parser) finishCall(expr Expression) Expression {
@@ -367,7 +374,7 @@ func (p *Parser) expression() Expression {
 			}
 		}
 
-		panic("Invalid assignment target.")
+		p.throw("Invalid assignment target.")
 	}
 
 	return expr
