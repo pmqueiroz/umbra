@@ -1,0 +1,26 @@
+module fibonacci
+
+def fibonacci(n) {
+  if n < 0 {
+    return "Input must be a non-negative integer"
+  }
+  if n < 2 {
+    return n
+  }
+
+  mut a num = 0
+  mut b num = 1
+  mut temp num
+
+  for mut i num = 2, n {
+    temp = a + b
+    a = b
+    b = temp
+  }
+  return b
+}
+
+def main() {
+  var result num = fibonacci(10)
+  print result
+}
