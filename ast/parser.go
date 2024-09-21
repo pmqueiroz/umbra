@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	umbra_error "github.com/pmqueiroz/umbra/error"
+	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
@@ -64,7 +64,7 @@ func (p *Parser) consume(errorMessage string, types ...tokens.TokenType) tokens.
 
 func (p *Parser) throw(message string) {
 	current_token := p.peek()
-	fmt.Println(umbra_error.NewSyntaxError(
+	fmt.Println(exception.NewSyntaxError(
 		message,
 		current_token.Raw.Line,
 		current_token.Raw.Column,

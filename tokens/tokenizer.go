@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"unicode"
 
-	umbra_error "github.com/pmqueiroz/umbra/error"
+	"github.com/pmqueiroz/umbra/exception"
 )
 
 func isAlpha(char rune) bool {
@@ -99,7 +99,7 @@ func (t *Tokenizer) string() {
 
 	if t.isAtEnd() {
 		fmt.Println(
-			umbra_error.NewSyntaxError("Unterminated string", t.line, t.column, string([]rune(t.source)[t.beginOfLexeme:t.current])),
+			exception.NewSyntaxError("Unterminated string", t.line, t.column, string([]rune(t.source)[t.beginOfLexeme:t.current])),
 		)
 		return
 	}
@@ -232,7 +232,7 @@ func (t *Tokenizer) scan() {
 		} else if isAlpha(char) {
 			t.identifier()
 		} else {
-			umbra_error.NewSyntaxError("Unexpected character", t.line, t.column, string(char))
+			exception.NewSyntaxError("Unexpected character", t.line, t.column, string(char))
 		}
 	}
 }
