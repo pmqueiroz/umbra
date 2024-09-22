@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pmqueiroz/umbra/ast"
 )
@@ -21,7 +22,15 @@ func Interpret(stmt ast.Statement, env *Environment) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(value)
+		if str, ok := value.(string); ok {
+			str = strings.ReplaceAll(str, "\\n", "\n")
+			str = strings.ReplaceAll(str, "\\t", "\t")
+			str = strings.ReplaceAll(str, "\\\"", "\"")
+			str = strings.ReplaceAll(str, "\\\\", "\\")
+			fmt.Print(str)
+		} else {
+			fmt.Print(value)
+		}
 		return nil
 	case ast.VarStatement:
 		var value interface{}
