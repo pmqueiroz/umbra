@@ -11,6 +11,8 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 	switch expr := expression.(type) {
 	case ast.LiteralExpression:
 		return expr.Value, nil
+	case ast.GroupingExpression:
+		return Evaluate(expr.Expression, env)
 	case ast.VariableExpression:
 		value, ok := env.Get(expr.Name.Raw.Value)
 		if !ok {
