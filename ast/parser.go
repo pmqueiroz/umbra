@@ -463,16 +463,21 @@ func (p *Parser) initializedForStatement() Statement {
 	var step Expression
 
 	p.consume("Expect ',' after start.", tokens.COMMA)
-	p.consume("Expect stop after start.", tokens.NUMERIC)
 
-	stop := p.numeric()
+	stop := p.expression()
+
+	switch stop.(type) {
+	case LiteralExpression, VariableExpression:
+	default:
+		p.throw("Expect stop to be a numeric literal or variable declaration.")
+	}
 
 	if p.match(tokens.COMMA) {
 		p.consume("Expect step after stop.", tokens.NUMERIC)
 		step = p.numeric()
 	} else {
 		step = LiteralExpression{
-			Value: 1,
+			Value: 1.0,
 		}
 	}
 

@@ -1,0 +1,20 @@
+module main
+
+def fibonacci(n num) num {
+  if n <= 1 { return n }
+
+  mut a num = 0
+  mut b num = 1
+  mut temp num
+
+  for mut i num = 2, n {
+    temp = a + b
+    a = b
+    b = temp
+  }
+
+  return b
+}
+
+const result num = fibonacci(47)
+print result

@@ -90,7 +90,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				if err != nil {
 					return nil, err
 				}
-				funcEnv.Set(function.Params[i].Name.Raw.Value, argValue)
+				funcEnv.Create(function.Params[i].Name.Raw.Value, argValue)
 			}
 
 			var result interface{}

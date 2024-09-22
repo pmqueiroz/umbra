@@ -20,8 +20,23 @@ func (env *Environment) Get(name string) (interface{}, bool) {
 	return value, exists
 }
 
-func (env *Environment) Set(name string, value interface{}) {
+func (env *Environment) Set(name string, value interface{}) bool {
+	if _, exists := env.values[name]; exists {
+		env.values[name] = value
+		return true
+	}
+	if env.parent != nil {
+		return env.parent.Set(name, value)
+	}
+	return false
+}
+
+func (env *Environment) Create(name string, value interface{}) bool {
+	if _, exists := env.Get(name); exists {
+		return false
+	}
 	env.values[name] = value
+	return true
 }
 
 func (env *Environment) ListValues() map[string]interface{} {
