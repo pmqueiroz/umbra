@@ -19,7 +19,7 @@ func (p *Parser) peek() tokens.Token {
 }
 
 func (p *Parser) isAtEOF() bool {
-	return p.peek().Id == tokens.EOF
+	return p.peek().Type == tokens.EOF
 }
 
 func (p *Parser) previous() tokens.Token {
@@ -38,7 +38,7 @@ func (p *Parser) check(tokenType tokens.TokenType) bool {
 		return false
 	}
 
-	return p.peek().Id == tokenType
+	return p.peek().Type == tokenType
 }
 
 func (p *Parser) match(types ...tokens.TokenType) bool {
@@ -66,8 +66,8 @@ func (p *Parser) throw(message string) {
 	current_token := p.peek()
 	fmt.Println(exception.NewSyntaxError(
 		message,
-		current_token.Raw.Line,
-		current_token.Raw.Column,
+		current_token.Loc.Line,
+		current_token.Loc.Range.From,
 		fmt.Sprintf("%#v", p.peek()),
 	))
 	os.Exit(1)
@@ -116,9 +116,11 @@ func (p *Parser) function() Statement {
 	if !p.check(tokens.LEFT_BRACE) {
 		returnType = p.consume("Expect return type.", append([]tokens.TokenType{tokens.VOID_TYPE}, tokens.DATA_TYPES...)...)
 	} else {
+		currentToken := p.peek()
 		returnType = tokens.Token{
-			Id:  tokens.VOID_TYPE,
-			Raw: p.peek().Raw,
+			Type:   tokens.VOID_TYPE,
+			Loc:    currentToken.Loc,
+			Lexeme: currentToken.Lexeme,
 		}
 	}
 
@@ -181,7 +183,7 @@ func (p *Parser) hashmap() Expression {
 }
 
 func (p *Parser) numeric() Expression {
-	value, err := strconv.ParseFloat(p.previous().Raw.Value, 64)
+	value, err := strconv.ParseFloat(p.previous().Lexeme, 64)
 
 	if err != nil {
 		p.throw("Unable to convert number.")
@@ -217,7 +219,7 @@ func (p *Parser) primary() Expression {
 
 	if p.match(tokens.STRING) {
 		return LiteralExpression{
-			Value: p.previous().Raw.Value,
+			Value: p.previous().Lexeme,
 		}
 	}
 
@@ -402,7 +404,7 @@ func (p *Parser) expression() Expression {
 }
 
 func (p *Parser) varDeclaration() Statement {
-	isMutable := p.previous().Id == tokens.MUT
+	isMutable := p.previous().Type == tokens.MUT
 	name := p.consume("Expect variable name.", tokens.IDENTIFIER)
 	variableType := p.consume("Expect variable type.", tokens.DATA_TYPES...)
 

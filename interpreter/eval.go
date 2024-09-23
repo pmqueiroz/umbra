@@ -14,9 +14,9 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 	case ast.GroupingExpression:
 		return Evaluate(expr.Expression, env)
 	case ast.VariableExpression:
-		value, ok := env.Get(expr.Name.Raw.Value)
+		value, ok := env.Get(expr.Name.Lexeme)
 		if !ok {
-			return nil, fmt.Errorf("undefined variable: %s", expr.Name.Raw.Value)
+			return nil, fmt.Errorf("undefined variable: %s", expr.Name.Lexeme)
 		}
 		return value, nil
 	case ast.AssignExpression:
@@ -24,7 +24,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		if err != nil {
 			return nil, err
 		}
-		env.Set(expr.Name.Raw.Value, value)
+		env.Set(expr.Name.Lexeme, value)
 		return value, nil
 	case ast.BinaryExpression:
 		left, err := Evaluate(expr.Left, env)
@@ -36,7 +36,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return nil, err
 		}
 
-		switch expr.Operator.Id {
+		switch expr.Operator.Type {
 		case tokens.PLUS:
 			return left.(float64) + right.(float64), nil
 		case tokens.MINUS:
@@ -61,7 +61,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		case tokens.BANG_EQUAL:
 			return left != right, nil
 		default:
-			return nil, fmt.Errorf("unknown binary expression: %s", expr.Operator.Raw.Value)
+			return nil, fmt.Errorf("unknown binary expression: %s", expr.Operator.Lexeme)
 		}
 	case ast.UnaryExpression:
 		right, err := Evaluate(expr.Right, env)
@@ -69,11 +69,11 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return nil, err
 		}
 
-		switch expr.Operator.Id {
+		switch expr.Operator.Type {
 		case tokens.MINUS:
 			return -right.(float64), nil
 		default:
-			return nil, fmt.Errorf("unknown unary expression: %s", expr.Operator.Raw.Value)
+			return nil, fmt.Errorf("unknown unary expression: %s", expr.Operator.Lexeme)
 		}
 	case ast.CallExpression:
 		callee, err := Evaluate(expr.Callee, env)
@@ -90,7 +90,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				if err != nil {
 					return nil, err
 				}
-				funcEnv.Create(function.Itself.Params[i].Name.Raw.Value, argValue)
+				funcEnv.Create(function.Itself.Params[i].Name.Lexeme, argValue)
 			}
 
 			var result interface{}

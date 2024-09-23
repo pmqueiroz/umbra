@@ -73,14 +73,18 @@ func (t *Tokenizer) match(expected rune) bool {
 }
 
 func (t *Tokenizer) addNonLiteralToken(tokenType TokenType) {
-	t.add(Token{
-		Id: tokenType,
-		Raw: RawToken{
-			Value:  string([]rune(t.source)[t.beginOfLexeme:t.current]),
-			Line:   t.line,
-			Column: t.column,
+	t.add(
+		Token{
+			Type:   tokenType,
+			Lexeme: string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Loc: Location{
+				Line: t.line,
+				Range: ColumnRange{
+					To: t.column,
+				},
+			},
 		},
-	})
+	)
 }
 
 func (t *Tokenizer) advanceLine() {
@@ -106,14 +110,18 @@ func (t *Tokenizer) string() {
 
 	t.advance()
 
-	t.add(Token{
-		Id: STRING,
-		Raw: RawToken{
-			Value:  string([]rune(t.source)[t.beginOfLexeme+1 : t.current-1]),
-			Line:   t.line,
-			Column: t.column,
+	t.add(
+		Token{
+			Type:   STRING,
+			Lexeme: string([]rune(t.source)[t.beginOfLexeme+1 : t.current-1]),
+			Loc: Location{
+				Line: t.line,
+				Range: ColumnRange{
+					To: t.column,
+				},
+			},
 		},
-	})
+	)
 }
 
 func (t *Tokenizer) numeric() {
@@ -129,14 +137,18 @@ func (t *Tokenizer) numeric() {
 		}
 	}
 
-	t.add(Token{
-		Id: NUMERIC,
-		Raw: RawToken{
-			Value:  string([]rune(t.source)[t.beginOfLexeme:t.current]),
-			Line:   t.line,
-			Column: t.column,
+	t.add(
+		Token{
+			Type:   NUMERIC,
+			Lexeme: string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Loc: Location{
+				Line: t.line,
+				Range: ColumnRange{
+					To: t.column,
+				},
+			},
 		},
-	})
+	)
 }
 
 func (t *Tokenizer) identifier() {
@@ -151,14 +163,18 @@ func (t *Tokenizer) identifier() {
 		return
 	}
 
-	t.add(Token{
-		Id: IDENTIFIER,
-		Raw: RawToken{
-			Value:  string([]rune(t.source)[t.beginOfLexeme:t.current]),
-			Line:   t.line,
-			Column: t.column,
+	t.add(
+		Token{
+			Type:   IDENTIFIER,
+			Lexeme: string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Loc: Location{
+				Line: t.line,
+				Range: ColumnRange{
+					To: t.column,
+				},
+			},
 		},
-	})
+	)
 }
 
 func (t *Tokenizer) scan() {
@@ -253,14 +269,18 @@ func Tokenize(source string) ([]Token, error) {
 		tokenizer.scan()
 	}
 
-	tokenizer.add(Token{
-		Id: EOF,
-		Raw: RawToken{
-			Value:  "",
-			Line:   tokenizer.line,
-			Column: tokenizer.column,
+	tokenizer.add(
+		Token{
+			Type:   EOF,
+			Lexeme: "",
+			Loc: Location{
+				Line: tokenizer.line,
+				Range: ColumnRange{
+					To: tokenizer.column,
+				},
+			},
 		},
-	})
+	)
 
 	return tokenizer.tokens, nil
 }

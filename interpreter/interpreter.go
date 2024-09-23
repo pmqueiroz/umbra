@@ -29,7 +29,7 @@ type FunctionDeclaration struct {
 func extractVarName(stmt ast.Statement) string {
 	switch s := stmt.(type) {
 	case ast.VarStatement:
-		return s.Name.Raw.Value
+		return s.Name.Lexeme
 	default:
 		return ""
 	}
@@ -61,7 +61,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 				return err
 			}
 		}
-		env.Create(stmt.Name.Raw.Value, value)
+		env.Create(stmt.Name.Lexeme, value)
 		return nil
 	case ast.BlockStatement:
 		newEnv := NewEnvironment(env)
@@ -97,7 +97,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		}
 		return Return{value: value}
 	case ast.FunctionStatement:
-		env.Create(stmt.Name.Raw.Value, FunctionDeclaration{Itself: &stmt, Environment: env})
+		env.Create(stmt.Name.Lexeme, FunctionDeclaration{Itself: &stmt, Environment: env})
 		return nil
 	case ast.ExpressionStatement:
 		_, err := Evaluate(stmt.Expression, env)

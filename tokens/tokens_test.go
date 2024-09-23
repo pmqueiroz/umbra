@@ -28,8 +28,8 @@ func TestGenerateTokenSingleCases(t *testing.T) {
 				t.Fatal("return an unexpected error")
 			}
 
-			if result[0].Id != testCase.want {
-				t.Errorf("got %s, want %s", result[0].Id, testCase.want)
+			if result[0].Type != testCase.want {
+				t.Errorf("got %s, want %s", result[0].Type, testCase.want)
 			}
 		})
 	}

@@ -100,13 +100,18 @@ func getKeyword(lexis string) TokenType {
 	return UNKNOWN
 }
 
-type RawToken struct {
-	Value  string
-	Line   int
-	Column int
+type ColumnRange struct {
+	From int
+	To   int
+}
+
+type Location struct {
+	Line  int
+	Range ColumnRange
 }
 
 type Token struct {
-	Raw RawToken
-	Id  TokenType
+	Lexeme string
+	Type   TokenType
+	Loc    Location
 }
