@@ -1,0 +1,57 @@
+module main
+
+mut binaryTree hashmap = {
+  value: 4,
+  left: {
+    value: 2,
+    left: {
+      value: 1
+    },
+    right: {
+      value: 3
+    }
+  },
+  right: {
+    value: 6,
+    left: {
+      value: 5
+    },
+    right: {
+      value: 7
+    }
+  }
+}
+
+def printTree(root hashmap) {
+  if root == null {
+    return null
+  }
+
+  printTree(root.left)
+  print root.value
+  print " "
+  printTree(root.right)
+}
+
+def invertTree(root hashmap) {
+  if root == null {
+    return null
+  }
+
+  mut left hashmap = invertTree(root.left)
+  mut right hashmap = invertTree(root.right)
+
+  root.left = right
+  root.right = left
+
+  return root
+}
+
+print "original:\n"
+
+printTree(binaryTree)
+
+invertTree(binaryTree)
+
+print "\ninverted:\n"
+printTree(binaryTree)
