@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/cli"
@@ -12,8 +9,12 @@ import (
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
-func run(options cli.Options, contents ...string) {
-	content := strings.Join(contents, "\n")
+type RunOptions struct {
+	cli.Options
+	Env *interpreter.Environment
+}
+
+func run(content string, options RunOptions) {
 	tokens, err := tokens.Tokenize(content)
 
 	if err != nil {
@@ -26,40 +27,8 @@ func run(options cli.Options, contents ...string) {
 		cli.PrintAst(module)
 	}
 
-	env := interpreter.NewEnvironment(nil)
-
-	if err := interpreter.Interpret(module, env); err != nil {
+	if err := interpreter.Interpret(module, options.Env); err != nil {
 		fmt.Println("Error:", err)
-	}
-}
-
-func runFile(path string, options cli.Options) {
-	fileContent, err := readFile(path)
-
-	if err != nil {
-		fmt.Printf("%s\n", err.Error())
-	}
-
-	run(options, fileContent)
-}
-
-func runPrompt(options cli.Options) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Print("Welcome to Umbra REPL!\nEnter :q to exit.\n")
-
-	for {
-		fmt.Print("> ")
-		line, err := reader.ReadString('\n')
-		if err != nil || line == ":q\n" {
-			break
-		}
-
-		run(
-			options,
-			"module main",
-			line,
-		)
 	}
 }
 
@@ -67,8 +36,22 @@ func main() {
 	args := cli.Parse()
 
 	if args.Input != "" {
-		runFile(args.Input, args.Options)
+		content, err := readFile(args.Input)
+
+		if err != nil {
+			fmt.Printf("%s\n", err.Error())
+		}
+
+		run(content, RunOptions{
+			Options: args.Options,
+			Env:     interpreter.NewEnvironment(nil),
+		})
 	} else {
-		runPrompt(args.Options)
+		cli.Repl(func(content string, env *interpreter.Environment) {
+			run(content, RunOptions{
+				Options: args.Options,
+				Env:     env,
+			})
+		})
 	}
 }
