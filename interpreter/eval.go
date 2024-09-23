@@ -158,6 +158,35 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			hashmap[key] = value
 		}
 		return hashmap, nil
+	case ast.MemberExpression:
+		object, err := Evaluate(expr.Object, env)
+		if err != nil {
+			return nil, err
+		}
+
+		switch obj := object.(type) {
+		case map[interface{}]interface{}:
+			value, ok := obj[expr.Property.Lexeme]
+			if !ok {
+				return nil, fmt.Errorf("undefined property: %v", expr.Property)
+			}
+			return value, nil
+		case []interface{}:
+			index, err := Evaluate(expr.Property, env)
+			if err != nil {
+				return nil, err
+			}
+			idx, ok := index.(float64)
+			if !ok {
+				return nil, fmt.Errorf("invalid array index: %v", index)
+			}
+			if int(idx) < 0 || int(idx) >= len(obj) {
+				return nil, fmt.Errorf("array index out of bounds: %v", idx)
+			}
+			return obj[int(idx)], nil
+		default:
+			return nil, fmt.Errorf("cannot access property of non-object type: %T", obj)
+		}
 	default:
 		return nil, fmt.Errorf("unknown expression: %T", expr)
 	}

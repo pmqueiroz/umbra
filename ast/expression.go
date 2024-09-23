@@ -52,3 +52,8 @@ type ArrayExpression struct {
 type HashmapExpression struct {
 	Pairs map[Expression]Expression
 }
+
+type MemberExpression struct {
+	Object   Expression
+	Property tokens.Token
+}

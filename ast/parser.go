@@ -276,8 +276,18 @@ func (p *Parser) finishCall(expr Expression) Expression {
 func (p *Parser) call() Expression {
 	expr := p.primary()
 
-	if p.match(tokens.LEFT_PARENTHESIS) {
-		return p.finishCall(expr)
+	for {
+		if p.match(tokens.LEFT_PARENTHESIS) {
+			return p.finishCall(expr)
+		} else if p.match(tokens.DOT) {
+			property := p.consume("Expect property name after '.'.", tokens.IDENTIFIER)
+			expr = MemberExpression{
+				Object:   expr,
+				Property: property,
+			}
+		} else {
+			break
+		}
 	}
 
 	return expr
