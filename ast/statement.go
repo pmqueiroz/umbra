@@ -33,8 +33,16 @@ type IfStatement struct {
 	ElseBranch Statement
 }
 
+type PrintChannel int
+
+const (
+	StdoutChannel PrintChannel = iota
+	StderrChannel
+)
+
 type PrintStatement struct {
 	Expression Expression
+	Channel    PrintChannel
 }
 
 type ReturnStatement struct {

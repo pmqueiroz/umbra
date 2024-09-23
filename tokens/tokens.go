@@ -37,7 +37,8 @@ const (
 	IF                 TokenType = "IF"
 	NULL               TokenType = "NULL"
 	OR                 TokenType = "OR"
-	PRINT              TokenType = "PRINT"
+	STDOUT             TokenType = "STDOUT"
+	STDERR             TokenType = "STDERR"
 	RETURN             TokenType = "RETURN"
 	THIS               TokenType = "THIS"
 	TRUE               TokenType = "TRUE"
@@ -75,7 +76,8 @@ var reservedKeywordsMap = map[string]TokenType{
 	"if":      IF,
 	"null":    NULL,
 	"or":      OR,
-	"print":   PRINT,
+	"stdout":  STDOUT,
+	"stderr":  STDERR,
 	"return":  RETURN,
 	"this":    THIS,
 	"true":    TRUE,

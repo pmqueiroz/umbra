@@ -17,4 +17,4 @@ def fibonacci(n num) num {
 }
 
 const result num = fibonacci(47)
-print result
+stdout result

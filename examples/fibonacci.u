@@ -7,4 +7,4 @@ def fib(n num) num {
 
 # i do not recommend going above 38
 # unless you want to wait a while
-print fib(38)
+stdout fib(38)

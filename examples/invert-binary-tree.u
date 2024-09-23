@@ -28,8 +28,8 @@ def printTree(root hashmap) {
   }
 
   printTree(root.left)
-  print root.value
-  print " "
+  stdout root.value
+  stdout " "
   printTree(root.right)
 }
 
@@ -47,11 +47,11 @@ def invertTree(root hashmap) {
   return root
 }
 
-print "original:\n"
+stdout "original:\n"
 
 printTree(binaryTree)
 
 invertTree(binaryTree)
 
-print "\ninverted:\n"
+stdout "\ninverted:\n"
 printTree(binaryTree)

@@ -444,10 +444,11 @@ func (p *Parser) returnStatement() Statement {
 	}
 }
 
-func (p *Parser) printStatement() Statement {
+func (p *Parser) printStatement(channel PrintChannel) Statement {
 	value := p.expression()
 	return PrintStatement{
 		Expression: value,
+		Channel:    channel,
 	}
 }
 
@@ -543,8 +544,12 @@ func (p *Parser) statement() Statement {
 	if p.match(tokens.IF) {
 		return p.ifStatement()
 	}
-	if p.match(tokens.PRINT) {
-		return p.printStatement()
+	if p.match(tokens.STDOUT, tokens.STDERR) {
+		channel := StdoutChannel
+		if p.previous().Type == tokens.STDERR {
+			channel = StderrChannel
+		}
+		return p.printStatement(channel)
 	}
 	if p.match(tokens.RETURN) {
 		return p.returnStatement()

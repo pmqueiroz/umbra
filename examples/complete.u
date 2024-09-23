@@ -52,13 +52,13 @@ for {
 }
 
 if i < 10 {
-  print "greater"
+  stdout "greater"
 }
 
 if true {
-  print "then"
+  stdout "then"
 } else if true {
-  print "elseif"
+  stdout "elseif"
 } else {
-  print "elf"
+  stdout "elf"
 }
