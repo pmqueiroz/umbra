@@ -157,17 +157,14 @@ func (p *Parser) array() Expression {
 }
 
 func (p *Parser) hashmap() Expression {
-	var properties []KeyValueExpression
+	properties := make(map[Expression]Expression)
 
 	if !p.check(tokens.RIGHT_BRACE) {
 		for {
 			name := p.consume("Expect property name.", tokens.IDENTIFIER)
 			p.consume("Expect ':' after property identifier in hashmap", tokens.COLON)
 
-			properties = append(properties, KeyValueExpression{
-				Key:   name,
-				Value: p.expression(),
-			})
+			properties[LiteralExpression{Value: name.Lexeme}] = p.expression()
 
 			if !p.match(tokens.COMMA) || p.check(tokens.RIGHT_BRACE) {
 				break
@@ -178,7 +175,7 @@ func (p *Parser) hashmap() Expression {
 	p.consume("Expect '}' after expression.", tokens.RIGHT_BRACE)
 
 	return HashmapExpression{
-		Properties: properties,
+		Pairs: properties,
 	}
 }
 

@@ -109,6 +109,55 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		}
 
 		return nil, fmt.Errorf("invalid function call %v", expr.Callee)
+	case ast.LogicalExpression:
+		left, err := Evaluate(expr.Left, env)
+		if err != nil {
+			return nil, err
+		}
+
+		switch expr.Operator.Type {
+		case tokens.OR:
+			if left.(bool) {
+				return true, nil
+			}
+		case tokens.AND:
+			if !left.(bool) {
+				return false, nil
+			}
+		default:
+			return nil, fmt.Errorf("unknown logical operator: %s", expr.Operator.Lexeme)
+		}
+
+		right, err := Evaluate(expr.Right, env)
+		if err != nil {
+			return nil, err
+		}
+
+		return right, nil
+	case ast.ArrayExpression:
+		var elements []interface{}
+		for _, element := range expr.Elements {
+			evaluatedElement, err := Evaluate(element, env)
+			if err != nil {
+				return nil, err
+			}
+			elements = append(elements, evaluatedElement)
+		}
+		return elements, nil
+	case ast.HashmapExpression:
+		hashmap := make(map[interface{}]interface{})
+		for keyExpr, valueExpr := range expr.Pairs {
+			key, err := Evaluate(keyExpr, env)
+			if err != nil {
+				return nil, err
+			}
+			value, err := Evaluate(valueExpr, env)
+			if err != nil {
+				return nil, err
+			}
+			hashmap[key] = value
+		}
+		return hashmap, nil
 	default:
 		return nil, fmt.Errorf("unknown expression: %T", expr)
 	}

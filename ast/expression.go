@@ -50,10 +50,5 @@ type ArrayExpression struct {
 }
 
 type HashmapExpression struct {
-	Properties []KeyValueExpression
-}
-
-type KeyValueExpression struct {
-	Key   tokens.Token
-	Value Expression
+	Pairs map[Expression]Expression
 }
