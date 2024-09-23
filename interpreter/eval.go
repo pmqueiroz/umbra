@@ -82,19 +82,19 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return nil, err
 		}
 
-		if function, ok := callee.(ast.FunctionStatement); ok {
-			funcEnv := NewEnvironment(env)
+		if function, ok := callee.(FunctionDeclaration); ok {
+			funcEnv := NewEnvironment(function.Environment)
 
 			for i, arg := range expr.Arguments {
 				argValue, err := Evaluate(arg, env)
 				if err != nil {
 					return nil, err
 				}
-				funcEnv.Create(function.Params[i].Name.Raw.Value, argValue)
+				funcEnv.Create(function.Itself.Params[i].Name.Raw.Value, argValue)
 			}
 
 			var result interface{}
-			for _, stmt := range function.Body {
+			for _, stmt := range function.Itself.Body {
 				if err := Interpret(stmt, funcEnv); err != nil {
 					if returnValue, ok := err.(Return); ok {
 						result = returnValue.value

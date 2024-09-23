@@ -1,5 +1,12 @@
 package interpreter
 
+import (
+	"fmt"
+	"os"
+
+	"github.com/pmqueiroz/umbra/exception"
+)
+
 type Environment struct {
 	values map[string]interface{}
 	parent *Environment
@@ -33,6 +40,8 @@ func (env *Environment) Set(name string, value interface{}) bool {
 
 func (env *Environment) Create(name string, value interface{}) bool {
 	if _, exists := env.Get(name); exists {
+		fmt.Println(exception.NewRuntimeError(fmt.Sprintf("variable %s already exists", name)))
+		os.Exit(1)
 		return false
 	}
 	env.values[name] = value
