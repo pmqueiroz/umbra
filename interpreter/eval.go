@@ -201,7 +201,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		case map[interface{}]interface{}:
 			value, ok := obj[expr.Property.Lexeme]
 			if !ok {
-				return nil, fmt.Errorf("undefined property: %v", expr.Property)
+				return nil, nil
 			}
 			return value, nil
 		case []interface{}:
