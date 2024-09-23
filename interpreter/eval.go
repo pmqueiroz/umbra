@@ -24,8 +24,41 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		if err != nil {
 			return nil, err
 		}
-		env.Set(expr.Name.Lexeme, value)
-		return value, nil
+
+		switch target := expr.Target.(type) {
+		case ast.VariableExpression:
+			env.Set(target.Name.Lexeme, value)
+			return value, nil
+		case ast.MemberExpression:
+			object, err := Evaluate(target.Object, env)
+			if err != nil {
+				return nil, err
+			}
+
+			switch obj := object.(type) {
+			case map[interface{}]interface{}:
+				obj[target.Property.Lexeme] = value
+				return value, nil
+			case []interface{}:
+				index, err := Evaluate(target.Property, env)
+				if err != nil {
+					return nil, err
+				}
+				idx, ok := index.(float64)
+				if !ok {
+					return nil, fmt.Errorf("invalid array index: %v", index)
+				}
+				if int(idx) < 0 || int(idx) >= len(obj) {
+					return nil, fmt.Errorf("array index out of bounds: %v", idx)
+				}
+				obj[int(idx)] = value
+				return value, nil
+			default:
+				return nil, fmt.Errorf("cannot assign to property of non-object type: %T", obj)
+			}
+		default:
+			return nil, fmt.Errorf("invalid assignment target: %T", target)
+		}
 	case ast.BinaryExpression:
 		left, err := Evaluate(expr.Left, env)
 		if err != nil {

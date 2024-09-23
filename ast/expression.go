@@ -7,8 +7,8 @@ import (
 type Expression interface{}
 
 type AssignExpression struct {
-	Name  tokens.Token
-	Value Expression
+	Target Expression
+	Value  Expression
 }
 
 type BinaryExpression struct {

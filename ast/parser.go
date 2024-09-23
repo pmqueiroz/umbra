@@ -396,15 +396,16 @@ func (p *Parser) expression() Expression {
 	if p.match(tokens.EQUAL) {
 		value := p.expression()
 
-		if assign, ok := expr.(VariableExpression); ok {
-			name := assign.Name
+		switch target := expr.(type) {
+		case VariableExpression, MemberExpression:
 			return AssignExpression{
-				Name:  name,
-				Value: value,
+				Target: target,
+				Value:  value,
 			}
+		default:
+			p.throw("Invalid assignment target.")
 		}
 
-		p.throw("Invalid assignment target.")
 	}
 
 	return expr
