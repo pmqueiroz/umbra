@@ -51,7 +51,6 @@ const (
 	VOID_TYPE          TokenType = "VOID_TYPE"
 	ARR_TYPE           TokenType = "ARR_TYPE"
 	HASHMAP_TYPE       TokenType = "HASHMAP_TYPE"
-	MODULE             TokenType = "MODULE"
 	BREAK              TokenType = "BREAK"
 )
 
@@ -90,7 +89,6 @@ var reservedKeywordsMap = map[string]TokenType{
 	"void":    VOID_TYPE,
 	"const":   CONST,
 	"mut":     MUT,
-	"module":  MODULE,
 	"break":   BREAK,
 }
 

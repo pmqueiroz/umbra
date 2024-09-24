@@ -72,6 +72,5 @@ type ConditionalForStatement struct {
 }
 
 type ModuleStatement struct {
-	Name         tokens.Token
 	Declarations []Statement
 }

@@ -1,5 +1,3 @@
-module main
-
 mut binaryTree hashmap = {
   value: 4,
   left: {

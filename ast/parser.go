@@ -584,15 +584,11 @@ func Parse(tokenList []tokens.Token) ModuleStatement {
 		current:   0,
 	}
 
-	parser.consume("Expect module at start of file", tokens.MODULE)
-	name := parser.consume("Expect module name", tokens.IDENTIFIER)
-
 	for !parser.isAtEOF() {
 		declarations = append(declarations, parser.declaration())
 	}
 
 	module := ModuleStatement{
-		Name:         name,
 		Declarations: declarations,
 	}
 
