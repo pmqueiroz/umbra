@@ -5,10 +5,12 @@ import (
 	"os"
 
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/tokens"
 )
 
 type Value struct {
 	data      interface{}
+	dataType  tokens.TokenType
 	isPrivate bool
 }
 
@@ -30,24 +32,24 @@ func NewEnvironment(parent *Environment) *Environment {
 	}
 }
 
-func (env *Environment) Get(name string, allowPrivate bool) (interface{}, bool) {
+func (env *Environment) Get(name string, allowPrivate bool) (Value, bool) {
 	value, exists := env.values[name]
 	if exists {
 		if value.isPrivate && !allowPrivate {
-			return nil, false
+			return Value{}, false
 		}
-		return value.data, true
+		return value, true
 	}
 
 	if env.parent != nil {
 		return env.parent.Get(name, allowPrivate)
 	}
-	return nil, false
+	return Value{}, false
 }
 
 func (env *Environment) Set(name string, value interface{}) bool {
 	if val, exists := env.values[name]; exists {
-		env.values[name] = Value{data: value, isPrivate: val.isPrivate}
+		env.values[name] = Value{data: value, dataType: val.dataType, isPrivate: val.isPrivate}
 		return true
 	}
 	if env.parent != nil {
@@ -56,13 +58,13 @@ func (env *Environment) Set(name string, value interface{}) bool {
 	return false
 }
 
-func (env *Environment) Create(name string, value interface{}) bool {
+func (env *Environment) Create(name string, value interface{}, dataType tokens.TokenType) bool {
 	if _, exists := env.Get(name, true); exists {
 		fmt.Println(exception.NewRuntimeError(fmt.Sprintf("variable %s already exists", name)))
 		os.Exit(1)
 		return false
 	}
-	env.values[name] = Value{data: value, isPrivate: true}
+	env.values[name] = Value{data: value, dataType: dataType, isPrivate: true}
 	return true
 }
 

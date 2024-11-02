@@ -52,6 +52,7 @@ const (
 	VOID_TYPE          TokenType = "VOID_TYPE"
 	ARR_TYPE           TokenType = "ARR_TYPE"
 	HASHMAP_TYPE       TokenType = "HASHMAP_TYPE"
+	FUN_TYPE           TokenType = "FUN_TYPE"
 	BREAK              TokenType = "BREAK"
 	PUBLIC             TokenType = "PUBLIC"
 	IMPORT             TokenType = "IMPORT"
@@ -90,6 +91,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"arr":     ARR_TYPE,
 	"hashmap": HASHMAP_TYPE,
 	"void":    VOID_TYPE,
+	"func":    FUN_TYPE,
 	"const":   CONST,
 	"mut":     MUT,
 	"break":   BREAK,

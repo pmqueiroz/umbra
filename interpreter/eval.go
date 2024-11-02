@@ -19,7 +19,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		if !ok {
 			return nil, exception.NewRuntimeError(fmt.Sprintf("undefined variable: %s", expr.Name.Lexeme))
 		}
-		return value, nil
+		return value.data, nil
 	case ast.AssignExpression:
 		value, err := Evaluate(expr.Value, env)
 		if err != nil {
@@ -28,6 +28,18 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 
 		switch target := expr.Target.(type) {
 		case ast.VariableExpression:
+			variable, exists := env.Get(target.Name.Lexeme, true)
+
+			if !exists {
+				return nil, exception.NewRuntimeError(fmt.Sprintf("undefined variable: %s", target.Name.Lexeme))
+			}
+
+			typeErr := CheckType(variable.dataType, value)
+
+			if typeErr != nil {
+				return nil, typeErr
+			}
+
 			env.Set(target.Name.Lexeme, value)
 			return value, nil
 		case ast.MemberExpression:
@@ -124,7 +136,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				if err != nil {
 					return nil, err
 				}
-				funcEnv.Create(function.Itself.Params[i].Name.Lexeme, argValue)
+				funcEnv.Create(function.Itself.Params[i].Name.Lexeme, argValue, function.Itself.Params[i].Name.Type)
 			}
 
 			var result interface{}
@@ -230,7 +242,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 
 			value, _ := namespace.Get(expr.Property.Lexeme, false)
 
-			return value, nil
+			return value.data, nil
 		}
 
 		return nil, exception.NewRuntimeError(fmt.Sprintf("invalid namespace: %T", expr.Namespace))

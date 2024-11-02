@@ -7,6 +7,7 @@ import (
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/tokens"
 )
 
 type Return struct {
@@ -73,14 +74,14 @@ func Interpret(statement ast.Statement, env *Environment) error {
 				return err
 			}
 
-			typeErr := CheckTypes(stmt.Type.Type, value)
+			typeErr := CheckType(stmt.Type.Type, value)
 
 			if typeErr != nil {
 				return typeErr
 			}
 		}
 
-		env.Create(stmt.Name.Lexeme, value)
+		env.Create(stmt.Name.Lexeme, value, stmt.Type.Type)
 		return nil
 	case ast.BlockStatement:
 		newEnv := NewEnvironment(env)
@@ -116,7 +117,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		}
 		return Return{value: value}
 	case ast.FunctionStatement:
-		env.Create(stmt.Name.Lexeme, FunctionDeclaration{Itself: &stmt, Environment: env})
+		env.Create(stmt.Name.Lexeme, FunctionDeclaration{Itself: &stmt, Environment: env}, tokens.FUN_TYPE)
 		return nil
 	case ast.ExpressionStatement:
 		_, err := Evaluate(stmt.Expression, env)
@@ -131,8 +132,8 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 		for {
 			loopEnv := NewEnvironment(forEnv)
-			controlVar, ok := loopEnv.Get(initializedVarName, true)
-			if !ok {
+			controlVar, exists := loopEnv.Get(initializedVarName, true)
+			if !exists {
 				return exception.NewRuntimeError(fmt.Sprintf("control variable not found in environment: %s", initializedVarName))
 			}
 
@@ -143,7 +144,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			var condition bool
 			if parsedStop, ok := stop.(float64); ok {
-				condition = controlVar.(float64) <= parsedStop
+				condition = controlVar.data.(float64) <= parsedStop
 			} else {
 				return exception.NewRuntimeError(fmt.Sprintf("loop stop should be a number, got: %T", stop))
 			}
@@ -164,12 +165,12 @@ func Interpret(statement ast.Statement, env *Environment) error {
 				return err
 			}
 
-			step, ok := stepValue.(float64)
-			if !ok {
+			step, exists := stepValue.(float64)
+			if !exists {
 				return exception.NewRuntimeError(fmt.Sprintf("loop step should be a number, got: %T", stepValue))
 			}
 
-			loopEnv.Set(initializedVarName, controlVar.(float64)+step)
+			loopEnv.Set(initializedVarName, controlVar.data.(float64)+step)
 		}
 
 		return nil
