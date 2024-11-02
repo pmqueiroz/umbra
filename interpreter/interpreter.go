@@ -201,6 +201,16 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		}
 
 		return nil
+	case ast.ImportStatement:
+		namespace, err := LoadModule(stmt.Path.Lexeme)
+
+		if err != nil {
+			return err
+		}
+
+		env.CreateNamespace(stmt.Path.Lexeme, &namespace)
+
+		return nil
 	default:
 		return fmt.Errorf("unknown declaration: %T", statement)
 	}

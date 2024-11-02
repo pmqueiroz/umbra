@@ -1,3 +1,5 @@
+import "io"
+
 mut binaryTree hashmap = {
   value: 4,
   left: {
@@ -26,8 +28,7 @@ def printTree(root hashmap) {
   }
 
   printTree(root.left)
-  stdout root.value
-  stdout " "
+  io::print(root.value)
   printTree(root.right)
 }
 
@@ -45,11 +46,12 @@ def invertTree(root hashmap) {
   return root
 }
 
-stdout "original:\n"
+io::printLn("original:")
 
 printTree(binaryTree)
 
 invertTree(binaryTree)
 
-stdout "\ninverted:\n"
+io::printLn("\ninverted:")
+
 printTree(binaryTree)

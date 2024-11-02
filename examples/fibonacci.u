@@ -1,3 +1,5 @@
+import "io"
+
 def fib(n num) num {
 	if n <= 1 { return n }
 	return fib(n - 1) + fib(n - 2)
@@ -5,4 +7,4 @@ def fib(n num) num {
 
 # i do not recommend going above 38
 # unless you want to wait a while
-stdout fib(38)
+io::printLn(fib(38))

@@ -285,6 +285,13 @@ func (p *Parser) call() Expression {
 				Object:   expr,
 				Property: property,
 			}
+		} else if p.match(tokens.DOUBLE_COLON) {
+			property := p.consume("Expect property name after '::'.", tokens.IDENTIFIER)
+			expr = NamespaceMemberExpression{
+				Namespace: expr,
+				Property:  property,
+			}
+
 		} else {
 			break
 		}
@@ -454,6 +461,16 @@ func (p *Parser) publicStatement() Statement {
 	}
 }
 
+func (p *Parser) importStatement() Statement {
+	keyword := p.previous()
+	path := p.consume("Expect module path.", tokens.STRING)
+
+	return ImportStatement{
+		Keyword: keyword,
+		Path:    path,
+	}
+}
+
 func (p *Parser) printStatement(channel PrintChannel) Statement {
 	value := p.expression()
 	return PrintStatement{
@@ -569,6 +586,9 @@ func (p *Parser) statement() Statement {
 	}
 	if p.match(tokens.PUBLIC) {
 		return p.publicStatement()
+	}
+	if p.match(tokens.IMPORT) {
+		return p.importStatement()
 	}
 	if p.match(tokens.LEFT_BRACE) {
 		blockStatement, _ := p.block()

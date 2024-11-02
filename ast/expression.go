@@ -57,3 +57,8 @@ type MemberExpression struct {
 	Object   Expression
 	Property tokens.Token
 }
+
+type NamespaceMemberExpression struct {
+	Namespace Expression
+	Property  tokens.Token
+}

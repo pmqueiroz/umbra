@@ -205,14 +205,18 @@ func (t *Tokenizer) scan() {
 		t.addNonLiteralToken(MINUS)
 	case '+':
 		t.addNonLiteralToken(PLUS)
-	case ':':
-		t.addNonLiteralToken(COLON)
 	case ';':
 		t.addNonLiteralToken(SEMICOLON)
 	case '*':
 		t.addNonLiteralToken(STAR)
 	case '/':
 		t.addNonLiteralToken(SLASH)
+	case ':':
+		if t.match(':') {
+			t.addNonLiteralToken(DOUBLE_COLON)
+		} else {
+			t.addNonLiteralToken(COLON)
+		}
 	case '!':
 		if t.match('=') {
 			t.addNonLiteralToken(BANG_EQUAL)

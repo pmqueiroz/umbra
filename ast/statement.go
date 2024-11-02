@@ -57,6 +57,11 @@ type PublicStatement struct {
 	Identifier tokens.Token
 }
 
+type ImportStatement struct {
+	Keyword tokens.Token
+	Path    tokens.Token
+}
+
 type VarStatement struct {
 	Name        tokens.Token
 	Initializer Expression

@@ -1,0 +1,22 @@
+def print(string str) {
+  stdout string
+}
+
+def printErr(string str) {
+  stderr string
+}
+
+def printLn(string str) {
+  print(string)
+  print("\n")
+}
+
+def printErrLn(string str) {
+  printErr(string)
+  printErr("\n")
+}
+
+pub print
+pub printErr
+pub printLn
+pub printErrLn

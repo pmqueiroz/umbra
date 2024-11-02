@@ -56,6 +56,13 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			default:
 				return nil, fmt.Errorf("cannot assign to property of non-object type: %T", obj)
 			}
+		// case ast.NamespaceMemberExpression:
+
+		// 	object, err := Evaluate(target.Object, env)
+		// 	if err != nil {
+		// 		return nil, err
+		// 	}
+
 		default:
 			return nil, fmt.Errorf("invalid assignment target: %T", target)
 		}
@@ -220,6 +227,19 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		default:
 			return nil, fmt.Errorf("cannot access property of non-object type: %T", obj)
 		}
+	case ast.NamespaceMemberExpression:
+		if variableExpr, ok := expr.Namespace.(ast.VariableExpression); ok {
+			namespace, ok := env.GetNamespace(variableExpr.Name.Lexeme)
+			if !ok {
+				return nil, fmt.Errorf("unknown namespace: %s", variableExpr.Name.Lexeme)
+			}
+
+			value, _ := namespace.Get(expr.Property.Lexeme, false)
+
+			return value, nil
+		}
+
+		return nil, fmt.Errorf("invalid namespace: %T", expr.Namespace)
 	default:
 		return nil, fmt.Errorf("unknown expression: %T", expr)
 	}

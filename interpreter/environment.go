@@ -12,15 +12,21 @@ type Value struct {
 	isPrivate bool
 }
 
+type Namespace struct {
+	env Environment
+}
+
 type Environment struct {
-	values map[string]Value
-	parent *Environment
+	values     map[string]Value
+	namespaces map[string]Namespace
+	parent     *Environment
 }
 
 func NewEnvironment(parent *Environment) *Environment {
 	return &Environment{
-		values: make(map[string]Value),
-		parent: parent,
+		values:     make(map[string]Value),
+		namespaces: make(map[string]Namespace),
+		parent:     parent,
 	}
 }
 
@@ -90,4 +96,36 @@ func (env *Environment) MakePublic(name string) bool {
 		return env.parent.MakePublic(name)
 	}
 	return false
+}
+
+func (env *Environment) GetNamespace(name string) (Environment, bool) {
+	namespace, exists := env.namespaces[name]
+	if exists {
+		return namespace.env, true
+	}
+
+	if env.parent != nil {
+		return env.parent.GetNamespace(name)
+	}
+
+	return Environment{}, false
+}
+
+func (env *Environment) CreateNamespace(name string, namespace *Environment) bool {
+	if _, exists := env.GetNamespace(name); exists {
+		fmt.Println(exception.NewRuntimeError(fmt.Sprintf("namespace %s already exists", name)))
+		os.Exit(1)
+		return false
+	}
+	env.namespaces[name] = Namespace{env: *namespace}
+	return true
+}
+
+func (env *Environment) ListNamespaces() map[string]interface{} {
+	allValues := make(map[string]interface{})
+	for key, value := range env.namespaces {
+		allValues[key] = value.env
+	}
+
+	return allValues
 }

@@ -19,6 +19,7 @@ const (
 	MINUS              TokenType = "MINUS"
 	PLUS               TokenType = "PLUS"
 	COLON              TokenType = "COLON"
+	DOUBLE_COLON       TokenType = "DOUBLE_COLON"
 	SEMICOLON          TokenType = "SEMICOLON"
 	SLASH              TokenType = "SLASH"
 	STAR               TokenType = "STAR"
@@ -53,6 +54,7 @@ const (
 	HASHMAP_TYPE       TokenType = "HASHMAP_TYPE"
 	BREAK              TokenType = "BREAK"
 	PUBLIC             TokenType = "PUBLIC"
+	IMPORT             TokenType = "IMPORT"
 )
 
 var DATA_TYPES = []TokenType{
@@ -92,6 +94,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"mut":     MUT,
 	"break":   BREAK,
 	"pub":     PUBLIC,
+	"import":  IMPORT,
 }
 
 func getKeyword(lexis string) TokenType {

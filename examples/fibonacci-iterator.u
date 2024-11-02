@@ -1,3 +1,5 @@
+import "io"
+
 def fibonacci(n num) num {
   if n <= 1 { return n }
 
@@ -14,5 +16,4 @@ def fibonacci(n num) num {
   return b
 }
 
-const result num = fibonacci(47)
-stdout result
+io::printLn(fibonacci(47))

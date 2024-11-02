@@ -1,4 +1,4 @@
-package main
+package helpers
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/pmqueiroz/umbra/exception"
 )
 
-func readFile(path string) (string, error) {
+func ReadFile(path string) (string, error) {
 	dat, err := os.ReadFile(path)
 
 	if err != nil {

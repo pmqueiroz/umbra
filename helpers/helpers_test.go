@@ -1,4 +1,4 @@
-package main
+package helpers
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ func TestValidFile(t *testing.T) {
 		return
 	}
 
-	dat, err := readFile(file.Name())
+	dat, err := ReadFile(file.Name())
 
 	if err != nil {
 		t.Fatal(err.Error())
@@ -34,7 +34,7 @@ func TestValidFile(t *testing.T) {
 }
 
 func TestNonexistentFile(t *testing.T) {
-	_, err := readFile("nonexistent.file")
+	_, err := ReadFile("nonexistent.file")
 
 	if err == nil {
 		t.Error("should return an error but didn't")

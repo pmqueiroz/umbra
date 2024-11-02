@@ -6,6 +6,7 @@ import (
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/cli"
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/interpreter"
 	"github.com/pmqueiroz/umbra/tokens"
 )
@@ -37,7 +38,7 @@ func main() {
 	args := cli.Parse()
 
 	if args.Input != "" {
-		content, err := readFile(args.Input)
+		content, err := helpers.ReadFile(args.Input)
 
 		if err != nil {
 			fmt.Printf("%s\n", err.Error())
