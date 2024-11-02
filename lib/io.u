@@ -1,18 +1,18 @@
-def print(string str) {
-  stdout string
+def print(value any) {
+  stdout value
 }
 
-def printErr(string str) {
-  stderr string
+def printErr(value any) {
+  stderr value
 }
 
-def printLn(string str) {
-  print(string)
+def printLn(value any) {
+  print(value)
   print("\n")
 }
 
-def printErrLn(string str) {
-  printErr(string)
+def printErrLn(value any) {
+  printErr(value)
   printErr("\n")
 }
 

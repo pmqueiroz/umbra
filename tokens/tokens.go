@@ -53,6 +53,7 @@ const (
 	ARR_TYPE           TokenType = "ARR_TYPE"
 	HASHMAP_TYPE       TokenType = "HASHMAP_TYPE"
 	FUN_TYPE           TokenType = "FUN_TYPE"
+	ANY_TYPE           TokenType = "ANY_TYPE"
 	BREAK              TokenType = "BREAK"
 	PUBLIC             TokenType = "PUBLIC"
 	IMPORT             TokenType = "IMPORT"
@@ -64,6 +65,8 @@ var DATA_TYPES = []TokenType{
 	BOOL_TYPE,
 	HASHMAP_TYPE,
 	ARR_TYPE,
+	ANY_TYPE,
+	FUN_TYPE,
 }
 
 var SPECIAL_TYPES = []TokenType{
@@ -97,6 +100,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"break":   BREAK,
 	"pub":     PUBLIC,
 	"import":  IMPORT,
+	"any":     ANY_TYPE,
 }
 
 func getKeyword(lexis string) TokenType {

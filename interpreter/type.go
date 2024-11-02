@@ -7,32 +7,36 @@ import (
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
-func CheckType(target tokens.TokenType, expected interface{}) error {
-	typeMismatchErr := fmt.Sprintf("expected %s got %T", target, expected)
+func CheckType(targetType tokens.TokenType, expected interface{}) error {
+	typeMismatchErr := fmt.Sprintf("expected %s got %T", targetType, expected)
+
+	if targetType == tokens.ANY_TYPE {
+		return nil
+	}
 
 	switch expected.(type) {
 	case nil:
-		if target != tokens.NULL {
+		if targetType != tokens.NULL {
 			return exception.NewTypeError(typeMismatchErr)
 		}
 	case string:
-		if target != tokens.STR_TYPE {
+		if targetType != tokens.STR_TYPE {
 			return exception.NewTypeError(typeMismatchErr)
 		}
 	case bool:
-		if target != tokens.BOOL_TYPE {
+		if targetType != tokens.BOOL_TYPE {
 			return exception.NewTypeError(typeMismatchErr)
 		}
 	case float64:
-		if target != tokens.NUM_TYPE {
+		if targetType != tokens.NUM_TYPE {
 			return exception.NewTypeError(typeMismatchErr)
 		}
 	case map[interface{}]interface{}:
-		if target != tokens.HASHMAP_TYPE {
+		if targetType != tokens.HASHMAP_TYPE {
 			return exception.NewTypeError(typeMismatchErr)
 		}
 	case []interface{}:
-		if target != tokens.ARR_TYPE {
+		if targetType != tokens.ARR_TYPE {
 			return exception.NewTypeError(typeMismatchErr)
 		}
 	}

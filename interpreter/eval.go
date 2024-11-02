@@ -136,7 +136,14 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				if err != nil {
 					return nil, err
 				}
-				funcEnv.Create(function.Itself.Params[i].Name.Lexeme, argValue, function.Itself.Params[i].Name.Type)
+
+				typeErr := CheckType(function.Itself.Params[i].Type.Type, argValue)
+
+				if typeErr != nil {
+					return nil, typeErr
+				}
+
+				funcEnv.Create(function.Itself.Params[i].Name.Lexeme, argValue, function.Itself.Params[i].Type.Type)
 			}
 
 			var result interface{}
