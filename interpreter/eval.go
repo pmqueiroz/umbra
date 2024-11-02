@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pmqueiroz/umbra/ast"
+	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
@@ -16,7 +17,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 	case ast.VariableExpression:
 		value, ok := env.Get(expr.Name.Lexeme, true)
 		if !ok {
-			return nil, fmt.Errorf("undefined variable: %s", expr.Name.Lexeme)
+			return nil, exception.NewRuntimeError(fmt.Sprintf("undefined variable: %s", expr.Name.Lexeme))
 		}
 		return value, nil
 	case ast.AssignExpression:
@@ -46,18 +47,18 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				}
 				idx, ok := index.(float64)
 				if !ok {
-					return nil, fmt.Errorf("invalid array index: %v", index)
+					return nil, exception.NewRuntimeError(fmt.Sprintf("invalid array index: %v", index))
 				}
 				if int(idx) < 0 || int(idx) >= len(obj) {
-					return nil, fmt.Errorf("array index out of bounds: %v", idx)
+					return nil, exception.NewRuntimeError(fmt.Sprintf("array index out of bounds: %v", idx))
 				}
 				obj[int(idx)] = value
 				return value, nil
 			default:
-				return nil, fmt.Errorf("cannot assign to property of non-object type: %T", obj)
+				return nil, exception.NewRuntimeError(fmt.Sprintf("cannot assign to property of non-object type: %T", obj))
 			}
 		default:
-			return nil, fmt.Errorf("invalid assignment target: %T", target)
+			return nil, exception.NewRuntimeError(fmt.Sprintf("invalid assignment target: %T", target))
 		}
 	case ast.BinaryExpression:
 		left, err := Evaluate(expr.Left, env)
@@ -78,7 +79,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return left.(float64) * right.(float64), nil
 		case tokens.SLASH:
 			if right.(float64) == 0 {
-				return nil, fmt.Errorf("invalid operation: division by zero")
+				return nil, exception.NewRuntimeError("invalid operation: division by zero")
 			}
 			return left.(float64) / right.(float64), nil
 		case tokens.GREATER_THAN:
@@ -94,7 +95,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		case tokens.BANG_EQUAL:
 			return left != right, nil
 		default:
-			return nil, fmt.Errorf("unknown binary expression: %s", expr.Operator.Lexeme)
+			return nil, exception.NewRuntimeError(fmt.Sprintf("unknown binary expression: %s", expr.Operator.Lexeme))
 		}
 	case ast.UnaryExpression:
 		right, err := Evaluate(expr.Right, env)
@@ -106,7 +107,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		case tokens.MINUS:
 			return -right.(float64), nil
 		default:
-			return nil, fmt.Errorf("unknown unary expression: %s", expr.Operator.Lexeme)
+			return nil, exception.NewRuntimeError(fmt.Sprintf("unknown unary expression: %s", expr.Operator.Lexeme))
 		}
 	case ast.CallExpression:
 		callee, err := Evaluate(expr.Callee, env)
@@ -141,7 +142,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return result, nil
 		}
 
-		return nil, fmt.Errorf("invalid function call %v", expr.Callee)
+		return nil, exception.NewRuntimeError(fmt.Sprintf("invalid function call %v", expr.Callee))
 	case ast.LogicalExpression:
 		left, err := Evaluate(expr.Left, env)
 		if err != nil {
@@ -158,7 +159,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return false, nil
 			}
 		default:
-			return nil, fmt.Errorf("unknown logical operator: %s", expr.Operator.Lexeme)
+			return nil, exception.NewRuntimeError(fmt.Sprintf("unknown logical operator: %s", expr.Operator.Lexeme))
 		}
 
 		right, err := Evaluate(expr.Right, env)
@@ -211,20 +212,20 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			}
 			idx, ok := index.(float64)
 			if !ok {
-				return nil, fmt.Errorf("invalid array index: %v", index)
+				return nil, exception.NewRuntimeError(fmt.Sprintf("invalid array index: %v", index))
 			}
 			if int(idx) < 0 || int(idx) >= len(obj) {
-				return nil, fmt.Errorf("array index out of bounds: %v", idx)
+				return nil, exception.NewRuntimeError(fmt.Sprintf("array index out of bounds: %v", idx))
 			}
 			return obj[int(idx)], nil
 		default:
-			return nil, fmt.Errorf("cannot access property of non-object type: %T", obj)
+			return nil, exception.NewRuntimeError(fmt.Sprintf("cannot access property of non-object type: %T", obj))
 		}
 	case ast.NamespaceMemberExpression:
 		if variableExpr, ok := expr.Namespace.(ast.VariableExpression); ok {
 			namespace, ok := env.GetNamespace(variableExpr.Name.Lexeme)
 			if !ok {
-				return nil, fmt.Errorf("unknown namespace: %s", variableExpr.Name.Lexeme)
+				return nil, exception.NewRuntimeError(fmt.Sprintf("unknown namespace: %s", variableExpr.Name.Lexeme))
 			}
 
 			value, _ := namespace.Get(expr.Property.Lexeme, false)
@@ -232,8 +233,8 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return value, nil
 		}
 
-		return nil, fmt.Errorf("invalid namespace: %T", expr.Namespace)
+		return nil, exception.NewRuntimeError(fmt.Sprintf("invalid namespace: %T", expr.Namespace))
 	default:
-		return nil, fmt.Errorf("unknown expression: %T", expr)
+		return nil, exception.NewRuntimeError(fmt.Sprintf("unknown expression: %T", expr))
 	}
 }

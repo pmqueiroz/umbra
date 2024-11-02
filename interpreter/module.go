@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/pmqueiroz/umbra/ast"
-	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/tokens"
 )
@@ -34,7 +33,7 @@ func LoadModule(path string) (Environment, error) {
 	namespace := NewEnvironment(nil)
 
 	if err := Interpret(module, namespace); err != nil {
-		fmt.Println(exception.NewRuntimeError(fmt.Sprint(err)))
+		fmt.Println(err)
 	}
 
 	return *namespace, nil

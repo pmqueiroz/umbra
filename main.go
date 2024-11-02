@@ -5,7 +5,6 @@ import (
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/cli"
-	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/interpreter"
 	"github.com/pmqueiroz/umbra/tokens"
@@ -30,7 +29,7 @@ func run(content string, options RunOptions) {
 	}
 
 	if err := interpreter.Interpret(module, options.Env); err != nil {
-		fmt.Println(exception.NewRuntimeError(fmt.Sprint(err)))
+		fmt.Println(err)
 	}
 }
 

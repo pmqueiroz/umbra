@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/pmqueiroz/umbra/ast"
+	"github.com/pmqueiroz/umbra/exception"
 )
 
 type Return struct {
@@ -71,7 +72,14 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			if err != nil {
 				return err
 			}
+
+			typeErr := CheckTypes(stmt.Type.Type, value)
+
+			if typeErr != nil {
+				return typeErr
+			}
 		}
+
 		env.Create(stmt.Name.Lexeme, value)
 		return nil
 	case ast.BlockStatement:
@@ -125,7 +133,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			loopEnv := NewEnvironment(forEnv)
 			controlVar, ok := loopEnv.Get(initializedVarName, true)
 			if !ok {
-				return fmt.Errorf("control variable not found in environment: %s", initializedVarName)
+				return exception.NewRuntimeError(fmt.Sprintf("control variable not found in environment: %s", initializedVarName))
 			}
 
 			stop, err := Evaluate(stmt.Stop, loopEnv)
@@ -137,7 +145,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			if parsedStop, ok := stop.(float64); ok {
 				condition = controlVar.(float64) <= parsedStop
 			} else {
-				return fmt.Errorf("loop stop should be a number, got: %T", stop)
+				return exception.NewRuntimeError(fmt.Sprintf("loop stop should be a number, got: %T", stop))
 			}
 
 			if !condition {
@@ -158,7 +166,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			step, ok := stepValue.(float64)
 			if !ok {
-				return fmt.Errorf("loop step should be a number, got: %T", stepValue)
+				return exception.NewRuntimeError(fmt.Sprintf("loop step should be a number, got: %T", stepValue))
 			}
 
 			loopEnv.Set(initializedVarName, controlVar.(float64)+step)
@@ -176,7 +184,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			parsedCondition, ok := condition.(bool)
 			if !ok {
-				return fmt.Errorf("loop condition should be a boolean, got: %T", parsedCondition)
+				return exception.NewRuntimeError(fmt.Sprintf("loop condition should be a boolean, got: %T", parsedCondition))
 			}
 
 			if !parsedCondition {
@@ -197,7 +205,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		success := env.MakePublic(stmt.Identifier.Lexeme)
 
 		if !success {
-			return fmt.Errorf("cannot make %s public. identifier does not exits", stmt.Identifier.Lexeme)
+			return exception.NewRuntimeError(fmt.Sprintf("cannot make %s public. identifier does not exits", stmt.Identifier.Lexeme))
 		}
 
 		return nil
@@ -212,6 +220,6 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 		return nil
 	default:
-		return fmt.Errorf("unknown declaration: %T", statement)
+		return exception.NewRuntimeError(fmt.Sprintf("unknown declaration: %T", statement))
 	}
 }
