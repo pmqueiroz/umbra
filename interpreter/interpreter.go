@@ -123,7 +123,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 		for {
 			loopEnv := NewEnvironment(forEnv)
-			controlVar, ok := loopEnv.Get(initializedVarName)
+			controlVar, ok := loopEnv.Get(initializedVarName, true)
 			if !ok {
 				return fmt.Errorf("control variable not found in environment: %s", initializedVarName)
 			}
@@ -193,6 +193,14 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		return nil
 	case ast.BreakStatement:
 		return Break{}
+	case ast.PublicStatement:
+		success := env.MakePublic(stmt.Identifier.Lexeme)
+
+		if !success {
+			return fmt.Errorf("cannot make %s public. identifier does not exits", stmt.Identifier.Lexeme)
+		}
+
+		return nil
 	default:
 		return fmt.Errorf("unknown declaration: %T", statement)
 	}

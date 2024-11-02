@@ -43,9 +43,11 @@ func main() {
 			fmt.Printf("%s\n", err.Error())
 		}
 
+		env := interpreter.NewEnvironment(nil)
+
 		run(content, RunOptions{
 			Options: args.Options,
-			Env:     interpreter.NewEnvironment(nil),
+			Env:     env,
 		})
 	} else {
 		cli.Repl(func(content string, env *interpreter.Environment) {

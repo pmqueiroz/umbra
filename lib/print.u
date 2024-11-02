@@ -1,0 +1,12 @@
+def print(string str) {
+  stdout string
+  stdout "\n"
+}
+
+def printErr(string str) {
+  stderr string
+  stderr "\n"
+}
+
+pub print
+pub printErr

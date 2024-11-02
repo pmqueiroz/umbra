@@ -444,6 +444,16 @@ func (p *Parser) returnStatement() Statement {
 	}
 }
 
+func (p *Parser) publicStatement() Statement {
+	keyword := p.previous()
+	name := p.consume("Expect variable name.", tokens.IDENTIFIER)
+
+	return PublicStatement{
+		Keyword:    keyword,
+		Identifier: name,
+	}
+}
+
 func (p *Parser) printStatement(channel PrintChannel) Statement {
 	value := p.expression()
 	return PrintStatement{
@@ -556,6 +566,9 @@ func (p *Parser) statement() Statement {
 	}
 	if p.match(tokens.BREAK) {
 		return p.breakStatement()
+	}
+	if p.match(tokens.PUBLIC) {
+		return p.publicStatement()
 	}
 	if p.match(tokens.LEFT_BRACE) {
 		blockStatement, _ := p.block()

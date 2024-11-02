@@ -52,6 +52,11 @@ type ReturnStatement struct {
 
 type BreakStatement struct{}
 
+type PublicStatement struct {
+	Keyword    tokens.Token
+	Identifier tokens.Token
+}
+
 type VarStatement struct {
 	Name        tokens.Token
 	Initializer Expression

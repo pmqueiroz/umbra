@@ -14,7 +14,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 	case ast.GroupingExpression:
 		return Evaluate(expr.Expression, env)
 	case ast.VariableExpression:
-		value, ok := env.Get(expr.Name.Lexeme)
+		value, ok := env.Get(expr.Name.Lexeme, true)
 		if !ok {
 			return nil, fmt.Errorf("undefined variable: %s", expr.Name.Lexeme)
 		}
