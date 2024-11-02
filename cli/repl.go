@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/pmqueiroz/umbra/interpreter"
 )
@@ -25,6 +24,6 @@ func Repl(evaluate func(content string, env *interpreter.Environment)) {
 			break
 		}
 
-		evaluate(strings.Join([]string{"module repl", line}, "\n"), env)
+		evaluate(line, env)
 	}
 }
