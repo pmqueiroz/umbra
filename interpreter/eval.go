@@ -56,13 +56,6 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			default:
 				return nil, fmt.Errorf("cannot assign to property of non-object type: %T", obj)
 			}
-		// case ast.NamespaceMemberExpression:
-
-		// 	object, err := Evaluate(target.Object, env)
-		// 	if err != nil {
-		// 		return nil, err
-		// 	}
-
 		default:
 			return nil, fmt.Errorf("invalid assignment target: %T", target)
 		}
