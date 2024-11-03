@@ -99,10 +99,12 @@ func (p *Parser) function() Statement {
 			paramName := p.consume("Expect parameter name.", tokens.IDENTIFIER)
 			variadic := p.match(tokens.VARIADIC)
 			paramType := p.consume("Expect parameter type.", tokens.DATA_TYPES...)
+			nullable := p.match(tokens.HOOK)
 			params = append(params, Parameter{
 				Name:     paramName,
 				Type:     paramType,
 				Variadic: variadic,
+				Nullable: nullable,
 			})
 
 			if !p.match(tokens.COMMA) {
@@ -438,6 +440,7 @@ func (p *Parser) varDeclaration() Statement {
 	isMutable := p.previous().Type == tokens.MUT
 	name := p.consume("Expect variable name.", tokens.IDENTIFIER)
 	variableType := p.consume("Expect variable type.", tokens.DATA_TYPES...)
+	nullable := p.match(tokens.HOOK)
 
 	var initializer Expression
 
@@ -450,6 +453,7 @@ func (p *Parser) varDeclaration() Statement {
 		Initializer: initializer,
 		Mutable:     isMutable,
 		Type:        variableType,
+		Nullable:    nullable,
 	}
 }
 

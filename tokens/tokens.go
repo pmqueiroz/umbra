@@ -59,6 +59,7 @@ const (
 	BREAK              TokenType = "BREAK"
 	PUBLIC             TokenType = "PUBLIC"
 	IMPORT             TokenType = "IMPORT"
+	HOOK               TokenType = "HOOK"
 )
 
 var DATA_TYPES = []TokenType{

@@ -7,7 +7,7 @@ import (
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
-func CheckType(targetType tokens.TokenType, expected interface{}) error {
+func CheckType(targetType tokens.TokenType, expected interface{}, nullable bool) error {
 	typeMismatchErr := fmt.Sprintf("expected %s got %T", targetType, expected)
 
 	if targetType == tokens.ANY_TYPE {
@@ -16,7 +16,7 @@ func CheckType(targetType tokens.TokenType, expected interface{}) error {
 
 	switch expected.(type) {
 	case nil:
-		if targetType != tokens.NULL {
+		if targetType != tokens.NULL && !nullable {
 			return exception.NewTypeError(typeMismatchErr)
 		}
 	case string:

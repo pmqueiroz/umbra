@@ -19,6 +19,7 @@ type Parameter struct {
 	Name     tokens.Token
 	Type     tokens.Token
 	Variadic bool
+	Nullable bool
 }
 
 type FunctionStatement struct {
@@ -68,6 +69,7 @@ type VarStatement struct {
 	Initializer Expression
 	Mutable     bool
 	Type        tokens.Token
+	Nullable    bool
 }
 
 type InitializedForStatement struct {

@@ -8,10 +8,11 @@ import (
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
-type Value struct {
-	data      interface{}
-	dataType  tokens.TokenType
-	isPrivate bool
+type Variable struct {
+	data     interface{}
+	dataType tokens.TokenType
+	private  bool
+	nullable bool
 }
 
 type Namespace struct {
@@ -19,24 +20,24 @@ type Namespace struct {
 }
 
 type Environment struct {
-	values     map[string]Value
+	values     map[string]Variable
 	namespaces map[string]Namespace
 	parent     *Environment
 }
 
 func NewEnvironment(parent *Environment) *Environment {
 	return &Environment{
-		values:     make(map[string]Value),
+		values:     make(map[string]Variable),
 		namespaces: make(map[string]Namespace),
 		parent:     parent,
 	}
 }
 
-func (env *Environment) Get(name string, allowPrivate bool) (Value, bool) {
+func (env *Environment) Get(name string, allowPrivate bool) (Variable, bool) {
 	value, exists := env.values[name]
 	if exists {
-		if value.isPrivate && !allowPrivate {
-			return Value{}, false
+		if value.private && !allowPrivate {
+			return Variable{}, false
 		}
 		return value, true
 	}
@@ -44,12 +45,12 @@ func (env *Environment) Get(name string, allowPrivate bool) (Value, bool) {
 	if env.parent != nil {
 		return env.parent.Get(name, allowPrivate)
 	}
-	return Value{}, false
+	return Variable{}, false
 }
 
 func (env *Environment) Set(name string, value interface{}) bool {
 	if val, exists := env.values[name]; exists {
-		env.values[name] = Value{data: value, dataType: val.dataType, isPrivate: val.isPrivate}
+		env.values[name] = Variable{data: value, dataType: val.dataType, private: val.private, nullable: val.nullable}
 		return true
 	}
 	if env.parent != nil {
@@ -58,20 +59,20 @@ func (env *Environment) Set(name string, value interface{}) bool {
 	return false
 }
 
-func (env *Environment) Create(name string, value interface{}, dataType tokens.TokenType) bool {
+func (env *Environment) Create(name string, value interface{}, dataType tokens.TokenType, nullable bool) bool {
 	if _, exists := env.Get(name, true); exists {
 		fmt.Println(exception.NewRuntimeError(fmt.Sprintf("variable %s already exists", name)))
 		os.Exit(1)
 		return false
 	}
-	env.values[name] = Value{data: value, dataType: dataType, isPrivate: true}
+	env.values[name] = Variable{data: value, dataType: dataType, private: true, nullable: nullable}
 	return true
 }
 
 func (env *Environment) ListValues(includePrivate bool) map[string]interface{} {
 	allValues := make(map[string]interface{})
 	for key, value := range env.values {
-		if !value.isPrivate || includePrivate {
+		if !value.private || includePrivate {
 			allValues[key] = value.data
 		}
 	}
@@ -88,8 +89,8 @@ func (env *Environment) ListValues(includePrivate bool) map[string]interface{} {
 
 func (env *Environment) MakePublic(name string) bool {
 	if value, exists := env.values[name]; exists {
-		if value.isPrivate {
-			value.isPrivate = false
+		if value.private {
+			value.private = false
 			env.values[name] = value
 		}
 		return true

@@ -34,7 +34,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return nil, exception.NewRuntimeError(fmt.Sprintf("undefined variable: %s", target.Name.Lexeme))
 			}
 
-			typeErr := CheckType(variable.dataType, value)
+			typeErr := CheckType(variable.dataType, value, variable.nullable)
 
 			if typeErr != nil {
 				return nil, typeErr
@@ -157,14 +157,14 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 							return nil, err
 						}
 
-						typeErr := CheckType(param.Type.Type, argValue)
+						typeErr := CheckType(param.Type.Type, argValue, param.Nullable)
 						if typeErr != nil {
 							return nil, typeErr
 						}
 
 						variadicArgs = append(variadicArgs, argValue)
 					}
-					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type.Type)
+					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type.Type, param.Nullable)
 					break
 				} else {
 					argValue, err := Evaluate(expr.Arguments[i], env)
@@ -172,12 +172,12 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 						return nil, err
 					}
 
-					typeErr := CheckType(param.Type.Type, argValue)
+					typeErr := CheckType(param.Type.Type, argValue, param.Nullable)
 					if typeErr != nil {
 						return nil, typeErr
 					}
 
-					funcEnv.Create(param.Name.Lexeme, argValue, param.Type.Type)
+					funcEnv.Create(param.Name.Lexeme, argValue, param.Type.Type, param.Nullable)
 				}
 			}
 

@@ -74,14 +74,14 @@ func Interpret(statement ast.Statement, env *Environment) error {
 				return err
 			}
 
-			typeErr := CheckType(stmt.Type.Type, value)
+			typeErr := CheckType(stmt.Type.Type, value, stmt.Nullable)
 
 			if typeErr != nil {
 				return typeErr
 			}
 		}
 
-		env.Create(stmt.Name.Lexeme, value, stmt.Type.Type)
+		env.Create(stmt.Name.Lexeme, value, stmt.Type.Type, stmt.Nullable)
 		return nil
 	case ast.BlockStatement:
 		newEnv := NewEnvironment(env)
@@ -117,7 +117,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		}
 		return Return{value: value}
 	case ast.FunctionStatement:
-		env.Create(stmt.Name.Lexeme, FunctionDeclaration{Itself: &stmt, Environment: env}, tokens.FUN_TYPE)
+		env.Create(stmt.Name.Lexeme, FunctionDeclaration{Itself: &stmt, Environment: env}, tokens.FUN_TYPE, false)
 		return nil
 	case ast.ExpressionStatement:
 		_, err := Evaluate(stmt.Expression, env)
