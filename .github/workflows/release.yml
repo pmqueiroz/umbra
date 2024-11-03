@@ -37,6 +37,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Build
+        shell: bash
         env:
           GOOS: ${{ matrix.job.platform }}
           GOARCH: ${{ matrix.job.arch }}
