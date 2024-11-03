@@ -129,9 +129,9 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		case tokens.SIZE:
 			switch parsedRight := right.(type) {
 			case []interface{}:
-				return len(parsedRight), nil
+				return float64(len(parsedRight)), nil
 			case string:
-				return len(parsedRight), nil
+				return float64(len(parsedRight)), nil
 			default:
 				return nil, exception.NewRuntimeError(fmt.Sprintf("cannot get length of: %s", parsedRight))
 			}
