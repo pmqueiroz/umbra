@@ -177,7 +177,7 @@ func (t *Tokenizer) identifier() {
 	)
 }
 
-func (t *Tokenizer) scan() {
+func (t *Tokenizer) scan() error {
 	char := t.advance()
 
 	switch char {
@@ -199,8 +199,6 @@ func (t *Tokenizer) scan() {
 		t.addNonLiteralToken(RIGHT_BRACKET)
 	case ',':
 		t.addNonLiteralToken(COMMA)
-	case '.':
-		t.addNonLiteralToken(DOT)
 	case '-':
 		t.addNonLiteralToken(MINUS)
 	case '+':
@@ -211,6 +209,16 @@ func (t *Tokenizer) scan() {
 		t.addNonLiteralToken(STAR)
 	case '/':
 		t.addNonLiteralToken(SLASH)
+	case '.':
+		if t.match('.') {
+			if t.match('.') {
+				t.addNonLiteralToken(VARIADIC)
+			} else {
+				return exception.NewSyntaxError("Unexpected double dot", t.line, t.column, string(char))
+			}
+		} else {
+			t.addNonLiteralToken(DOT)
+		}
 	case ':':
 		if t.match(':') {
 			t.addNonLiteralToken(DOUBLE_COLON)
@@ -252,9 +260,11 @@ func (t *Tokenizer) scan() {
 		} else if isAlpha(char) {
 			t.identifier()
 		} else {
-			exception.NewSyntaxError("Unexpected character", t.line, t.column, string(char))
+			return exception.NewSyntaxError("Unexpected character", t.line, t.column, string(char))
 		}
 	}
+
+	return nil
 }
 
 func Tokenize(source string) ([]Token, error) {
@@ -270,7 +280,11 @@ func Tokenize(source string) ([]Token, error) {
 	for !tokenizer.isAtEnd() {
 		tokenizer.beginOfLexeme = tokenizer.current
 
-		tokenizer.scan()
+		err := tokenizer.scan()
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	tokenizer.add(

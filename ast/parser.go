@@ -97,10 +97,12 @@ func (p *Parser) function() Statement {
 	if !p.check(tokens.RIGHT_PARENTHESIS) {
 		for {
 			paramName := p.consume("Expect parameter name.", tokens.IDENTIFIER)
+			variadic := p.match(tokens.VARIADIC)
 			paramType := p.consume("Expect parameter type.", tokens.DATA_TYPES...)
 			params = append(params, Parameter{
-				Name: paramName,
-				Type: paramType,
+				Name:     paramName,
+				Type:     paramType,
+				Variadic: variadic,
 			})
 
 			if !p.match(tokens.COMMA) {

@@ -131,19 +131,37 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		if function, ok := callee.(FunctionDeclaration); ok {
 			funcEnv := NewEnvironment(function.Environment)
 
-			for i, arg := range expr.Arguments {
-				argValue, err := Evaluate(arg, env)
-				if err != nil {
-					return nil, err
+			for i, param := range function.Itself.Params {
+				if param.Variadic {
+					var variadicArgs []interface{}
+					for j := i; j < len(expr.Arguments); j++ {
+						argValue, err := Evaluate(expr.Arguments[j], env)
+						if err != nil {
+							return nil, err
+						}
+
+						typeErr := CheckType(param.Type.Type, argValue)
+						if typeErr != nil {
+							return nil, typeErr
+						}
+
+						variadicArgs = append(variadicArgs, argValue)
+					}
+					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type.Type)
+					break
+				} else {
+					argValue, err := Evaluate(expr.Arguments[i], env)
+					if err != nil {
+						return nil, err
+					}
+
+					typeErr := CheckType(param.Type.Type, argValue)
+					if typeErr != nil {
+						return nil, typeErr
+					}
+
+					funcEnv.Create(param.Name.Lexeme, argValue, param.Type.Type)
 				}
-
-				typeErr := CheckType(function.Itself.Params[i].Type.Type, argValue)
-
-				if typeErr != nil {
-					return nil, typeErr
-				}
-
-				funcEnv.Create(function.Itself.Params[i].Name.Lexeme, argValue, function.Itself.Params[i].Type.Type)
 			}
 
 			var result interface{}

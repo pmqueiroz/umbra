@@ -16,6 +16,7 @@ const (
 	RIGHT_BRACKET      TokenType = "RIGHT_BRACKET"
 	COMMA              TokenType = "COMMA"
 	DOT                TokenType = "DOT"
+	VARIADIC           TokenType = "VARIADIC"
 	MINUS              TokenType = "MINUS"
 	PLUS               TokenType = "PLUS"
 	COLON              TokenType = "COLON"

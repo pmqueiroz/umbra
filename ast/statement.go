@@ -16,8 +16,9 @@ type ExpressionStatement struct {
 }
 
 type Parameter struct {
-	Name tokens.Token
-	Type tokens.Token
+	Name     tokens.Token
+	Type     tokens.Token
+	Variadic bool
 }
 
 type FunctionStatement struct {
