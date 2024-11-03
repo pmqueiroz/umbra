@@ -52,17 +52,18 @@ jobs:
           PKG_PATH=umbra-${{ github.ref_name }}-${{ matrix.job.platform }}-${{ matrix.job.arch }}${PKG_suffix}
           PKG_PATH_SHA=${PKG_PATH}.sha256
 
+          pushd "${PKG_BASENAME}/" >/dev/null
           case ${{ matrix.job.platform }} in
             windows)
-              7z -y a "${PKG_PATH}" "${PKG_BASENAME}"/*
-              # certutil -hashfile $PKG_PATH SHA256 | awk 'NR==2 { print $1 }' > $PKG_PATH_SHA
-              echo "test" > $PKG_PATH_SHA
+              7z -y a "${PKG_PATH}" *
+              certutil -hashfile $PKG_PATH SHA256 | awk 'NR==2 { print $1 }' > $PKG_PATH_SHA
               ;;
             *)
-              tar czf "${PKG_PATH}" "${PKG_BASENAME}"/*
+              tar czf "${PKG_PATH}" *
               shasum -a 256 $PKG_PATH | awk '{ print $1 }' > $PKG_PATH_SHA
               ;;
           esac
+          popd >/dev/null
 
           echo "PKG_PATH=${PKG_PATH}" >> $GITHUB_OUTPUT
           echo "PKG_PATH_SHA=${PKG_PATH_SHA}" >> $GITHUB_OUTPUT
