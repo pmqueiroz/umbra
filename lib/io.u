@@ -1,19 +1,35 @@
-def print(value any) {
-  stdout value
+def print(values ...any) {
+  for mut i num = 0, ~values - 1 {
+    stdout values[i]
+  }
 }
 
-def printErr(value any) {
-  stderr value
+def printLn(values ...any) {
+  for mut i num = 0, ~values - 1 {
+    stdout values[i]
+    if (i != ~values - 1) {
+      stdout " "
+    }
+  }
+
+  stdout "\n"
 }
 
-def printLn(value any) {
-  print(value)
-  print("\n")
+def printErr(values ...any) {
+  for mut i num = 0, ~values - 1 {
+    stdout values[i]
+  }
 }
 
-def printErrLn(value any) {
-  printErr(value)
-  printErr("\n")
+def printErrLn(values ...any) {
+  for mut i num = 0, ~values - 1 {
+    stdout values[i]
+    if (i != ~values - 1) {
+      stdout " "
+    }
+  }
+
+  stdout "\n"
 }
 
 pub print
