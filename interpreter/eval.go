@@ -48,9 +48,15 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return nil, err
 			}
 
+			property, err := resolveMemberExpressionProperty(target, env)
+
+			if err != nil {
+				return nil, err
+			}
+
 			switch obj := object.(type) {
 			case map[interface{}]interface{}:
-				obj[target.Property.Lexeme] = value
+				obj[property] = value
 				return value, nil
 			case []interface{}:
 				index, err := Evaluate(target.Property, env)
@@ -235,9 +241,15 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return nil, err
 		}
 
+		property, err := resolveMemberExpressionProperty(expr, env)
+
+		if err != nil {
+			return nil, err
+		}
+
 		switch obj := object.(type) {
 		case map[interface{}]interface{}:
-			value, ok := obj[expr.Property.Lexeme]
+			value, ok := obj[property]
 			if !ok {
 				return nil, nil
 			}
@@ -274,4 +286,22 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 	default:
 		return nil, exception.NewRuntimeError(fmt.Sprintf("unknown expression: %T", expr))
 	}
+}
+
+func resolveMemberExpressionProperty(expr ast.MemberExpression, env *Environment) (interface{}, error) {
+	var property interface{}
+	var computeErr error
+	if expr.Computed {
+		property, computeErr = Evaluate(expr.Property, env)
+	} else if variable, ok := expr.Property.(ast.VariableExpression); ok {
+		property = variable.Name.Lexeme
+	} else {
+		return nil, exception.NewRuntimeError("invalid member expression property")
+	}
+
+	if computeErr != nil {
+		return nil, computeErr
+	}
+
+	return property, nil
 }

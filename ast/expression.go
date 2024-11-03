@@ -55,7 +55,8 @@ type HashmapExpression struct {
 
 type MemberExpression struct {
 	Object   Expression
-	Property tokens.Token
+	Property Expression
+	Computed bool
 }
 
 type NamespaceMemberExpression struct {

@@ -281,12 +281,26 @@ func (p *Parser) call() Expression {
 	for {
 		if p.match(tokens.LEFT_PARENTHESIS) {
 			return p.finishCall(expr)
-		} else if p.match(tokens.DOT) {
-			property := p.consume("Expect property name after '.'.", tokens.IDENTIFIER)
-			expr = MemberExpression{
-				Object:   expr,
-				Property: property,
+		} else if p.match(tokens.DOT, tokens.LEFT_BRACKET) {
+			if p.previous().Type == tokens.DOT {
+				property := p.consume("Expect property name after '.'.", tokens.IDENTIFIER)
+				expr = MemberExpression{
+					Object: expr,
+					Property: VariableExpression{
+						Name: property,
+					},
+					Computed: false,
+				}
+			} else {
+				property := p.expression()
+				expr = MemberExpression{
+					Object:   expr,
+					Property: property,
+					Computed: true,
+				}
+				p.consume("Expect ']' after expression.", tokens.RIGHT_BRACKET)
 			}
+
 		} else if p.match(tokens.DOUBLE_COLON) {
 			property := p.consume("Expect property name after '::'.", tokens.IDENTIFIER)
 			expr = NamespaceMemberExpression{

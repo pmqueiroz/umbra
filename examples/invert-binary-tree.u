@@ -22,7 +22,7 @@ mut binaryTree hashmap = {
   }
 }
 
-def printTree(root hashmap) {
+def printTree(root any) {
   if root == null {
     return null
   }
@@ -32,13 +32,13 @@ def printTree(root hashmap) {
   printTree(root.right)
 }
 
-def invertTree(root hashmap) {
+def invertTree(root any) {
   if root == null {
     return null
   }
 
-  mut left hashmap = invertTree(root.left)
-  mut right hashmap = invertTree(root.right)
+  mut left any = invertTree(root.left)
+  mut right any = invertTree(root.right)
 
   root.left = right
   root.right = left
