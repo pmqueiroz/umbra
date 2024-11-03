@@ -30,20 +30,38 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - name: Build CLI
+      - name: Build
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           VERSION: ${{ github.ref_name }}
         run: |
-          go build -ldflags="-X main.Version=${VERSION}" -o build/umbra-${{ matrix.goos }}-${{ matrix.goarch }}
-      - name: Publish to GitHub Release
-        uses: ncipollo/release-action@v1
+          ./build.sh ${{ matrix.goos }} ${{ matrix.goarch }}
+      - name: Create tarball
+        shell: bash
+        id: tarball
+        run: |
+          PKG_suffix=".tar.gz" ; case ${{ matrix.goos }} in windows) PKG_suffix=".zip" ;; esac;
+          PKG_BASENAME=build/${{ matrix.goos }}-${{ matrix.goarch }}
+          PKG_PATH=umbra-${{ github.ref_name }}-${{ matrix.goos }}-${{ matrix.goarch }}${PKG_suffix}
+          PKG_PATH_SHA=${PKG_PATH}.sha256
+
+          case ${{ matrix.goos }} in
+            windows)
+              7z -y a "${PKG_PATH}" "${PKG_BASENAME}"/*
+              certutil -hashfile $PKG_PATH SHA256 > $PKG_PATH_SHA
+              ;;
+            *)
+              tar czf "${PKG_PATH}" "${PKG_BASENAME}"/*
+              shasum -a 256 $PKG_PATH > $PKG_PATH_SHA
+              ;;
+          esac
+
+          echo "PKG_PATH=${PKG_PATH}" >> $GITHUB_OUTPUT
+          echo "PKG_PATH_SHA=${PKG_PATH_SHA}" >> $GITHUB_OUTPUT
+      - name: Publish archives and packages
+        uses: softprops/action-gh-release@v2
         with:
-          allowUpdates: true
-          artifacts: build/umbra-${{ matrix.goos }}-${{ matrix.goarch }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+          files: |
+            ${{ steps.tarball.outputs.PKG_PATH }}
+            ${{ steps.tarball.outputs.PKG_PATH_SHA }}
