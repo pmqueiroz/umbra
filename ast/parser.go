@@ -469,11 +469,23 @@ func (p *Parser) returnStatement() Statement {
 
 func (p *Parser) publicStatement() Statement {
 	keyword := p.previous()
-	name := p.consume("Expect variable name.", tokens.IDENTIFIER)
+	var identifiers []tokens.Token
+
+	if p.match(tokens.IDENTIFIER) {
+		identifiers = append(identifiers, p.previous())
+	} else {
+		p.consume("Expect valid public statement", tokens.LEFT_BRACE)
+
+		for !p.check(tokens.RIGHT_BRACE) && !p.isAtEOF() {
+			identifiers = append(identifiers, p.consume("Expect variable name.", tokens.IDENTIFIER))
+		}
+
+		p.consume("Expect '}' after block.", tokens.RIGHT_BRACE)
+	}
 
 	return PublicStatement{
-		Keyword:    keyword,
-		Identifier: name,
+		Keyword:     keyword,
+		Identifiers: identifiers,
 	}
 }
 

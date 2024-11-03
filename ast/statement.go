@@ -54,8 +54,8 @@ type ReturnStatement struct {
 type BreakStatement struct{}
 
 type PublicStatement struct {
-	Keyword    tokens.Token
-	Identifier tokens.Token
+	Keyword     tokens.Token
+	Identifiers []tokens.Token
 }
 
 type ImportStatement struct {

@@ -203,12 +203,14 @@ func Interpret(statement ast.Statement, env *Environment) error {
 	case ast.BreakStatement:
 		return Break{}
 	case ast.PublicStatement:
-		success := env.MakePublic(stmt.Identifier.Lexeme)
+		for _, identifier := range stmt.Identifiers {
+			success := env.MakePublic(identifier.Lexeme)
 
-		if !success {
-			return exception.NewRuntimeError(fmt.Sprintf("cannot make %s public. identifier does not exits", stmt.Identifier.Lexeme))
+			if !success {
+				return exception.NewRuntimeError(fmt.Sprintf("cannot make %s public. identifier does not exits", identifier.Lexeme))
+			}
+
 		}
-
 		return nil
 	case ast.ImportStatement:
 		namespace, err := LoadModule(stmt.Path.Lexeme)

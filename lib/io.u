@@ -32,7 +32,9 @@ def printErrLn(values ...any) {
   stdout "\n"
 }
 
-pub print
-pub printErr
-pub printLn
-pub printErrLn
+pub {
+  print
+  printLn
+  printErr
+  printErrLn
+}
