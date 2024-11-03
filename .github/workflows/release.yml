@@ -37,8 +37,12 @@ jobs:
           VERSION: ${{ github.ref_name }}
         run: |
           go build -ldflags="-X main.Version=${VERSION}" -o build/umbra-${{ matrix.goos }}-${{ matrix.goarch }}
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      - name: Publish to GitHub Release
+        uses: ncipollo/release-action@v1
         with:
-          name: umbra-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: build/umbra-${{ matrix.goos }}-${{ matrix.goarch }}
+          artifacts: build/umbra-${{ matrix.goos }}-${{ matrix.goarch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
