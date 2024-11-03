@@ -10,6 +10,9 @@ import (
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
+// set through ldflags
+var Version = "development"
+
 type RunOptions struct {
 	cli.Options
 	Env *interpreter.Environment
@@ -36,8 +39,13 @@ func run(content string, options RunOptions) {
 func main() {
 	args := cli.Parse()
 
-	if args.Input != "" {
-		content, err := helpers.ReadFile(args.Input)
+	if args.Options.ShowVersion {
+		fmt.Printf("%s\n", Version)
+		return
+	}
+
+	if args.Path != "" {
+		content, err := helpers.ReadFile(args.Path)
 
 		if err != nil {
 			fmt.Printf("%s\n", err.Error())

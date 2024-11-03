@@ -34,8 +34,9 @@ jobs:
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
+          VERSION: ${{ github.ref_name }}
         run: |
-          go build -o build/umbra-${{ matrix.goos }}-${{ matrix.goarch }}
+          go build -ldflags="-X main.Version=${VERSION}" -o build/umbra-${{ matrix.goos }}-${{ matrix.goarch }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
