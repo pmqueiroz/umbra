@@ -53,8 +53,6 @@ jobs:
           PKG_PATH=umbra-${{ github.ref_name }}-${{ matrix.job.platform }}-${{ matrix.job.arch }}${PKG_suffix}
           PKG_PATH_SHA=${PKG_PATH}.sha256
 
-          find . | sed -e 's/[^-][^\/]*\//|   /g' -e 's/|\([^ ]\)/|-- \1/'
-
           pushd "${PKG_BASENAME}/" >/dev/null
           case ${{ matrix.job.platform }} in
             windows)
@@ -68,8 +66,8 @@ jobs:
           esac
           popd >/dev/null
 
-          echo "PKG_PATH=${PKG_PATH}" >> $GITHUB_OUTPUT
-          echo "PKG_PATH_SHA=${PKG_PATH_SHA}" >> $GITHUB_OUTPUT
+          echo "PKG_PATH=${PKG_BASENAME}/${PKG_PATH}" >> $GITHUB_OUTPUT
+          echo "PKG_PATH_SHA=${PKG_BASENAME}/${PKG_PATH_SHA}" >> $GITHUB_OUTPUT
       - name: Publish archives and packages
         uses: softprops/action-gh-release@v2
         with:
