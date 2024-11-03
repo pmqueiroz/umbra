@@ -209,6 +209,8 @@ func (t *Tokenizer) scan() error {
 		t.addNonLiteralToken(STAR)
 	case '/':
 		t.addNonLiteralToken(SLASH)
+	case '~':
+		t.addNonLiteralToken(SIZE)
 	case '.':
 		if t.match('.') {
 			if t.match('.') {

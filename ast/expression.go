@@ -63,3 +63,7 @@ type NamespaceMemberExpression struct {
 	Namespace Expression
 	Property  tokens.Token
 }
+
+type SizeExpression struct {
+	Value Expression
+}

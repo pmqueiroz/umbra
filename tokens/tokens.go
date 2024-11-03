@@ -31,6 +31,7 @@ const (
 	GREATER_THAN_EQUAL TokenType = "GREATER_THAN_EQUAL"
 	LESS_THAN          TokenType = "LESS_THAN"
 	LESS_THAN_EQUAL    TokenType = "LESS_THAN_EQUAL"
+	SIZE               TokenType = "SIZE"
 	NOT                TokenType = "NOT"
 	AND                TokenType = "AND"
 	ELSE               TokenType = "ELSE"

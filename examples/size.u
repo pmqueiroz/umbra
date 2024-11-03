@@ -1,0 +1,4 @@
+import "io"
+
+io::printLn(~[0, 1, 2])
+io::printLn(~"string")

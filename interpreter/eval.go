@@ -124,6 +124,17 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		switch expr.Operator.Type {
 		case tokens.MINUS:
 			return -right.(float64), nil
+		case tokens.NOT:
+			return !right.(bool), nil
+		case tokens.SIZE:
+			switch parsedRight := right.(type) {
+			case []interface{}:
+				return len(parsedRight), nil
+			case string:
+				return len(parsedRight), nil
+			default:
+				return nil, exception.NewRuntimeError(fmt.Sprintf("cannot get length of: %s", parsedRight))
+			}
 		default:
 			return nil, exception.NewRuntimeError(fmt.Sprintf("unknown unary expression: %s", expr.Operator.Lexeme))
 		}
