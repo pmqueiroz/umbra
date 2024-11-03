@@ -520,12 +520,6 @@ func (p *Parser) initializedForStatement() Statement {
 
 	stop := p.expression()
 
-	switch stop.(type) {
-	case LiteralExpression, VariableExpression:
-	default:
-		p.throw("Expect stop to be a numeric literal or variable declaration.")
-	}
-
 	if p.match(tokens.COMMA) {
 		p.consume("Expect step after stop.", tokens.NUMERIC)
 		step = p.numeric()
