@@ -8,11 +8,17 @@ on:
 jobs:
   build:
     name: Build and Release Binaries
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.job.os }}
     strategy:
       matrix:
-        goos: [linux, windows, darwin]
-        goarch: [amd64, arm64]
+        job:
+          - { os: ubuntu-latest , platform: linux   , arch: arm64 }
+          - { os: ubuntu-latest , platform: linux   , arch: amd64 }
+          - { os: ubuntu-latest , platform: darwin  , arch: arm64 }
+          - { os: ubuntu-latest , platform: darwin  , arch: amd64 }
+          - { os: windows-2019  , platform: windows , arch: arm64 }
+          - { os: windows-2019  , platform: windows , arch: amd64 }
+         
       fail-fast: false
     steps:
       - name: Checkout code
@@ -32,21 +38,21 @@ jobs:
             ${{ runner.os }}-go-
       - name: Build
         env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
+          GOOS: ${{ matrix.job.platform }}
+          GOARCH: ${{ matrix.job.arch }}
           VERSION: ${{ github.ref_name }}
         run: |
-          ./build.sh ${{ matrix.goos }} ${{ matrix.goarch }}
+          ./build.sh ${{ matrix.job.platform }} ${{ matrix.job.arch }}
       - name: Create tarball
         shell: bash
         id: tarball
         run: |
-          PKG_suffix=".tar.gz" ; case ${{ matrix.goos }} in windows) PKG_suffix=".zip" ;; esac;
-          PKG_BASENAME=build/${{ matrix.goos }}-${{ matrix.goarch }}
-          PKG_PATH=umbra-${{ github.ref_name }}-${{ matrix.goos }}-${{ matrix.goarch }}${PKG_suffix}
+          PKG_suffix=".tar.gz" ; case ${{ matrix.job.platform }} in windows) PKG_suffix=".zip" ;; esac;
+          PKG_BASENAME=build/${{ matrix.job.platform }}-${{ matrix.job.arch }}
+          PKG_PATH=umbra-${{ github.ref_name }}-${{ matrix.job.platform }}-${{ matrix.job.arch }}${PKG_suffix}
           PKG_PATH_SHA=${PKG_PATH}.sha256
 
-          case ${{ matrix.goos }} in
+          case ${{ matrix.job.platform }} in
             windows)
               7z -y a "${PKG_PATH}" "${PKG_BASENAME}"/*
               certutil -hashfile $PKG_PATH SHA256 | awk 'NR==2 { print $1 }' > $PKG_PATH_SHA
