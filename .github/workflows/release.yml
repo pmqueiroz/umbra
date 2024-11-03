@@ -65,6 +65,8 @@ jobs:
           esac
           popd >/dev/null
 
+          find build | sed -e 's/[^-][^\/]*\//|   /g' -e 's/|\([^ ]\)/|-- \1/'
+
           echo "PKG_PATH=${PKG_PATH}" >> $GITHUB_OUTPUT
           echo "PKG_PATH_SHA=${PKG_PATH_SHA}" >> $GITHUB_OUTPUT
       - name: Publish archives and packages
