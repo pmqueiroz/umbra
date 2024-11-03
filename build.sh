@@ -13,7 +13,12 @@ build_umbra() {
 
   echo "Building umbra-${VERSION} binary to ${platform}-${arch}"
 
-  go build -ldflags="-X main.Version=${VERSION}" -o build/${platform}-${arch}/bin/umbra
+  local suffix=""
+  case ${platform} in
+    windows) suffix=".exe" ;;
+  esac;
+
+  go build -ldflags="-X main.Version=${VERSION}" -o build/${platform}-${arch}/bin/umbra${suffix}
 
   echo "Copying built in libs"
 
