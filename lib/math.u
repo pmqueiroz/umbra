@@ -1,3 +1,5 @@
+mut EPSILON num = 0.0000000000001
+
 def int(x num) num {
   if (x >= 0) {
     return x - (x % 1)
@@ -21,9 +23,8 @@ def sqrt(x num) num {
   }
 
   mut guess num = x
-  mut epsilon num = 0.0000000000001
 
-  for (abs(guess * guess - x) > epsilon) {
+  for (abs(guess * guess - x) > EPSILON) {
     guess = (guess + x / guess) / 2
   }
 
@@ -78,7 +79,7 @@ def sin(x num) num {
   mut sum num = x
   mut n num = 1
 
-  for (abs(term) > 0.0000000000001) {
+  for (abs(term) > EPSILON) {
     term = -term * x * x / ((2 * n) * (2 * n + 1))
     sum = sum + term
     n = n + 1
@@ -92,7 +93,7 @@ def cos(x num) num {
   mut sum num = 1
   mut n num = 1
 
-  for (abs(term) > 0.0000000000001) {
+  for (abs(term) > EPSILON) {
     term = -term * x * x / ((2 * n - 1) * (2 * n))
     sum = sum + term
     n = n + 1
