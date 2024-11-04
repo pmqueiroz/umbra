@@ -30,6 +30,8 @@ type LiteralExpression struct {
 	Value interface{}
 }
 
+type NaNExpression struct{}
+
 type LogicalExpression struct {
 	Left     Expression
 	Operator tokens.Token

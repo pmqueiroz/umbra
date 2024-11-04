@@ -1,0 +1,118 @@
+def int(x num) num {
+  if (x >= 0) {
+    return x - (x % 1)
+  } else {
+    return x - (x % 1) - 1
+  }
+}
+
+def abs(x num) num {
+
+  if (x == -0) return 0
+
+  if (x <= 0) return x * -1
+
+  return x
+}
+
+def sqrt(x num) num {
+  if (x < 0) {
+    return NaN 
+  }
+
+  mut guess num = x
+  mut epsilon num = 0.0000000000001
+
+  for (abs(guess * guess - x) > epsilon) {
+    guess = (guess + x / guess) / 2
+  }
+
+  if (guess == 0) {
+    return guess
+  }
+
+  return guess - (guess * guess - x) / (2 * guess)
+}
+
+def floor(x num) num {
+  mut result num = x
+  if (x < 0 and x != int(x)) {
+    result = int(x) - 1
+  } else {
+    result = int(x)
+  }
+  return result
+}
+
+def ceil(x num) num {
+  mut result num = x
+  if (x > 0 and x != int(x)) {
+    result = int(x) + 1
+  } else {
+    result = int(x)
+  }
+  return result
+}
+
+def pow(base num, exponent num) num {
+  if (exponent == 0) return 1
+  if (exponent < 0) return 1 / pow(base, -exponent)
+
+  mut result num = 1
+  mut exp num = exponent
+  mut b num = base
+
+  for (exp > 0) {
+    if (exp % 2 == 1) {
+      result = result * b
+    }
+    b = b * b
+    exp = floor(exp / 2)
+  }
+
+  return result
+}
+
+def sin(x num) num {
+  mut term num = x
+  mut sum num = x
+  mut n num = 1
+
+  for (abs(term) > 0.0000000000001) {
+    term = -term * x * x / ((2 * n) * (2 * n + 1))
+    sum = sum + term
+    n = n + 1
+  }
+
+  return sum
+}
+
+def cos(x num) num {
+  mut term num = 1
+  mut sum num = 1
+  mut n num = 1
+
+  for (abs(term) > 0.0000000000001) {
+    term = -term * x * x / ((2 * n - 1) * (2 * n))
+    sum = sum + term
+    n = n + 1
+  }
+
+  return sum
+}
+
+def tan(x num) num {
+  return sin(x) / cos(x)
+}
+
+pub {
+  int
+  abs
+  sqrt
+  floor
+  ceil
+  pow
+  sin
+  cos
+  tan
+}

@@ -23,6 +23,7 @@ const (
 	DOUBLE_COLON       TokenType = "DOUBLE_COLON"
 	SEMICOLON          TokenType = "SEMICOLON"
 	SLASH              TokenType = "SLASH"
+	PERCENT            TokenType = "PERCENT"
 	STAR               TokenType = "STAR"
 	EQUAL              TokenType = "EQUAL"
 	EQUAL_EQUAL        TokenType = "EQUAL_EQUAL"
@@ -60,6 +61,7 @@ const (
 	PUBLIC             TokenType = "PUBLIC"
 	IMPORT             TokenType = "IMPORT"
 	HOOK               TokenType = "HOOK"
+	NOT_A_NUMBER       TokenType = "NOT_A_NUMBER"
 )
 
 var DATA_TYPES = []TokenType{
@@ -104,6 +106,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"pub":     PUBLIC,
 	"import":  IMPORT,
 	"any":     ANY_TYPE,
+	"NaN":     NOT_A_NUMBER,
 }
 
 func getKeyword(lexis string) TokenType {

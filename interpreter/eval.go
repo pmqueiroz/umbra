@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/exception"
@@ -12,6 +13,8 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 	switch expr := expression.(type) {
 	case ast.LiteralExpression:
 		return expr.Value, nil
+	case ast.NaNExpression:
+		return math.NaN(), nil
 	case ast.GroupingExpression:
 		return Evaluate(expr.Expression, env)
 	case ast.VariableExpression:
@@ -100,6 +103,16 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return nil, exception.NewRuntimeError("invalid operation: division by zero")
 			}
 			return left.(float64) / right.(float64), nil
+		case tokens.PERCENT:
+			leftVal, ok := left.(float64)
+			if !ok {
+				return nil, exception.NewRuntimeError(fmt.Sprintf("invalid operand type for modulus: %T", left))
+			}
+			rightVal, ok := right.(float64)
+			if !ok {
+				return nil, exception.NewRuntimeError(fmt.Sprintf("invalid operand type for modulus: %T", right))
+			}
+			return math.Mod(leftVal, rightVal), nil
 		case tokens.GREATER_THAN:
 			return left.(float64) > right.(float64), nil
 		case tokens.GREATER_THAN_EQUAL:

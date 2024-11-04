@@ -218,6 +218,10 @@ func (p *Parser) primary() Expression {
 		return p.numeric()
 	}
 
+	if p.match(tokens.NOT_A_NUMBER) {
+		return NaNExpression{}
+	}
+
 	if p.match(tokens.STRING) {
 		return LiteralExpression{
 			Value: p.previous().Lexeme,
@@ -334,7 +338,7 @@ func (p *Parser) unary() Expression {
 func (p *Parser) multiplication() Expression {
 	expr := p.unary()
 
-	for p.match(tokens.SLASH, tokens.STAR) {
+	for p.match(tokens.SLASH, tokens.STAR, tokens.PERCENT) {
 		expr = BinaryExpression{
 			Left:     expr,
 			Operator: p.previous(),
