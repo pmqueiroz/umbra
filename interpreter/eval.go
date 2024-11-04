@@ -3,6 +3,7 @@ package interpreter
 import (
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/exception"
@@ -139,7 +140,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return -right.(float64), nil
 		case tokens.NOT:
 			return !right.(bool), nil
-		case tokens.SIZE:
+		case tokens.TILDE:
 			switch parsedRight := right.(type) {
 			case []interface{}:
 				return float64(len(parsedRight)), nil
@@ -147,6 +148,19 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return float64(len(parsedRight)), nil
 			default:
 				return nil, exception.NewRuntimeError(fmt.Sprintf("cannot get length of: %s", parsedRight))
+			}
+		case tokens.RANGE:
+			switch parsedRight := right.(type) {
+			case string:
+				return strings.Split(parsedRight, ""), nil
+			case map[interface{}]interface{}:
+				var result [][]interface{}
+				for key, value := range parsedRight {
+					result = append(result, []interface{}{key, value})
+				}
+				return result, nil
+			default:
+				return nil, exception.NewRuntimeError(fmt.Sprintf("illegal use of range. type %T is invalid", parsedRight))
 			}
 		default:
 			return nil, exception.NewRuntimeError(fmt.Sprintf("unknown unary expression: %s", expr.Operator.Lexeme))

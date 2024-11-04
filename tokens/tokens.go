@@ -32,7 +32,7 @@ const (
 	GREATER_THAN_EQUAL TokenType = "GREATER_THAN_EQUAL"
 	LESS_THAN          TokenType = "LESS_THAN"
 	LESS_THAN_EQUAL    TokenType = "LESS_THAN_EQUAL"
-	SIZE               TokenType = "SIZE"
+	TILDE              TokenType = "TILDE"
 	NOT                TokenType = "NOT"
 	AND                TokenType = "AND"
 	ELSE               TokenType = "ELSE"
@@ -62,6 +62,7 @@ const (
 	IMPORT             TokenType = "IMPORT"
 	HOOK               TokenType = "HOOK"
 	NOT_A_NUMBER       TokenType = "NOT_A_NUMBER"
+	RANGE              TokenType = "RANGE"
 )
 
 var DATA_TYPES = []TokenType{
@@ -107,6 +108,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"import":  IMPORT,
 	"any":     ANY_TYPE,
 	"NaN":     NOT_A_NUMBER,
+	"range":   RANGE,
 }
 
 func getKeyword(lexis string) TokenType {

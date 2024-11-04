@@ -323,7 +323,7 @@ func (p *Parser) call() Expression {
 }
 
 func (p *Parser) unary() Expression {
-	if p.match(tokens.NOT, tokens.MINUS, tokens.SIZE) {
+	if p.match(tokens.NOT, tokens.MINUS, tokens.TILDE, tokens.RANGE) {
 		operator := p.previous()
 		right := p.unary()
 		return UnaryExpression{

@@ -212,7 +212,7 @@ func (t *Tokenizer) scan() error {
 	case '%':
 		t.addNonLiteralToken(PERCENT)
 	case '~':
-		t.addNonLiteralToken(SIZE)
+		t.addNonLiteralToken(TILDE)
 	case '?':
 		t.addNonLiteralToken(HOOK)
 	case '.':
