@@ -7,7 +7,9 @@ import (
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/tokens"
+	"github.com/sanity-io/litter"
 )
 
 type Return struct {
@@ -152,7 +154,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			if parsedStop, ok := stop.(float64); ok {
 				condition = controlVar.data.(float64) <= parsedStop
 			} else {
-				return exception.NewRuntimeError("RT022", stop)
+				return exception.NewRuntimeError("RT022", helpers.UmbraType(stop))
 			}
 
 			if !condition {
@@ -168,7 +170,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			step, exists := stepValue.(float64)
 			if !exists {
-				return exception.NewRuntimeError("RT023", stepValue)
+				return exception.NewRuntimeError("RT023", helpers.UmbraType(stepValue))
 			}
 
 			loopEnv.Set(initializedVarName, controlVar.data.(float64)+step)
@@ -198,7 +200,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			parsedCondition, ok := condition.(bool)
 			if !ok {
-				return exception.NewRuntimeError("RT024", parsedCondition)
+				return exception.NewRuntimeError("RT024", helpers.UmbraType(parsedCondition))
 			}
 
 			if !parsedCondition {
@@ -242,6 +244,6 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 		return nil
 	default:
-		return exception.NewRuntimeError("RT000", statement)
+		return exception.NewRuntimeError("RT000", litter.Sdump(statement))
 	}
 }

@@ -6,7 +6,9 @@ import (
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/tokens"
+	"github.com/sanity-io/litter"
 )
 
 func getLength(data interface{}) int {
@@ -102,10 +104,10 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				obj[int(idx)] = value
 				return value, nil
 			default:
-				return nil, exception.NewRuntimeError("RT005", obj)
+				return nil, exception.NewRuntimeError("RT005", helpers.UmbraType(obj))
 			}
 		default:
-			return nil, exception.NewRuntimeError("RT006", target)
+			return nil, exception.NewRuntimeError("RT006", helpers.UmbraType(target))
 		}
 	case ast.BinaryExpression:
 		left, err := Evaluate(expr.Left, env)
@@ -129,7 +131,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			if leftIsFloat && rightIsFloat {
 				return leftFloat + rightFloat, nil
 			}
-			return nil, exception.NewRuntimeError("RT007", left, right)
+			return nil, exception.NewRuntimeError("RT007", helpers.UmbraType(left), helpers.UmbraType(right))
 		case tokens.MINUS:
 			return left.(float64) - right.(float64), nil
 		case tokens.STAR:
@@ -140,15 +142,13 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			}
 			return left.(float64) / right.(float64), nil
 		case tokens.PERCENT:
-			leftVal, ok := left.(float64)
-			if !ok {
-				return nil, exception.NewRuntimeError("RT009", left)
+			leftFloat, leftIsFloat := left.(float64)
+			rightFloat, rightIsFloat := right.(float64)
+			if leftIsFloat && rightIsFloat {
+				return math.Mod(leftFloat, rightFloat), nil
 			}
-			rightVal, ok := right.(float64)
-			if !ok {
-				return nil, exception.NewRuntimeError("RT009", right)
-			}
-			return math.Mod(leftVal, rightVal), nil
+
+			return nil, exception.NewRuntimeError("RT009", helpers.UmbraType(left), helpers.UmbraType(right))
 		case tokens.GREATER_THAN:
 			return left.(float64) > right.(float64), nil
 		case tokens.GREATER_THAN_EQUAL:
@@ -184,7 +184,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			case string:
 				return float64(len(parsedRight)), nil
 			default:
-				return nil, exception.NewRuntimeError("RT011", parsedRight)
+				return nil, exception.NewRuntimeError("RT011", helpers.UmbraType(parsedRight))
 			}
 		case tokens.RANGE:
 			switch parsedRight := right.(type) {
@@ -197,7 +197,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				}
 				return result, nil
 			default:
-				return nil, exception.NewRuntimeError("RT012", parsedRight)
+				return nil, exception.NewRuntimeError("RT012", helpers.UmbraType(parsedRight))
 			}
 		default:
 			return nil, exception.NewRuntimeError("RT013", expr.Operator.Lexeme)
@@ -343,7 +343,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			}
 			return getElementAt(obj, int(idx)), nil
 		default:
-			return nil, exception.NewRuntimeError("RT016", obj)
+			return nil, exception.NewRuntimeError("RT016", helpers.UmbraType(obj))
 		}
 	case ast.NamespaceMemberExpression:
 		if variableExpr, ok := expr.Namespace.(ast.VariableExpression); ok {
@@ -357,9 +357,9 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return value.data, nil
 		}
 
-		return nil, exception.NewRuntimeError("RT019", expr.Namespace)
+		return nil, exception.NewRuntimeError("RT019", litter.Sdump(expr.Namespace))
 	default:
-		return nil, exception.NewRuntimeError("RT017", expr)
+		return nil, exception.NewRuntimeError("RT017", litter.Sdump(expr))
 	}
 }
 
