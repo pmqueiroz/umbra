@@ -1,0 +1,49 @@
+import "io"
+
+def substring(string str, start num, end num) {
+  mut result str = ""
+  if (start < 0 or end > ~string or start > end) {
+    return result
+  }
+
+  for mut i num = 0, ~range string - 1 {
+    if (i < start) {
+      continue
+    }
+
+    if (i >= end) {
+      break
+    }
+    
+    result = result + (range string)[i]
+  }
+
+  return result
+}
+
+def split(string str, separator str) {
+  mut result arr = []
+  mut start num = 0
+  mut end num = 0
+
+  for mut i num = 0, ~range string - 1 {
+    if ((range string)[i] == separator) {
+      result[~result] = substring(string, start, end)
+      start = i + 1
+      end = i + 1
+    } else {
+      end = i + 1
+    }
+  }
+
+  result[~result] = substring(string, start, end)
+  return result
+}
+
+# TODO: as soon as the umbra supports char type implements the related functions
+# like: toUpper, toLower, toChar, fromChar
+
+pub {
+  substring
+  split
+}
