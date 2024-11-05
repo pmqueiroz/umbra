@@ -10,6 +10,28 @@ import (
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
+func getLength(data interface{}) int {
+	switch v := data.(type) {
+	case []string:
+		return len(v)
+	case []interface{}:
+		return len(v)
+	default:
+		return -1
+	}
+}
+
+func getElementAt(data interface{}, idx int) interface{} {
+	switch v := data.(type) {
+	case []string:
+		return v[idx]
+	case []interface{}:
+		return v[idx]
+	default:
+		return nil
+	}
+}
+
 func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) {
 	switch expr := expression.(type) {
 	case ast.LiteralExpression:
@@ -71,8 +93,12 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				if !ok {
 					return nil, exception.NewRuntimeError(fmt.Sprintf("invalid array index: %v", index))
 				}
-				if int(idx) < 0 || int(idx) >= len(obj) {
+				if int(idx) < 0 || int(idx) > len(obj) {
 					return nil, exception.NewRuntimeError(fmt.Sprintf("array index out of bounds: %v", idx))
+				}
+				if int(idx) == len(obj) {
+					env.Set(target.Object.(ast.VariableExpression).Name.Lexeme, append(obj, value))
+					return value, nil
 				}
 				obj[int(idx)] = value
 				return value, nil
@@ -154,10 +180,12 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			switch parsedRight := right.(type) {
 			case []interface{}:
 				return float64(len(parsedRight)), nil
+			case []string:
+				return float64(len(parsedRight)), nil
 			case string:
 				return float64(len(parsedRight)), nil
 			default:
-				return nil, exception.NewRuntimeError(fmt.Sprintf("cannot get length of: %s", parsedRight))
+				return nil, exception.NewRuntimeError(fmt.Sprintf("cannot get length of: %T", parsedRight))
 			}
 		case tokens.RANGE:
 			switch parsedRight := right.(type) {
@@ -302,7 +330,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return nil, nil
 			}
 			return value, nil
-		case []interface{}:
+		case []interface{}, []string:
 			index, err := Evaluate(expr.Property, env)
 			if err != nil {
 				return nil, err
@@ -311,10 +339,10 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			if !ok {
 				return nil, exception.NewRuntimeError(fmt.Sprintf("invalid array index: %v", index))
 			}
-			if int(idx) < 0 || int(idx) >= len(obj) {
+			if int(idx) < 0 || int(idx) >= getLength(obj) {
 				return nil, exception.NewRuntimeError(fmt.Sprintf("array index out of bounds: %v", idx))
 			}
-			return obj[int(idx)], nil
+			return getElementAt(obj, int(idx)), nil
 		default:
 			return nil, exception.NewRuntimeError(fmt.Sprintf("cannot access property of non-object type: %T", obj))
 		}
