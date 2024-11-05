@@ -1,3 +1,5 @@
+#!/bin/bash
+
 : "${VERSION:=development}"
 
 build_umbra() {
@@ -9,7 +11,7 @@ build_umbra() {
     exit 1
   fi
 
-  rm -rf build/${platform}-${arch}
+  rm -rf build/"${platform}"-"${arch}"
 
   echo "Building umbra-${VERSION} binary to ${platform}-${arch}"
 
@@ -18,16 +20,16 @@ build_umbra() {
     windows) suffix=".exe" ;;
   esac;
 
-  go build -ldflags="-X main.Version=${VERSION}" -o build/${platform}-${arch}/bin/umbra${suffix}
+  go build -ldflags="-X main.Version=${VERSION}" -o build/"${platform}"-"${arch}"/bin/umbra${suffix}
 
   echo "Copying built in libs"
 
-  mkdir -p build/${platform}-${arch}/lib/
-  cp -r lib/* build/${platform}-${arch}/lib/
+  mkdir -p build/"${platform}"-"${arch}"/lib/
+  cp -r lib/* build/"${platform}"-"${arch}"/lib/
 
   echo "Copying LICENSE, README"
 
-  cp LICENSE README.md build/${platform}-${arch}/
+  cp LICENSE README.md build/"${platform}"-"${arch}"/
 }
 
-build_umbra $@
+build_umbra "$@"
