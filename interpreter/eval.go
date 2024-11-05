@@ -1,7 +1,6 @@
 package interpreter
 
 import (
-	"fmt"
 	"math"
 	"strings"
 
@@ -43,7 +42,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 	case ast.VariableExpression:
 		value, ok := env.Get(expr.Name.Lexeme, true)
 		if !ok {
-			return nil, exception.NewRuntimeError(fmt.Sprintf("undefined variable: %s", expr.Name.Lexeme))
+			return nil, exception.NewRuntimeError("RT002", expr.Name.Lexeme)
 		}
 		return value.data, nil
 	case ast.AssignExpression:
@@ -57,7 +56,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			variable, exists := env.Get(target.Name.Lexeme, true)
 
 			if !exists {
-				return nil, exception.NewRuntimeError(fmt.Sprintf("undefined variable: %s", target.Name.Lexeme))
+				return nil, exception.NewRuntimeError("RT002", target.Name.Lexeme)
 			}
 
 			typeErr := CheckType(variable.dataType, value, variable.nullable)
@@ -91,10 +90,10 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				}
 				idx, ok := index.(float64)
 				if !ok {
-					return nil, exception.NewRuntimeError(fmt.Sprintf("invalid array index: %v", index))
+					return nil, exception.NewRuntimeError("RT003", index)
 				}
 				if int(idx) < 0 || int(idx) > len(obj) {
-					return nil, exception.NewRuntimeError(fmt.Sprintf("array index out of bounds: %v", idx))
+					return nil, exception.NewRuntimeError("RT004", idx)
 				}
 				if int(idx) == len(obj) {
 					env.Set(target.Object.(ast.VariableExpression).Name.Lexeme, append(obj, value))
@@ -103,10 +102,10 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				obj[int(idx)] = value
 				return value, nil
 			default:
-				return nil, exception.NewRuntimeError(fmt.Sprintf("cannot assign to property of non-object type: %T", obj))
+				return nil, exception.NewRuntimeError("RT005", obj)
 			}
 		default:
-			return nil, exception.NewRuntimeError(fmt.Sprintf("invalid assignment target: %T", target))
+			return nil, exception.NewRuntimeError("RT006", target)
 		}
 	case ast.BinaryExpression:
 		left, err := Evaluate(expr.Left, env)
@@ -130,24 +129,24 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			if leftIsFloat && rightIsFloat {
 				return leftFloat + rightFloat, nil
 			}
-			return nil, exception.NewRuntimeError(fmt.Sprintf("type mismatch: %T + %T", left, right))
+			return nil, exception.NewRuntimeError("RT007", left, right)
 		case tokens.MINUS:
 			return left.(float64) - right.(float64), nil
 		case tokens.STAR:
 			return left.(float64) * right.(float64), nil
 		case tokens.SLASH:
 			if right.(float64) == 0 {
-				return nil, exception.NewRuntimeError("invalid operation: division by zero")
+				return nil, exception.NewRuntimeError("RT008")
 			}
 			return left.(float64) / right.(float64), nil
 		case tokens.PERCENT:
 			leftVal, ok := left.(float64)
 			if !ok {
-				return nil, exception.NewRuntimeError(fmt.Sprintf("invalid operand type for modulus: %T", left))
+				return nil, exception.NewRuntimeError("RT009", left)
 			}
 			rightVal, ok := right.(float64)
 			if !ok {
-				return nil, exception.NewRuntimeError(fmt.Sprintf("invalid operand type for modulus: %T", right))
+				return nil, exception.NewRuntimeError("RT009", right)
 			}
 			return math.Mod(leftVal, rightVal), nil
 		case tokens.GREATER_THAN:
@@ -163,7 +162,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		case tokens.BANG_EQUAL:
 			return left != right, nil
 		default:
-			return nil, exception.NewRuntimeError(fmt.Sprintf("unknown binary expression: %s", expr.Operator.Lexeme))
+			return nil, exception.NewRuntimeError("RT010", expr.Operator.Lexeme)
 		}
 	case ast.UnaryExpression:
 		right, err := Evaluate(expr.Right, env)
@@ -185,7 +184,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			case string:
 				return float64(len(parsedRight)), nil
 			default:
-				return nil, exception.NewRuntimeError(fmt.Sprintf("cannot get length of: %T", parsedRight))
+				return nil, exception.NewRuntimeError("RT011", parsedRight)
 			}
 		case tokens.RANGE:
 			switch parsedRight := right.(type) {
@@ -198,10 +197,10 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				}
 				return result, nil
 			default:
-				return nil, exception.NewRuntimeError(fmt.Sprintf("illegal use of range. type %T is invalid", parsedRight))
+				return nil, exception.NewRuntimeError("RT012", parsedRight)
 			}
 		default:
-			return nil, exception.NewRuntimeError(fmt.Sprintf("unknown unary expression: %s", expr.Operator.Lexeme))
+			return nil, exception.NewRuntimeError("RT013", expr.Operator.Lexeme)
 		}
 	case ast.CallExpression:
 		callee, err := Evaluate(expr.Callee, env)
@@ -261,7 +260,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return result, nil
 		}
 
-		return nil, exception.NewRuntimeError(fmt.Sprintf("invalid function call %v", expr.Callee))
+		return nil, exception.NewRuntimeError("RT014", expr.Callee)
 	case ast.LogicalExpression:
 		left, err := Evaluate(expr.Left, env)
 		if err != nil {
@@ -278,7 +277,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return false, nil
 			}
 		default:
-			return nil, exception.NewRuntimeError(fmt.Sprintf("unknown logical operator: %s", expr.Operator.Lexeme))
+			return nil, exception.NewRuntimeError("RT015", expr.Operator.Lexeme)
 		}
 
 		right, err := Evaluate(expr.Right, env)
@@ -337,20 +336,20 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			}
 			idx, ok := index.(float64)
 			if !ok {
-				return nil, exception.NewRuntimeError(fmt.Sprintf("invalid array index: %v", index))
+				return nil, exception.NewRuntimeError("RT003", index)
 			}
 			if int(idx) < 0 || int(idx) >= getLength(obj) {
-				return nil, exception.NewRuntimeError(fmt.Sprintf("array index out of bounds: %v", idx))
+				return nil, exception.NewRuntimeError("RT004", idx)
 			}
 			return getElementAt(obj, int(idx)), nil
 		default:
-			return nil, exception.NewRuntimeError(fmt.Sprintf("cannot access property of non-object type: %T", obj))
+			return nil, exception.NewRuntimeError("RT016", obj)
 		}
 	case ast.NamespaceMemberExpression:
 		if variableExpr, ok := expr.Namespace.(ast.VariableExpression); ok {
 			namespace, ok := env.GetNamespace(variableExpr.Name.Lexeme)
 			if !ok {
-				return nil, exception.NewRuntimeError(fmt.Sprintf("unknown namespace: %s", variableExpr.Name.Lexeme))
+				return nil, exception.NewRuntimeError("RT018", variableExpr.Name.Lexeme)
 			}
 
 			value, _ := namespace.Get(expr.Property.Lexeme, false)
@@ -358,9 +357,9 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return value.data, nil
 		}
 
-		return nil, exception.NewRuntimeError(fmt.Sprintf("invalid namespace: %T", expr.Namespace))
+		return nil, exception.NewRuntimeError("RT019", expr.Namespace)
 	default:
-		return nil, exception.NewRuntimeError(fmt.Sprintf("unknown expression: %T", expr))
+		return nil, exception.NewRuntimeError("RT017", expr)
 	}
 }
 
@@ -372,7 +371,7 @@ func resolveMemberExpressionProperty(expr ast.MemberExpression, env *Environment
 	} else if variable, ok := expr.Property.(ast.VariableExpression); ok {
 		property = variable.Name.Lexeme
 	} else {
-		return nil, exception.NewRuntimeError("invalid member expression property")
+		return nil, exception.NewRuntimeError("RT020")
 	}
 
 	if computeErr != nil {

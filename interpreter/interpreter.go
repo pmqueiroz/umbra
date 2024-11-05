@@ -140,7 +140,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			loopEnv := NewEnvironment(forEnv)
 			controlVar, exists := loopEnv.Get(initializedVarName, true)
 			if !exists {
-				return exception.NewRuntimeError(fmt.Sprintf("control variable not found in environment: %s", initializedVarName))
+				return exception.NewRuntimeError("RT021", initializedVarName)
 			}
 
 			stop, err := Evaluate(stmt.Stop, loopEnv)
@@ -152,7 +152,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			if parsedStop, ok := stop.(float64); ok {
 				condition = controlVar.data.(float64) <= parsedStop
 			} else {
-				return exception.NewRuntimeError(fmt.Sprintf("loop stop should be a number, got: %T", stop))
+				return exception.NewRuntimeError("RT022", stop)
 			}
 
 			if !condition {
@@ -168,7 +168,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			step, exists := stepValue.(float64)
 			if !exists {
-				return exception.NewRuntimeError(fmt.Sprintf("loop step should be a number, got: %T", stepValue))
+				return exception.NewRuntimeError("RT023", stepValue)
 			}
 
 			loopEnv.Set(initializedVarName, controlVar.data.(float64)+step)
@@ -198,7 +198,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			parsedCondition, ok := condition.(bool)
 			if !ok {
-				return exception.NewRuntimeError(fmt.Sprintf("loop condition should be a boolean, got: %T", parsedCondition))
+				return exception.NewRuntimeError("RT024", parsedCondition)
 			}
 
 			if !parsedCondition {
@@ -226,7 +226,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			success := env.MakePublic(identifier.Lexeme)
 
 			if !success {
-				return exception.NewRuntimeError(fmt.Sprintf("cannot make %s public. identifier does not exits", identifier.Lexeme))
+				return exception.NewRuntimeError("RT025", identifier.Lexeme)
 			}
 
 		}
@@ -242,6 +242,6 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 		return nil
 	default:
-		return exception.NewRuntimeError(fmt.Sprintf("unknown declaration: %T", statement))
+		return exception.NewRuntimeError("RT000", statement)
 	}
 }

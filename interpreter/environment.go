@@ -61,7 +61,7 @@ func (env *Environment) Set(name string, value interface{}) bool {
 
 func (env *Environment) Create(name string, value interface{}, dataType tokens.TokenType, nullable bool) bool {
 	if _, exists := env.Get(name, true); exists {
-		fmt.Println(exception.NewRuntimeError(fmt.Sprintf("variable %s already exists", name)))
+		fmt.Println(exception.NewRuntimeError("RT001", name))
 		os.Exit(1)
 		return false
 	}
@@ -116,7 +116,7 @@ func (env *Environment) GetNamespace(name string) (Environment, bool) {
 
 func (env *Environment) CreateNamespace(name string, namespace *Environment) bool {
 	if _, exists := env.GetNamespace(name); exists {
-		fmt.Println(exception.NewRuntimeError(fmt.Sprintf("namespace %s already exists", name)))
+		fmt.Println(exception.NewRuntimeError("RT001", name))
 		os.Exit(1)
 		return false
 	}
