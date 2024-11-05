@@ -19,7 +19,9 @@ func (e *GenericError) prettyCtx() string {
 }`, e.code)
 }
 
-func NewGenericError(code string, message string) error {
+func NewGenericError(code string, arguments ...any) error {
+	message := fmt.Sprintf(Messages[code], arguments...)
+
 	return &GenericError{
 		message: message,
 		code:    code,

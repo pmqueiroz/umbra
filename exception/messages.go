@@ -27,4 +27,5 @@ var Messages = map[string]string{
 	"RT023": "loop step should be a number, got: %T",
 	"RT024": "loop condition should be a boolean, got: %T",
 	"RT025": "cannot make %s public. identifier does not exits",
+	"GN001": "cannot find module '%s'",
 }
