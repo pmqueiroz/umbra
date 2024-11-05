@@ -94,7 +94,17 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 
 		switch expr.Operator.Type {
 		case tokens.PLUS:
-			return left.(float64) + right.(float64), nil
+			leftStr, leftIsString := left.(string)
+			rightStr, rightIsString := right.(string)
+			if leftIsString && rightIsString {
+				return leftStr + rightStr, nil
+			}
+			leftFloat, leftIsFloat := left.(float64)
+			rightFloat, rightIsFloat := right.(float64)
+			if leftIsFloat && rightIsFloat {
+				return leftFloat + rightFloat, nil
+			}
+			return nil, exception.NewRuntimeError(fmt.Sprintf("type mismatch: %T + %T", left, right))
 		case tokens.MINUS:
 			return left.(float64) - right.(float64), nil
 		case tokens.STAR:
