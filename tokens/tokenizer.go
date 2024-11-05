@@ -73,14 +73,16 @@ func (t *Tokenizer) match(expected rune) bool {
 }
 
 func (t *Tokenizer) addNonLiteralToken(tokenType TokenType) {
+	lexeme := string([]rune(t.source)[t.beginOfLexeme:t.current])
 	t.add(
 		Token{
 			Type:   tokenType,
-			Lexeme: string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Lexeme: lexeme,
 			Loc: Location{
 				Line: t.line,
 				Range: ColumnRange{
-					To: t.column,
+					From: t.column - len(lexeme) + 1,
+					To:   t.column,
 				},
 			},
 		},
@@ -110,14 +112,17 @@ func (t *Tokenizer) string() {
 
 	t.advance()
 
+	lexeme := string([]rune(t.source)[t.beginOfLexeme+1 : t.current-1])
+
 	t.add(
 		Token{
 			Type:   STRING,
-			Lexeme: string([]rune(t.source)[t.beginOfLexeme+1 : t.current-1]),
+			Lexeme: lexeme,
 			Loc: Location{
 				Line: t.line,
 				Range: ColumnRange{
-					To: t.column,
+					From: t.column - len(lexeme) + 1,
+					To:   t.column,
 				},
 			},
 		},
@@ -137,14 +142,17 @@ func (t *Tokenizer) numeric() {
 		}
 	}
 
+	lexeme := string([]rune(t.source)[t.beginOfLexeme:t.current])
+
 	t.add(
 		Token{
 			Type:   NUMERIC,
-			Lexeme: string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Lexeme: lexeme,
 			Loc: Location{
 				Line: t.line,
 				Range: ColumnRange{
-					To: t.column,
+					From: t.column - len(lexeme) + 1,
+					To:   t.column,
 				},
 			},
 		},
@@ -163,14 +171,17 @@ func (t *Tokenizer) identifier() {
 		return
 	}
 
+	lexeme := string([]rune(t.source)[t.beginOfLexeme:t.current])
+
 	t.add(
 		Token{
 			Type:   IDENTIFIER,
-			Lexeme: string([]rune(t.source)[t.beginOfLexeme:t.current]),
+			Lexeme: lexeme,
 			Loc: Location{
 				Line: t.line,
 				Range: ColumnRange{
-					To: t.column,
+					From: t.column - len(lexeme) + 1,
+					To:   t.column,
 				},
 			},
 		},
@@ -300,7 +311,8 @@ func Tokenize(source string) ([]Token, error) {
 			Loc: Location{
 				Line: tokenizer.line,
 				Range: ColumnRange{
-					To: tokenizer.column,
+					From: tokenizer.column,
+					To:   tokenizer.column,
 				},
 			},
 		},
