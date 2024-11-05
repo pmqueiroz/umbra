@@ -58,6 +58,7 @@ const (
 	FUN_TYPE           TokenType = "FUN_TYPE"
 	ANY_TYPE           TokenType = "ANY_TYPE"
 	BREAK              TokenType = "BREAK"
+	CONTINUE           TokenType = "CONTINUE"
 	PUBLIC             TokenType = "PUBLIC"
 	IMPORT             TokenType = "IMPORT"
 	HOOK               TokenType = "HOOK"
@@ -80,35 +81,36 @@ var SPECIAL_TYPES = []TokenType{
 }
 
 var reservedKeywordsMap = map[string]TokenType{
-	"not":     NOT,
-	"and":     AND,
-	"else":    ELSE,
-	"def":     FUN,
-	"for":     FOR,
-	"if":      IF,
-	"null":    NULL,
-	"or":      OR,
-	"stdout":  STDOUT,
-	"stderr":  STDERR,
-	"return":  RETURN,
-	"this":    THIS,
-	"true":    TRUE,
-	"false":   FALSE,
-	"str":     STR_TYPE,
-	"num":     NUM_TYPE,
-	"bool":    BOOL_TYPE,
-	"arr":     ARR_TYPE,
-	"hashmap": HASHMAP_TYPE,
-	"void":    VOID_TYPE,
-	"func":    FUN_TYPE,
-	"const":   CONST,
-	"mut":     MUT,
-	"break":   BREAK,
-	"pub":     PUBLIC,
-	"import":  IMPORT,
-	"any":     ANY_TYPE,
-	"NaN":     NOT_A_NUMBER,
-	"range":   RANGE,
+	"not":      NOT,
+	"and":      AND,
+	"else":     ELSE,
+	"def":      FUN,
+	"for":      FOR,
+	"if":       IF,
+	"null":     NULL,
+	"or":       OR,
+	"stdout":   STDOUT,
+	"stderr":   STDERR,
+	"return":   RETURN,
+	"this":     THIS,
+	"true":     TRUE,
+	"false":    FALSE,
+	"str":      STR_TYPE,
+	"num":      NUM_TYPE,
+	"bool":     BOOL_TYPE,
+	"arr":      ARR_TYPE,
+	"hashmap":  HASHMAP_TYPE,
+	"void":     VOID_TYPE,
+	"func":     FUN_TYPE,
+	"const":    CONST,
+	"mut":      MUT,
+	"break":    BREAK,
+	"continue": CONTINUE,
+	"pub":      PUBLIC,
+	"import":   IMPORT,
+	"any":      ANY_TYPE,
+	"NaN":      NOT_A_NUMBER,
+	"range":    RANGE,
 }
 
 func getKeyword(lexis string) TokenType {

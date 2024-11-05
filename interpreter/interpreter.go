@@ -24,6 +24,12 @@ func (r Break) Error() string {
 	return "for loop break"
 }
 
+type Continue struct{}
+
+func (r Continue) Error() string {
+	return "for loop continue"
+}
+
 type FunctionDeclaration struct {
 	Itself      *ast.FunctionStatement
 	Environment *Environment
@@ -153,12 +159,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 				break
 			}
 
-			if err := Interpret(stmt.Body, loopEnv); err != nil {
-				if _, ok := err.(Break); ok {
-					break
-				}
-				return err
-			}
+			bodyErr := Interpret(stmt.Body, loopEnv)
 
 			stepValue, err := Evaluate(stmt.Step, loopEnv)
 			if err != nil {
@@ -171,6 +172,18 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			}
 
 			loopEnv.Set(initializedVarName, controlVar.data.(float64)+step)
+
+			if _, ok := bodyErr.(Break); ok {
+				break
+			}
+
+			if _, ok := bodyErr.(Continue); ok {
+				continue
+			}
+
+			if bodyErr != nil {
+				return bodyErr
+			}
 		}
 
 		return nil
@@ -196,12 +209,18 @@ func Interpret(statement ast.Statement, env *Environment) error {
 				if _, ok := err.(Break); ok {
 					break
 				}
+
+				if _, ok := err.(Continue); ok {
+					continue
+				}
 				return err
 			}
 		}
 		return nil
 	case ast.BreakStatement:
 		return Break{}
+	case ast.ContinueStatement:
+		return Continue{}
 	case ast.PublicStatement:
 		for _, identifier := range stmt.Identifiers {
 			success := env.MakePublic(identifier.Lexeme)

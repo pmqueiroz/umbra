@@ -465,6 +465,10 @@ func (p *Parser) breakStatement() Statement {
 	return BreakStatement{}
 }
 
+func (p *Parser) continueStatement() Statement {
+	return ContinueStatement{}
+}
+
 func (p *Parser) returnStatement() Statement {
 	keyword := p.previous()
 	value := p.expression()
@@ -613,6 +617,9 @@ func (p *Parser) statement() Statement {
 	}
 	if p.match(tokens.BREAK) {
 		return p.breakStatement()
+	}
+	if p.match(tokens.CONTINUE) {
+		return p.continueStatement()
 	}
 	if p.match(tokens.PUBLIC) {
 		return p.publicStatement()
