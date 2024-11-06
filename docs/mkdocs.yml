@@ -14,6 +14,7 @@ nav:
     - "Values": examples/values.md
     - "Variables": examples/variables.md
     - "Loops": examples/loops.md
+    - "Conditions": examples/conditions.md
 
 theme:
   name: material

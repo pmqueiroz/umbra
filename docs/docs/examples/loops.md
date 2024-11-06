@@ -70,3 +70,4 @@ results in
 7
 9
 ```
+Next example: [Conditions](/examples/conditions)
