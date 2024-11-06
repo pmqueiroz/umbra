@@ -9,7 +9,7 @@ nav:
   - Libs:
     - "Math": libs/math.md
     - IO: libs/io.md
-  - "Umbra by example":
+  - "Learn by example":
     - "Hello World": examples/hello-word.md
     - "Values": examples/values.md
     - "Variables": examples/variables.md
