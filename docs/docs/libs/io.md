@@ -1,5 +1,9 @@
 # IO
 
+```u hl_lines="1"
+import "io"
+```
+
 ## Functions
 
 ### `print(values ...any)`

@@ -7,8 +7,8 @@ edit_uri: "https://github.com/pmqueiroz/umbra/tree/main/docs"
 nav:
   - "Getting started": index.md
   - Libs:
-    - "Math": libs/math.md
     - IO: libs/io.md
+    - "Math": libs/math.md
   - "Learn by example":
     - "Hello World": examples/hello-word.md
     - "Values": examples/values.md

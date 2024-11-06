@@ -2,6 +2,11 @@
 
 Perform mathematical operations such as absolute value, square root, trigonometric calculations, and power functions.
 
+
+```u hl_lines="1"
+import "math"
+```
+
 ## Functions
 
 ### `abs(x num) num`
