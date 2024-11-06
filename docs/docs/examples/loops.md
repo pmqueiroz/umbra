@@ -24,7 +24,7 @@ where `i` starts at `0`, runs until `10`, and increments by `2` on each iteratio
 The conditional `for` loop, on the other hand, is structured with a condition, executing as long as the condition remains true.
 
 ```u title="loops.u"
-if i < 10 {
+for i < 10 {
   
 }
 ```
@@ -41,4 +41,32 @@ for {
 
   i = i + 1
 }
+```
+
+### Control loop flow
+
+Umbra also includes `break` and `continue` statements to control loop flow. `break` immediately exits the loop, while `continue` skips to the next iteration, allowing precise control over looping behavior.
+
+```u
+for mut i num = 0, 100 {
+  if i % 2 == 0 {
+    continue
+  }
+
+  if i > 10 {
+    break
+  }
+
+  io::printLn(i)
+}
+```
+
+results in
+
+```
+1
+3
+5
+7
+9
 ```
