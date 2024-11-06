@@ -1,0 +1,45 @@
+site_name: Umbra
+site_author: pmqueiroz
+copyright: "Copyright &copy 2024 Pedro Queiroz"
+repo_url: https://github.com/pmqueiroz/umbra
+edit_uri: "https://github.com/pmqueiroz/umbra/tree/main/docs"
+
+nav:
+  - "Getting started": index.md
+  - Libs:
+    - "Math": libs/math.md
+    - IO: libs/io.md
+
+theme:
+  name: material
+  language: en
+  logo: assets/logo-light.svg
+  palette:
+    primary: custom
+
+extra_css:
+  - styles/global.css
+
+markdown_extensions:
+  - tables
+  - attr_list
+  - md_in_html
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+plugins:
+  - search
+  - macros
+  - include-markdown
+
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/pmqueiroz
