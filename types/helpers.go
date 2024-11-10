@@ -8,7 +8,7 @@ import (
 )
 
 func CheckType(targetType tokens.TokenType, expected interface{}, nullable bool) error {
-	typeMismatchErr := fmt.Sprintf("expected %s got %T", targetType, expected)
+	typeMismatchErr := fmt.Sprintf("expected %s got %s", targetType, ParseUmbraType(expected))
 
 	if targetType == tokens.ANY_TYPE {
 		return nil
@@ -21,6 +21,10 @@ func CheckType(targetType tokens.TokenType, expected interface{}, nullable bool)
 		}
 	case string:
 		if targetType != tokens.STR_TYPE {
+			return exception.NewTypeError(typeMismatchErr)
+		}
+	case rune:
+		if targetType != tokens.CHAR_TYPE {
 			return exception.NewTypeError(typeMismatchErr)
 		}
 	case bool:
@@ -47,6 +51,8 @@ func ParseUmbraType(value interface{}) UmbraType {
 	switch value.(type) {
 	case string:
 		return STR
+	case rune:
+		return CHAR
 	case bool:
 		return BOOL
 	case float64:

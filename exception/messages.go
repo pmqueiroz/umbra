@@ -4,7 +4,7 @@ var Messages = map[string]string{
 	"RT000": "unknown declaration: %s",
 	"RT001": "variable %s already exists",
 	"RT002": "undefined variable: %s",
-	"RT003": "invalid array index: %v",
+	"RT003": "invalid index: %v",
 	"RT004": "array index out of bounds: %v",
 	"RT005": "cannot assign to property of type: %s",
 	"RT006": "cannot assign property to %s type",
@@ -28,5 +28,6 @@ var Messages = map[string]string{
 	"RT024": "loop condition should be a <bool> got %s instead",
 	"RT025": "cannot make %s public. identifier does not exits",
 	"RT026": "cannot operate comparison with type %s",
+	"RT027": "cannot subtract value of type %s with a type %s",
 	"GN001": "cannot find module '%s'",
 }

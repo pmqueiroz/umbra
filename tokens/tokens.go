@@ -66,6 +66,7 @@ const (
 	HOOK               TokenType = "HOOK"
 	NOT_A_NUMBER       TokenType = "NOT_A_NUMBER"
 	RANGE              TokenType = "RANGE"
+	TYPE_OF            TokenType = "TYPE_OF"
 )
 
 var DATA_TYPES = []TokenType{
@@ -115,6 +116,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"any":      ANY_TYPE,
 	"NaN":      NOT_A_NUMBER,
 	"range":    RANGE,
+	"typeof":   TYPE_OF,
 }
 
 func getKeyword(lexis string) TokenType {

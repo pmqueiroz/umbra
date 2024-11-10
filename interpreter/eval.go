@@ -132,19 +132,44 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 
 		switch expr.Operator.Type {
 		case tokens.PLUS:
-			leftStr, leftIsString := left.(string)
-			rightStr, rightIsString := right.(string)
-			if leftIsString && rightIsString {
-				return leftStr + rightStr, nil
-			}
-			leftFloat, leftIsFloat := left.(float64)
-			rightFloat, rightIsFloat := right.(float64)
-			if leftIsFloat && rightIsFloat {
-				return leftFloat + rightFloat, nil
+			switch leftVal := left.(type) {
+			case string:
+				switch rightVal := right.(type) {
+				case string:
+					return leftVal + rightVal, nil
+				case rune:
+					return leftVal + string(rightVal), nil
+				}
+			case rune:
+				if rightStr, ok := right.(string); ok {
+					return string(leftVal) + rightStr, nil
+				} else if rightRune, ok := right.(rune); ok {
+					return leftVal + rightRune, nil
+				} else if rightFloat, ok := right.(float64); ok {
+					return leftVal + rune(rightFloat), nil
+				}
+			case float64:
+				if rightFloat, ok := right.(float64); ok {
+					return leftVal + rightFloat, nil
+				}
 			}
 			return nil, exception.NewRuntimeError("RT007", types.ParseUmbraType(left), types.ParseUmbraType(right))
 		case tokens.MINUS:
-			return left.(float64) - right.(float64), nil
+			switch leftVal := left.(type) {
+			case float64:
+				if rightFloat, ok := right.(float64); ok {
+					return leftVal - rightFloat, nil
+				} else if rightRune, ok := right.(rune); ok {
+					return leftVal - float64(rightRune), nil
+				}
+			case rune:
+				if rightFloat, ok := right.(float64); ok {
+					return rune(float64(leftVal) - rightFloat), nil
+				} else if rightRune, ok := right.(rune); ok {
+					return leftVal - rightRune, nil
+				}
+			}
+			return nil, exception.NewRuntimeError("RT027", types.ParseUmbraType(left), types.ParseUmbraType(right))
 		case tokens.STAR:
 			return left.(float64) * right.(float64), nil
 		case tokens.SLASH:
@@ -221,6 +246,8 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			return -right.(float64), nil
 		case tokens.NOT:
 			return !right.(bool), nil
+		case tokens.TYPE_OF:
+			return types.ParseUmbraType(right), nil
 		case tokens.TILDE:
 			switch parsedRight := right.(type) {
 			case []interface{}:
@@ -374,6 +401,19 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			if !ok {
 				return nil, nil
 			}
+			return value, nil
+		case string:
+			index, err := Evaluate(expr.Property, env)
+			if err != nil {
+				return nil, err
+			}
+			idx, ok := index.(float64)
+			if !ok {
+				return nil, exception.NewRuntimeError("RT003", index)
+			}
+
+			value := []rune(obj)[int(idx)]
+
 			return value, nil
 		case []interface{}, []string:
 			index, err := Evaluate(expr.Property, env)
