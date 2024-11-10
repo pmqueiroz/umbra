@@ -40,10 +40,35 @@ def split(string str, separator str) {
   return result
 }
 
-# TODO: as soon as the umbra supports char type implements the related functions
-# like: toUpper, toLower, toChar, fromChar
+def toUpper(string str) {
+  mut buffer str = ""
+  for mut i num = 0, ~range string - 1 {
+
+    if string[i] >= 'a' and string[i] <= 'z' {
+      buffer = buffer + (string[i] - 32)
+    } else {
+      buffer = buffer + string[i]
+    }
+  }
+
+  return buffer
+}
+
+def toLower(string str) {
+  mut buffer str = ""
+  for mut i num = 0, ~range string - 1 {
+    if string[i] >= 'A' and string[i] <= 'Z' {
+      buffer = buffer + (string[i] + 32)
+    } else {
+      buffer = buffer + string[i]
+    }
+  }
+  return buffer
+}
 
 pub {
   substring
   split
+  toUpper
+  toLower
 }
