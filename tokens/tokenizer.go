@@ -129,6 +129,39 @@ func (t *Tokenizer) string() {
 	)
 }
 
+func (t *Tokenizer) char() {
+	if t.peek() == '\\' {
+		t.advance()
+	}
+
+	t.advance()
+
+	if t.peek() != '\'' || t.isAtEnd() {
+		fmt.Println(
+			exception.NewSyntaxError("Unterminated char", t.line, t.column, string([]rune(t.source)[t.beginOfLexeme:t.current])),
+		)
+		return
+	}
+
+	t.advance()
+
+	lexeme := string([]rune(t.source)[t.beginOfLexeme+1 : t.current-1])
+
+	t.add(
+		Token{
+			Type:   CHAR,
+			Lexeme: lexeme,
+			Loc: Location{
+				Line: t.line,
+				Range: ColumnRange{
+					From: t.column - len(lexeme) + 1,
+					To:   t.column,
+				},
+			},
+		},
+	)
+}
+
 func (t *Tokenizer) numeric() {
 	for isDigit(t.peek()) {
 		t.advance()
@@ -271,6 +304,8 @@ func (t *Tokenizer) scan() error {
 		t.advanceLine()
 	case '"':
 		t.string()
+	case '\'':
+		t.char()
 	default:
 		if isDigit(char) {
 			t.numeric()

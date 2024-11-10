@@ -7,6 +7,7 @@ const (
 	EOF                TokenType = "EOF"
 	IDENTIFIER         TokenType = "IDENTIFIER"
 	STRING             TokenType = "STRING"
+	CHAR               TokenType = "CHAR"
 	NUMERIC            TokenType = "NUMERIC"
 	LEFT_PARENTHESIS   TokenType = "LEFT_PAREN"
 	RIGHT_PARENTHESIS  TokenType = "RIGHT_PAREN"
@@ -50,6 +51,7 @@ const (
 	CONST              TokenType = "VAR"
 	MUT                TokenType = "MUT"
 	STR_TYPE           TokenType = "STR_TYPE"
+	CHAR_TYPE          TokenType = "CHAR_TYPE"
 	NUM_TYPE           TokenType = "NUM_TYPE"
 	BOOL_TYPE          TokenType = "BOOL_TYPE"
 	VOID_TYPE          TokenType = "VOID_TYPE"
@@ -68,6 +70,7 @@ const (
 
 var DATA_TYPES = []TokenType{
 	STR_TYPE,
+	CHAR_TYPE,
 	NUM_TYPE,
 	BOOL_TYPE,
 	HASHMAP_TYPE,
@@ -96,6 +99,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"true":     TRUE,
 	"false":    FALSE,
 	"str":      STR_TYPE,
+	"char":     CHAR_TYPE,
 	"num":      NUM_TYPE,
 	"bool":     BOOL_TYPE,
 	"arr":      ARR_TYPE,

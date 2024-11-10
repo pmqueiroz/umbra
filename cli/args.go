@@ -9,6 +9,7 @@ import (
 
 type Options struct {
 	PrintAst    bool
+	PrintTokens bool
 	ShowVersion bool
 }
 
@@ -25,6 +26,7 @@ func Parse() Args {
 	parsedArgs := Args{}
 
 	flag.BoolVar(&parsedArgs.Options.PrintAst, "ast", false, "Prints the AST of the program")
+	flag.BoolVar(&parsedArgs.Options.PrintTokens, "tokens", false, "Prints the tokens of the program")
 	flag.BoolVar(&parsedArgs.Options.ShowVersion, "version", false, "Display the version of umbra")
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, HELP_HEADER)

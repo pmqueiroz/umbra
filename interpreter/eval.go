@@ -6,8 +6,8 @@ import (
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/exception"
-	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/tokens"
+	"github.com/pmqueiroz/umbra/types"
 	"github.com/sanity-io/litter"
 )
 
@@ -61,7 +61,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return nil, exception.NewRuntimeError("RT002", target.Name.Lexeme)
 			}
 
-			typeErr := CheckType(variable.dataType, value, variable.nullable)
+			typeErr := types.CheckType(variable.dataType, value, variable.nullable)
 
 			if typeErr != nil {
 				return nil, typeErr
@@ -104,10 +104,10 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				obj[int(idx)] = value
 				return value, nil
 			default:
-				return nil, exception.NewRuntimeError("RT005", helpers.UmbraType(obj))
+				return nil, exception.NewRuntimeError("RT005", types.ParseUmbraType(obj))
 			}
 		default:
-			return nil, exception.NewRuntimeError("RT006", helpers.UmbraType(target))
+			return nil, exception.NewRuntimeError("RT006", types.ParseUmbraType(target))
 		}
 	case ast.BinaryExpression:
 		left, err := Evaluate(expr.Left, env)
@@ -131,7 +131,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			if leftIsFloat && rightIsFloat {
 				return leftFloat + rightFloat, nil
 			}
-			return nil, exception.NewRuntimeError("RT007", helpers.UmbraType(left), helpers.UmbraType(right))
+			return nil, exception.NewRuntimeError("RT007", types.ParseUmbraType(left), types.ParseUmbraType(right))
 		case tokens.MINUS:
 			return left.(float64) - right.(float64), nil
 		case tokens.STAR:
@@ -148,7 +148,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return math.Mod(leftFloat, rightFloat), nil
 			}
 
-			return nil, exception.NewRuntimeError("RT009", helpers.UmbraType(left), helpers.UmbraType(right))
+			return nil, exception.NewRuntimeError("RT009", types.ParseUmbraType(left), types.ParseUmbraType(right))
 		case tokens.GREATER_THAN:
 			return left.(float64) > right.(float64), nil
 		case tokens.GREATER_THAN_EQUAL:
@@ -184,7 +184,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			case string:
 				return float64(len(parsedRight)), nil
 			default:
-				return nil, exception.NewRuntimeError("RT011", helpers.UmbraType(parsedRight))
+				return nil, exception.NewRuntimeError("RT011", types.ParseUmbraType(parsedRight))
 			}
 		case tokens.RANGE:
 			switch parsedRight := right.(type) {
@@ -197,7 +197,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				}
 				return result, nil
 			default:
-				return nil, exception.NewRuntimeError("RT012", helpers.UmbraType(parsedRight))
+				return nil, exception.NewRuntimeError("RT012", types.ParseUmbraType(parsedRight))
 			}
 		default:
 			return nil, exception.NewRuntimeError("RT013", expr.Operator.Lexeme)
@@ -221,7 +221,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 							return nil, err
 						}
 
-						typeErr := CheckType(param.Type.Type, argValue, param.Nullable)
+						typeErr := types.CheckType(param.Type.Type, argValue, param.Nullable)
 						if typeErr != nil {
 							return nil, typeErr
 						}
@@ -236,7 +236,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 						return nil, err
 					}
 
-					typeErr := CheckType(param.Type.Type, argValue, param.Nullable)
+					typeErr := types.CheckType(param.Type.Type, argValue, param.Nullable)
 					if typeErr != nil {
 						return nil, typeErr
 					}
@@ -343,7 +343,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			}
 			return getElementAt(obj, int(idx)), nil
 		default:
-			return nil, exception.NewRuntimeError("RT016", helpers.UmbraType(obj))
+			return nil, exception.NewRuntimeError("RT016", types.ParseUmbraType(obj))
 		}
 	case ast.NamespaceMemberExpression:
 		if variableExpr, ok := expr.Namespace.(ast.VariableExpression); ok {

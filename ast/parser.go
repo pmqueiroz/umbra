@@ -228,6 +228,17 @@ func (p *Parser) primary() Expression {
 		}
 	}
 
+	if p.match(tokens.CHAR) {
+		char, err := strconv.Unquote(`"` + p.previous().Lexeme + `"`)
+		if err != nil {
+			p.throw("Unable to convert char.")
+		}
+
+		return LiteralExpression{
+			Value: rune(char[0]),
+		}
+	}
+
 	if p.match(tokens.IDENTIFIER) {
 		return VariableExpression{
 			Name: p.previous(),

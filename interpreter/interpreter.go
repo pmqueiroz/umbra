@@ -7,8 +7,8 @@ import (
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/exception"
-	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/tokens"
+	"github.com/pmqueiroz/umbra/types"
 	"github.com/sanity-io/litter"
 )
 
@@ -82,7 +82,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 				return err
 			}
 
-			typeErr := CheckType(stmt.Type.Type, value, stmt.Nullable)
+			typeErr := types.CheckType(stmt.Type.Type, value, stmt.Nullable)
 
 			if typeErr != nil {
 				return typeErr
@@ -154,7 +154,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			if parsedStop, ok := stop.(float64); ok {
 				condition = controlVar.data.(float64) <= parsedStop
 			} else {
-				return exception.NewRuntimeError("RT022", helpers.UmbraType(stop))
+				return exception.NewRuntimeError("RT022", types.ParseUmbraType(stop))
 			}
 
 			if !condition {
@@ -170,7 +170,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			step, exists := stepValue.(float64)
 			if !exists {
-				return exception.NewRuntimeError("RT023", helpers.UmbraType(stepValue))
+				return exception.NewRuntimeError("RT023", types.ParseUmbraType(stepValue))
 			}
 
 			loopEnv.Set(initializedVarName, controlVar.data.(float64)+step)
@@ -200,7 +200,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			parsedCondition, ok := condition.(bool)
 			if !ok {
-				return exception.NewRuntimeError("RT024", helpers.UmbraType(parsedCondition))
+				return exception.NewRuntimeError("RT024", types.ParseUmbraType(parsedCondition))
 			}
 
 			if !parsedCondition {

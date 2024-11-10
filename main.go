@@ -25,6 +25,10 @@ func run(content string, options RunOptions) {
 		fmt.Printf("%s\n", err.Error())
 	}
 
+	if options.PrintTokens {
+		cli.PrintTokens(tokens)
+	}
+
 	module := ast.Parse(tokens)
 
 	if options.PrintAst {

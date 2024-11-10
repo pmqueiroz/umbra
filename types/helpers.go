@@ -1,4 +1,4 @@
-package interpreter
+package types
 
 import (
 	"fmt"
@@ -41,4 +41,23 @@ func CheckType(targetType tokens.TokenType, expected interface{}, nullable bool)
 		}
 	}
 	return nil
+}
+
+func ParseUmbraType(value interface{}) UmbraType {
+	switch value.(type) {
+	case string:
+		return STR
+	case bool:
+		return BOOL
+	case float64:
+		return NUM
+	case nil:
+		return NULL
+	case map[interface{}]interface{}:
+		return HASHMAP
+	case []interface{}:
+		return ARR
+	default:
+		return UNKNOWN
+	}
 }
