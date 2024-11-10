@@ -33,6 +33,17 @@ func getElementAt(data interface{}, idx int) interface{} {
 	}
 }
 
+func toFloat64(value interface{}) (float64, error) {
+	switch v := value.(type) {
+	case float64:
+		return v, nil
+	case rune:
+		return float64(v), nil
+	default:
+		return 0, exception.NewRuntimeError("RT026", types.ParseUmbraType(value))
+	}
+}
+
 func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) {
 	switch expr := expression.(type) {
 	case ast.LiteralExpression:
@@ -150,13 +161,48 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 
 			return nil, exception.NewRuntimeError("RT009", types.ParseUmbraType(left), types.ParseUmbraType(right))
 		case tokens.GREATER_THAN:
-			return left.(float64) > right.(float64), nil
+			leftVal, err := toFloat64(left)
+			if err != nil {
+				return false, err
+			}
+			rightVal, err := toFloat64(right)
+			if err != nil {
+				return false, err
+			}
+			return leftVal > rightVal, nil
+
 		case tokens.GREATER_THAN_EQUAL:
-			return left.(float64) >= right.(float64), nil
+			leftVal, err := toFloat64(left)
+			if err != nil {
+				return false, err
+			}
+			rightVal, err := toFloat64(right)
+			if err != nil {
+				return false, err
+			}
+			return leftVal >= rightVal, nil
+
 		case tokens.LESS_THAN:
-			return left.(float64) < right.(float64), nil
+			leftVal, err := toFloat64(left)
+			if err != nil {
+				return false, err
+			}
+			rightVal, err := toFloat64(right)
+			if err != nil {
+				return false, err
+			}
+			return leftVal < rightVal, nil
+
 		case tokens.LESS_THAN_EQUAL:
-			return left.(float64) <= right.(float64), nil
+			leftVal, err := toFloat64(left)
+			if err != nil {
+				return false, err
+			}
+			rightVal, err := toFloat64(right)
+			if err != nil {
+				return false, err
+			}
+			return leftVal <= rightVal, nil
 		case tokens.EQUAL_EQUAL:
 			return left == right, nil
 		case tokens.BANG_EQUAL:
