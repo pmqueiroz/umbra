@@ -67,3 +67,22 @@ func ParseUmbraType(value interface{}) UmbraType {
 		return UNKNOWN
 	}
 }
+
+func ParseTokenType(value tokens.TokenType) UmbraType {
+	switch value {
+	case tokens.STR_TYPE:
+		return STR
+	case tokens.CHAR_TYPE:
+		return CHAR
+	case tokens.BOOL_TYPE:
+		return BOOL
+	case tokens.NUM_TYPE:
+		return NUM
+	case tokens.HASHMAP_TYPE:
+		return HASHMAP
+	case tokens.ARR_TYPE:
+		return ARR
+	default:
+		return UNKNOWN
+	}
+}

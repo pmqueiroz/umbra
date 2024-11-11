@@ -69,16 +69,21 @@ const (
 	TYPE_OF            TokenType = "TYPE_OF"
 )
 
-var DATA_TYPES = []TokenType{
+var PRIMITIVE_TYPES = []TokenType{
 	STR_TYPE,
 	CHAR_TYPE,
 	NUM_TYPE,
 	BOOL_TYPE,
+}
+
+var COMPLEX_TYPES = []TokenType{
 	HASHMAP_TYPE,
 	ARR_TYPE,
 	ANY_TYPE,
 	FUN_TYPE,
 }
+
+var DATA_TYPES = append(PRIMITIVE_TYPES, COMPLEX_TYPES...)
 
 var SPECIAL_TYPES = []TokenType{
 	VOID_TYPE,

@@ -2,7 +2,9 @@ package interpreter
 
 import (
 	"math"
+	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/exception"
@@ -444,6 +446,66 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		}
 
 		return nil, exception.NewRuntimeError("RT019", litter.Sdump(expr.Namespace))
+	case ast.TypeConversionExpression:
+		value, err := Evaluate(expr.Value, env)
+		if err != nil {
+			return nil, err
+		}
+
+		defaultError := exception.NewRuntimeError("RT028", types.ParseUmbraType(value), types.ParseTokenType(expr.Type.Type))
+
+		switch expr.Type.Type {
+		case tokens.STR_TYPE:
+			switch v := value.(type) {
+			case rune:
+				return string(v), nil
+			case float64:
+				return strconv.FormatFloat(v, 'f', -1, 64), nil
+			case bool:
+				return strconv.FormatBool(v), nil
+			}
+			return nil, defaultError
+		case tokens.CHAR_TYPE:
+			switch v := value.(type) {
+			case float64:
+				return rune(v), nil
+			case string:
+				switch utf8.RuneCountInString(v) {
+				case 1:
+					return []rune(v)[0], nil
+				case 2:
+					if []rune(v)[0] != '\\' {
+						return nil, exception.NewRuntimeError("RT029")
+					}
+
+					runeStr, err := strconv.Unquote(`"` + v + `"`)
+					if err != nil {
+						return nil, exception.NewRuntimeError("RT030")
+					}
+
+					return []rune(runeStr)[0], nil
+				default:
+					return nil, exception.NewRuntimeError("RT029")
+				}
+			}
+			return nil, defaultError
+		case tokens.NUM_TYPE:
+			switch v := value.(type) {
+			case bool:
+				return map[bool]float64{true: 1.0, false: 0.0}[v], nil
+			case rune:
+				return float64(v), nil
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return math.NaN(), nil
+				}
+
+				return value, nil
+			}
+			return math.NaN(), defaultError
+		}
+		return nil, defaultError
 	default:
 		return nil, exception.NewRuntimeError("RT017", litter.Sdump(expr))
 	}

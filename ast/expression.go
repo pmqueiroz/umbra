@@ -30,6 +30,11 @@ type LiteralExpression struct {
 	Value interface{}
 }
 
+type TypeConversionExpression struct {
+	Type  tokens.Token
+	Value Expression
+}
+
 type NaNExpression struct{}
 
 type LogicalExpression struct {

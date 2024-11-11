@@ -29,5 +29,8 @@ var Messages = map[string]string{
 	"RT025": "cannot make %s public. identifier does not exits",
 	"RT026": "cannot operate comparison with type %s",
 	"RT027": "cannot subtract value of type %s with a type %s",
+	"RT028": "cannot convert value of type %s to type %s",
+	"RT029": "<str> should have only on char to be converted to type <char>",
+	"RT030": "convert into char failed",
 	"GN001": "cannot find module '%s'",
 }

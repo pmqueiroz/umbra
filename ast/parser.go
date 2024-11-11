@@ -261,6 +261,20 @@ func (p *Parser) primary() Expression {
 		}
 	}
 
+	if p.match(tokens.PRIMITIVE_TYPES...) {
+		conversionType := p.previous()
+		p.consume("Expect '(' after type conversion.", tokens.LEFT_PARENTHESIS)
+
+		expr := p.expression()
+
+		p.consume("Expect ')' after type conversion.", tokens.RIGHT_PARENTHESIS)
+
+		return TypeConversionExpression{
+			Type:  conversionType,
+			Value: expr,
+		}
+	}
+
 	p.throw("Expect expression.")
 	return LiteralExpression{
 		Value: nil,
