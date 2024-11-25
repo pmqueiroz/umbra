@@ -33,6 +33,6 @@ var Messages = map[string]string{
 	"RT029": "<str> should have only on char to be converted to type <char>",
 	"RT030": "convert into char failed",
 	"RT031": "invalid internal function call",
-	"RT032": "cannot read file: %s",
+	"RT032": "cannot %s file: %s",
 	"GN001": "cannot find module '%s'",
 }
