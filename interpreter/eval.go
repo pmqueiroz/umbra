@@ -7,7 +7,9 @@ import (
 	"unicode/utf8"
 
 	"github.com/pmqueiroz/umbra/ast"
+	"github.com/pmqueiroz/umbra/environment"
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/native"
 	"github.com/pmqueiroz/umbra/tokens"
 	"github.com/pmqueiroz/umbra/types"
 	"github.com/sanity-io/litter"
@@ -46,7 +48,7 @@ func toFloat64(value interface{}) (float64, error) {
 	}
 }
 
-func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) {
+func Evaluate(expression ast.Expression, env *environment.Environment) (interface{}, error) {
 	switch expr := expression.(type) {
 	case ast.LiteralExpression:
 		return expr.Value, nil
@@ -59,7 +61,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		if !ok {
 			return nil, exception.NewRuntimeError("RT002", expr.Name.Lexeme)
 		}
-		return value.data, nil
+		return value.Data, nil
 	case ast.AssignExpression:
 		value, err := Evaluate(expr.Value, env)
 		if err != nil {
@@ -74,7 +76,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 				return nil, exception.NewRuntimeError("RT002", target.Name.Lexeme)
 			}
 
-			typeErr := types.CheckType(variable.dataType, value, variable.nullable)
+			typeErr := types.CheckType(variable.DataType, value, variable.Nullable)
 
 			if typeErr != nil {
 				return nil, typeErr
@@ -285,7 +287,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 		}
 
 		if function, ok := callee.(FunctionDeclaration); ok {
-			funcEnv := NewEnvironment(function.Environment)
+			funcEnv := environment.NewEnvironment(function.Environment)
 
 			for i, param := range function.Itself.Params {
 				if param.Variadic {
@@ -303,7 +305,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 
 						variadicArgs = append(variadicArgs, argValue)
 					}
-					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type.Type, param.Nullable)
+					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type.Type, param.Nullable, false)
 					break
 				} else {
 					argValue, err := Evaluate(expr.Arguments[i], env)
@@ -316,7 +318,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 						return nil, typeErr
 					}
 
-					funcEnv.Create(param.Name.Lexeme, argValue, param.Type.Type, param.Nullable)
+					funcEnv.Create(param.Name.Lexeme, argValue, param.Type.Type, param.Nullable, false)
 				}
 			}
 
@@ -333,6 +335,23 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 			}
 
 			return result, nil
+		} else if goFunc, ok := callee.(native.InternalModuleFn); ok {
+			var args []interface{}
+			for _, arg := range expr.Arguments {
+				argValue, err := Evaluate(arg, env)
+				if err != nil {
+					return nil, err
+				}
+				args = append(args, argValue)
+			}
+
+			defer func() {
+				if r := recover(); r != nil {
+					err = exception.NewRuntimeError("RT031")
+				}
+			}()
+			result, err := goFunc(args)
+			return result, err
 		}
 
 		return nil, exception.NewRuntimeError("RT014", expr.Callee)
@@ -442,7 +461,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 
 			value, _ := namespace.Get(expr.Property.Lexeme, false)
 
-			return value.data, nil
+			return value.Data, nil
 		}
 
 		return nil, exception.NewRuntimeError("RT019", litter.Sdump(expr.Namespace))
@@ -511,7 +530,7 @@ func Evaluate(expression ast.Expression, env *Environment) (interface{}, error) 
 	}
 }
 
-func resolveMemberExpressionProperty(expr ast.MemberExpression, env *Environment) (interface{}, error) {
+func resolveMemberExpressionProperty(expr ast.MemberExpression, env *environment.Environment) (interface{}, error) {
 	var property interface{}
 	var computeErr error
 	if expr.Computed {

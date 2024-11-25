@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/pmqueiroz/umbra/ast"
+	"github.com/pmqueiroz/umbra/environment"
 	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/tokens"
 	"github.com/pmqueiroz/umbra/types"
@@ -34,7 +35,7 @@ func (r Continue) Error() string {
 
 type FunctionDeclaration struct {
 	Itself      *ast.FunctionStatement
-	Environment *Environment
+	Environment *environment.Environment
 }
 
 func extractVarName(stmt ast.Statement) string {
@@ -46,7 +47,7 @@ func extractVarName(stmt ast.Statement) string {
 	}
 }
 
-func Interpret(statement ast.Statement, env *Environment) error {
+func Interpret(statement ast.Statement, env *environment.Environment) error {
 	switch stmt := statement.(type) {
 	case ast.PrintStatement:
 		value, err := Evaluate(stmt.Expression, env)
@@ -89,10 +90,10 @@ func Interpret(statement ast.Statement, env *Environment) error {
 			}
 		}
 
-		env.Create(stmt.Name.Lexeme, value, stmt.Type.Type, stmt.Nullable)
+		env.Create(stmt.Name.Lexeme, value, stmt.Type.Type, stmt.Nullable, false)
 		return nil
 	case ast.BlockStatement:
-		newEnv := NewEnvironment(env)
+		newEnv := environment.NewEnvironment(env)
 		for _, stmt := range stmt.Statements {
 			if err := Interpret(stmt, newEnv); err != nil {
 				return err
@@ -125,13 +126,13 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		}
 		return Return{value: value}
 	case ast.FunctionStatement:
-		env.Create(stmt.Name.Lexeme, FunctionDeclaration{Itself: &stmt, Environment: env}, tokens.FUN_TYPE, false)
+		env.Create(stmt.Name.Lexeme, FunctionDeclaration{Itself: &stmt, Environment: env}, tokens.FUN_TYPE, false, false)
 		return nil
 	case ast.ExpressionStatement:
 		_, err := Evaluate(stmt.Expression, env)
 		return err
 	case ast.InitializedForStatement:
-		forEnv := NewEnvironment(env)
+		forEnv := environment.NewEnvironment(env)
 		if err := Interpret(stmt.Start, forEnv); err != nil {
 			return err
 		}
@@ -139,7 +140,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		initializedVarName := extractVarName(stmt.Start)
 
 		for {
-			loopEnv := NewEnvironment(forEnv)
+			loopEnv := environment.NewEnvironment(forEnv)
 			controlVar, exists := loopEnv.Get(initializedVarName, true)
 			if !exists {
 				return exception.NewRuntimeError("RT021", initializedVarName)
@@ -152,7 +153,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 
 			var condition bool
 			if parsedStop, ok := stop.(float64); ok {
-				condition = controlVar.data.(float64) <= parsedStop
+				condition = controlVar.Data.(float64) <= parsedStop
 			} else {
 				return exception.NewRuntimeError("RT022", types.ParseUmbraType(stop))
 			}
@@ -173,7 +174,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 				return exception.NewRuntimeError("RT023", types.ParseUmbraType(stepValue))
 			}
 
-			loopEnv.Set(initializedVarName, controlVar.data.(float64)+step)
+			loopEnv.Set(initializedVarName, controlVar.Data.(float64)+step)
 
 			if _, ok := bodyErr.(Break); ok {
 				break
@@ -191,7 +192,7 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		return nil
 	case ast.ConditionalForStatement:
 		for {
-			loopEnv := NewEnvironment(env)
+			loopEnv := environment.NewEnvironment(env)
 
 			condition, err := Evaluate(stmt.Condition, loopEnv)
 			if err != nil {
@@ -234,14 +235,11 @@ func Interpret(statement ast.Statement, env *Environment) error {
 		}
 		return nil
 	case ast.ImportStatement:
-		namespace, err := LoadModule(stmt.Path.Lexeme)
-
+		module, err := LoadModule(stmt.Path.Lexeme)
 		if err != nil {
 			return err
 		}
-
-		env.CreateNamespace(stmt.Path.Lexeme, &namespace)
-
+		env.CreateNamespace(module.Name, module.Environment)
 		return nil
 	default:
 		return exception.NewRuntimeError("RT000", litter.Sdump(statement))

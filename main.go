@@ -5,6 +5,7 @@ import (
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/cli"
+	"github.com/pmqueiroz/umbra/environment"
 	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/interpreter"
 	"github.com/pmqueiroz/umbra/tokens"
@@ -15,7 +16,7 @@ var Version = "development"
 
 type RunOptions struct {
 	cli.Options
-	Env *interpreter.Environment
+	Env *environment.Environment
 }
 
 func run(content string, options RunOptions) {
@@ -55,14 +56,14 @@ func main() {
 			fmt.Printf("%s\n", err.Error())
 		}
 
-		env := interpreter.NewEnvironment(nil)
+		env := environment.NewEnvironment(nil)
 
 		run(content, RunOptions{
 			Options: args.Options,
 			Env:     env,
 		})
 	} else {
-		cli.Repl(func(content string, env *interpreter.Environment) {
+		cli.Repl(func(content string, env *environment.Environment) {
 			run(content, RunOptions{
 				Options: args.Options,
 				Env:     env,

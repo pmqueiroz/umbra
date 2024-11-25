@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pmqueiroz/umbra/interpreter"
+	"github.com/pmqueiroz/umbra/environment"
 )
 
 func header() {
 	fmt.Print("Welcome to Umbra REPL!\nEnter :q to exit.\n")
 }
 
-func Repl(evaluate func(content string, env *interpreter.Environment)) {
+func Repl(evaluate func(content string, env *environment.Environment)) {
 	header()
 	reader := bufio.NewReader(os.Stdin)
-	env := interpreter.NewEnvironment(nil)
+	env := environment.NewEnvironment(nil)
 
 	for {
 		fmt.Print("> ")

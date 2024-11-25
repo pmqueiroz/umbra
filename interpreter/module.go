@@ -5,9 +5,16 @@ import (
 	"os"
 
 	"github.com/pmqueiroz/umbra/ast"
+	"github.com/pmqueiroz/umbra/environment"
 	"github.com/pmqueiroz/umbra/helpers"
+	"github.com/pmqueiroz/umbra/native"
 	"github.com/pmqueiroz/umbra/tokens"
 )
+
+type Module struct {
+	Name        string
+	Environment *environment.Environment
+}
 
 func ResolveModule(module string) (string, error) {
 	content, err := helpers.ReadFile(fmt.Sprintf("%s/lib/%s.u", os.Getenv("UMBRA_PATH"), module))
@@ -15,11 +22,19 @@ func ResolveModule(module string) (string, error) {
 	return content, err
 }
 
-func LoadModule(path string) (Environment, error) {
+func LoadInternalModule(name string, namespace *environment.Environment) error {
+	if ok := native.Register(name, namespace); !ok {
+		return fmt.Errorf("unable to include %s. internal module does not exits", name)
+	}
+
+	return nil
+}
+
+func LoadBuiltInModule(path string, namespace *environment.Environment) error {
 	content, err := ResolveModule(path)
 
 	if err != nil {
-		return Environment{}, fmt.Errorf("unable to include %s. module does not exits", path)
+		return fmt.Errorf("unable to include %s. module does not exits", path)
 	}
 
 	tokens, err := tokens.Tokenize(content)
@@ -30,11 +45,37 @@ func LoadModule(path string) (Environment, error) {
 
 	module := ast.Parse(tokens)
 
-	namespace := NewEnvironment(nil)
-
 	if err := Interpret(module, namespace); err != nil {
 		fmt.Println(err)
 	}
 
-	return *namespace, nil
+	return nil
+}
+
+func LoadModule(path string) (Module, error) {
+	namespace := environment.NewEnvironment(nil)
+
+	if len(path) >= 9 && path[:9] == "internal/" {
+		err := LoadInternalModule(path[9:], namespace)
+
+		if err != nil {
+			return Module{}, err
+		}
+
+		return Module{
+			Name:        path[9:],
+			Environment: namespace,
+		}, nil
+	}
+
+	err := LoadBuiltInModule(path, namespace)
+
+	if err != nil {
+		return Module{}, err
+	}
+
+	return Module{
+		Name:        path,
+		Environment: namespace,
+	}, nil
 }
