@@ -55,15 +55,15 @@ func LoadBuiltInModule(path string, namespace *environment.Environment) error {
 func LoadModule(path string) (Module, error) {
 	namespace := environment.NewEnvironment(nil)
 
-	if len(path) >= 9 && path[:9] == "internal/" {
-		err := LoadInternalModule(path[9:], namespace)
+	if len(path) >= 7 && path[:7] == "native/" {
+		err := LoadInternalModule(path[7:], namespace)
 
 		if err != nil {
 			return Module{}, err
 		}
 
 		return Module{
-			Name:        path[9:],
+			Name:        path[7:],
 			Environment: namespace,
 		}, nil
 	}
