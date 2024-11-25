@@ -42,8 +42,8 @@ func deleteFile(args []interface{}) (interface{}, error) {
 
 var OsModule = InternalModule{
 	symbols: map[string]InternalModuleFn{
-		"ReadFile":   readFile,
-		"WriteFile":  writeFile,
-		"DeleteFile": deleteFile,
+		"readFile":   readFile,
+		"writeFile":  writeFile,
+		"deleteFile": deleteFile,
 	},
 }
