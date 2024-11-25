@@ -34,5 +34,6 @@ var Messages = map[string]string{
 	"RT030": "convert into char failed",
 	"RT031": "invalid internal function call",
 	"RT032": "cannot %s file: %s",
+	"RT033": "all paths must be strings",
 	"GN001": "cannot find module '%s'",
 }

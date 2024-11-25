@@ -29,6 +29,8 @@ func Register(name string, namespace *environment.Environment) (ok bool) {
 	switch name {
 	case "os":
 		module = OsModule
+	case "path":
+		module = PathModule
 	default:
 		ok = false
 		return
