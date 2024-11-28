@@ -7,7 +7,7 @@ import (
 	"github.com/pmqueiroz/umbra/exception"
 )
 
-func isAlpha(char rune) bool {
+func isIdentifier(char rune) bool {
 	return unicode.IsLetter(char) || char == '_'
 }
 
@@ -16,7 +16,7 @@ func isDigit(char rune) bool {
 }
 
 func isAlphaNumeric(char rune) bool {
-	return isAlpha(char) || unicode.IsDigit(char)
+	return isIdentifier(char) || unicode.IsDigit(char)
 }
 
 type Tokenizer struct {
@@ -309,7 +309,7 @@ func (t *Tokenizer) scan() error {
 	default:
 		if isDigit(char) {
 			t.numeric()
-		} else if isAlpha(char) {
+		} else if isIdentifier(char) {
 			t.identifier()
 		} else {
 			return exception.NewSyntaxError("Unexpected character", t.line, t.column, string(char))
