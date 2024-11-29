@@ -2,6 +2,7 @@ package ast
 
 import (
 	"github.com/pmqueiroz/umbra/tokens"
+	"github.com/pmqueiroz/umbra/types"
 )
 
 type Statement interface {
@@ -17,7 +18,7 @@ type ExpressionStatement struct {
 
 type Parameter struct {
 	Name     tokens.Token
-	Type     tokens.Token
+	Type     types.UmbraType
 	Variadic bool
 	Nullable bool
 }
@@ -64,6 +65,28 @@ type PublicStatement struct {
 type ImportStatement struct {
 	Keyword tokens.Token
 	Path    tokens.Token
+}
+
+type EnumMember struct {
+	Name      string
+	Value     Expression
+	Signature string
+}
+
+type EnumStatement struct {
+	Name      tokens.Token
+	Members   map[string]EnumMember
+	Signature string
+}
+
+func (e *EnumStatement) Get(name tokens.Token) (EnumMember, bool) {
+	member, ok := e.Members[name.Lexeme]
+
+	return member, ok
+}
+
+func (e *EnumStatement) ValidMember(member EnumMember) bool {
+	return e.Signature == member.Signature
 }
 
 type VarStatement struct {

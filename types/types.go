@@ -12,5 +12,6 @@ const (
 	FUN     UmbraType = "<fun>"
 	ANY     UmbraType = "<any>"
 	NULL    UmbraType = "<null>"
+	ENUM    UmbraType = "<enum>"
 	UNKNOWN UmbraType = "<unknown>"
 )

@@ -5,12 +5,12 @@ import (
 	"os"
 
 	"github.com/pmqueiroz/umbra/exception"
-	"github.com/pmqueiroz/umbra/tokens"
+	"github.com/pmqueiroz/umbra/types"
 )
 
 type Variable struct {
 	Data     interface{}
-	DataType tokens.TokenType
+	DataType types.UmbraType
 	Nullable bool
 	private  bool
 	native   bool
@@ -60,7 +60,7 @@ func (env *Environment) Set(name string, value interface{}) bool {
 	return false
 }
 
-func (env *Environment) Create(name string, value interface{}, dataType tokens.TokenType, nullable bool, internal bool) bool {
+func (env *Environment) Create(name string, value interface{}, dataType types.UmbraType, nullable bool, internal bool) bool {
 	if _, exists := env.Get(name, true); exists {
 		fmt.Println(exception.NewRuntimeError("RT001", name))
 		os.Exit(1)

@@ -44,7 +44,7 @@ func toFloat64(value interface{}) (float64, error) {
 	case rune:
 		return float64(v), nil
 	default:
-		return 0, exception.NewRuntimeError("RT026", types.ParseUmbraType(value))
+		return 0, exception.NewRuntimeError("RT026", types.SafeParseUmbraType(value))
 	}
 }
 
@@ -76,7 +76,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				return nil, exception.NewRuntimeError("RT002", target.Name.Lexeme)
 			}
 
-			typeErr := types.CheckType(variable.DataType, value, variable.Nullable)
+			typeErr := types.CheckPrimitiveType(variable.DataType, value, variable.Nullable)
 
 			if typeErr != nil {
 				return nil, typeErr
@@ -119,10 +119,10 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				obj[int(idx)] = value
 				return value, nil
 			default:
-				return nil, exception.NewRuntimeError("RT005", types.ParseUmbraType(obj))
+				return nil, exception.NewRuntimeError("RT005", types.SafeParseUmbraType(obj))
 			}
 		default:
-			return nil, exception.NewRuntimeError("RT006", types.ParseUmbraType(target))
+			return nil, exception.NewRuntimeError("RT006", types.SafeParseUmbraType(target))
 		}
 	case ast.BinaryExpression:
 		left, err := Evaluate(expr.Left, env)
@@ -157,7 +157,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					return leftVal + rightFloat, nil
 				}
 			}
-			return nil, exception.NewRuntimeError("RT007", types.ParseUmbraType(left), types.ParseUmbraType(right))
+			return nil, exception.NewRuntimeError("RT007", types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
 		case tokens.MINUS:
 			switch leftVal := left.(type) {
 			case float64:
@@ -173,7 +173,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					return leftVal - rightRune, nil
 				}
 			}
-			return nil, exception.NewRuntimeError("RT027", types.ParseUmbraType(left), types.ParseUmbraType(right))
+			return nil, exception.NewRuntimeError("RT027", types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
 		case tokens.STAR:
 			return left.(float64) * right.(float64), nil
 		case tokens.SLASH:
@@ -188,7 +188,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				return math.Mod(leftFloat, rightFloat), nil
 			}
 
-			return nil, exception.NewRuntimeError("RT009", types.ParseUmbraType(left), types.ParseUmbraType(right))
+			return nil, exception.NewRuntimeError("RT009", types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
 		case tokens.GREATER_THAN:
 			leftVal, err := toFloat64(left)
 			if err != nil {
@@ -251,7 +251,13 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 		case tokens.NOT:
 			return !right.(bool), nil
 		case tokens.TYPE_OF:
-			return types.ParseUmbraType(right), nil
+			parsedType, err := types.ParseUmbraType(right)
+
+			if err != nil {
+				return nil, err
+			}
+
+			return parsedType, nil
 		case tokens.TILDE:
 			switch parsedRight := right.(type) {
 			case []interface{}:
@@ -261,7 +267,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			case string:
 				return float64(len(parsedRight)), nil
 			default:
-				return nil, exception.NewRuntimeError("RT011", types.ParseUmbraType(parsedRight))
+				return nil, exception.NewRuntimeError("RT011", types.SafeParseUmbraType(parsedRight))
 			}
 		case tokens.RANGE:
 			switch parsedRight := right.(type) {
@@ -274,7 +280,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				}
 				return result, nil
 			default:
-				return nil, exception.NewRuntimeError("RT012", types.ParseUmbraType(parsedRight))
+				return nil, exception.NewRuntimeError("RT012", types.SafeParseUmbraType(parsedRight))
 			}
 		default:
 			return nil, exception.NewRuntimeError("RT013", expr.Operator.Lexeme)
@@ -298,14 +304,14 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 							return nil, err
 						}
 
-						typeErr := types.CheckType(param.Type.Type, argValue, param.Nullable)
+						typeErr := types.CheckPrimitiveType(param.Type, argValue, param.Nullable)
 						if typeErr != nil {
 							return nil, typeErr
 						}
 
 						variadicArgs = append(variadicArgs, argValue)
 					}
-					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type.Type, param.Nullable, false)
+					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type, param.Nullable, false)
 					break
 				} else {
 					argValue, err := Evaluate(expr.Arguments[i], env)
@@ -313,12 +319,12 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 						return nil, err
 					}
 
-					typeErr := types.CheckType(param.Type.Type, argValue, param.Nullable)
+					typeErr := types.CheckPrimitiveType(param.Type, argValue, param.Nullable)
 					if typeErr != nil {
 						return nil, typeErr
 					}
 
-					funcEnv.Create(param.Name.Lexeme, argValue, param.Type.Type, param.Nullable, false)
+					funcEnv.Create(param.Name.Lexeme, argValue, param.Type, param.Nullable, false)
 				}
 			}
 
@@ -449,8 +455,18 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				return nil, exception.NewRuntimeError("RT004", idx)
 			}
 			return getElementAt(obj, int(idx)), nil
+		case ast.EnumStatement:
+			if prop, ok := expr.Property.(ast.VariableExpression); ok {
+				member, ok := obj.Get(prop.Name)
+				if !ok {
+					return nil, exception.NewRuntimeError("RT034", prop.Name.Lexeme)
+				}
+
+				return member, nil
+			}
+			return nil, exception.NewRuntimeError("RT020")
 		default:
-			return nil, exception.NewRuntimeError("RT016", types.ParseUmbraType(obj))
+			return nil, exception.NewRuntimeError("RT016", types.SafeParseUmbraType(obj))
 		}
 	case ast.NamespaceMemberExpression:
 		if variableExpr, ok := expr.Namespace.(ast.VariableExpression); ok {
@@ -471,7 +487,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			return nil, err
 		}
 
-		defaultError := exception.NewRuntimeError("RT028", types.ParseUmbraType(value), types.ParseTokenType(expr.Type.Type))
+		defaultError := exception.NewRuntimeError("RT028", types.SafeParseUmbraType(value), types.SafeParseUmbraType(expr.Type.Type))
 
 		switch expr.Type.Type {
 		case tokens.STR_TYPE:

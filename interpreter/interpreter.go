@@ -1,6 +1,8 @@
 package interpreter
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
@@ -83,14 +85,49 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 				return err
 			}
 
-			typeErr := types.CheckType(stmt.Type.Type, value, stmt.Nullable)
+			parsedType, enum, parseTypeErr := func() (types.UmbraType, ast.EnumStatement, error) {
+				switch stmt.Type.Type {
+				case tokens.IDENTIFIER:
+					value, ok := env.Get(stmt.Type.Lexeme, true)
+					if !ok {
+						return types.UNKNOWN, ast.EnumStatement{}, exception.NewRuntimeError("RT002", stmt.Type.Lexeme)
+					}
 
-			if typeErr != nil {
-				return typeErr
+					if enum, ok := value.Data.(ast.EnumStatement); ok {
+						return types.ENUM, enum, nil
+					}
+
+					return types.UNKNOWN, ast.EnumStatement{}, exception.NewRuntimeError("RT035", stmt.Type.Lexeme)
+				default:
+					t, e := types.ParseTokenType(stmt.Type.Type)
+					return t, ast.EnumStatement{}, e
+				}
+			}()
+
+			if parseTypeErr != nil {
+				return parseTypeErr
 			}
+
+			switch parsedType {
+			case types.ENUM:
+				if member, ok := value.(ast.EnumMember); ok {
+					if ok := enum.ValidMember(member); ok {
+						return nil
+					}
+				}
+
+				return exception.NewTypeError(fmt.Sprintf("expected %s got %s", enum.Name.Lexeme, value))
+			default:
+				typeErr := types.CheckPrimitiveType(parsedType, value, stmt.Nullable)
+
+				if typeErr != nil {
+					return typeErr
+				}
+			}
+
 		}
 
-		env.Create(stmt.Name.Lexeme, value, stmt.Type.Type, stmt.Nullable, false)
+		env.Create(stmt.Name.Lexeme, value, types.SafeParseUmbraType(stmt.Type.Type), stmt.Nullable, false)
 		return nil
 	case ast.BlockStatement:
 		newEnv := environment.NewEnvironment(env)
@@ -126,7 +163,13 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 		}
 		return Return{value: value}
 	case ast.FunctionStatement:
-		env.Create(stmt.Name.Lexeme, FunctionDeclaration{Itself: &stmt, Environment: env}, tokens.FUN_TYPE, false, false)
+		env.Create(
+			stmt.Name.Lexeme,
+			FunctionDeclaration{Itself: &stmt, Environment: env},
+			types.FUN,
+			false,
+			false,
+		)
 		return nil
 	case ast.ExpressionStatement:
 		_, err := Evaluate(stmt.Expression, env)
@@ -155,7 +198,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			if parsedStop, ok := stop.(float64); ok {
 				condition = controlVar.Data.(float64) <= parsedStop
 			} else {
-				return exception.NewRuntimeError("RT022", types.ParseUmbraType(stop))
+				return exception.NewRuntimeError("RT022", types.SafeParseUmbraType(stop))
 			}
 
 			if !condition {
@@ -171,7 +214,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 			step, exists := stepValue.(float64)
 			if !exists {
-				return exception.NewRuntimeError("RT023", types.ParseUmbraType(stepValue))
+				return exception.NewRuntimeError("RT023", types.SafeParseUmbraType(stepValue))
 			}
 
 			loopEnv.Set(initializedVarName, controlVar.Data.(float64)+step)
@@ -201,7 +244,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 			parsedCondition, ok := condition.(bool)
 			if !ok {
-				return exception.NewRuntimeError("RT024", types.ParseUmbraType(parsedCondition))
+				return exception.NewRuntimeError("RT024", types.SafeParseUmbraType(parsedCondition))
 			}
 
 			if !parsedCondition {
@@ -240,6 +283,28 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			return err
 		}
 		env.CreateNamespace(module.Name, module.Environment)
+		return nil
+	case ast.EnumStatement:
+		hasher := sha256.New()
+		hasher.Write([]byte(stmt.Name.Lexeme))
+		for member := range stmt.Members {
+			hasher.Write([]byte(member))
+		}
+
+		stmt.Signature = hex.EncodeToString(hasher.Sum(nil))
+
+		for name, member := range stmt.Members {
+			member.Signature = stmt.Signature
+			stmt.Members[name] = member
+		}
+
+		env.Create(
+			stmt.Name.Lexeme,
+			stmt,
+			types.ENUM,
+			false,
+			false,
+		)
 		return nil
 	default:
 		return exception.NewRuntimeError("RT000", litter.Sdump(statement))

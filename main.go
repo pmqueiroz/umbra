@@ -11,6 +11,7 @@ import (
 	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/interpreter"
 	"github.com/pmqueiroz/umbra/tokens"
+	"github.com/pmqueiroz/umbra/types"
 )
 
 // set through ldflags
@@ -65,7 +66,7 @@ func main() {
 
 		env := environment.NewEnvironment(nil)
 
-		env.Create("__FILE__", __FILE__, tokens.STR_TYPE, false, false)
+		env.Create("__FILE__", __FILE__, types.STR, false, false)
 
 		run(content, RunOptions{
 			Options: args.Options,

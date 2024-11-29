@@ -67,6 +67,8 @@ const (
 	NOT_A_NUMBER       TokenType = "NOT_A_NUMBER"
 	RANGE              TokenType = "RANGE"
 	TYPE_OF            TokenType = "TYPE_OF"
+	ENUM               TokenType = "ENUM"
+	MATCH              TokenType = "MATCH"
 )
 
 var PRIMITIVE_TYPES = []TokenType{
@@ -81,6 +83,7 @@ var COMPLEX_TYPES = []TokenType{
 	ARR_TYPE,
 	ANY_TYPE,
 	FUN_TYPE,
+	IDENTIFIER, // enums
 }
 
 var DATA_TYPES = append(PRIMITIVE_TYPES, COMPLEX_TYPES...)
@@ -122,6 +125,8 @@ var reservedKeywordsMap = map[string]TokenType{
 	"NaN":      NOT_A_NUMBER,
 	"range":    RANGE,
 	"typeof":   TYPE_OF,
+	"enum":     ENUM,
+	"match":    MATCH,
 }
 
 func getKeyword(lexis string) TokenType {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/tokens"
+	"github.com/pmqueiroz/umbra/types"
 )
 
 type Parser struct {
@@ -99,10 +100,16 @@ func (p *Parser) function() Statement {
 			paramName := p.consume("Expect parameter name.", tokens.IDENTIFIER)
 			variadic := p.match(tokens.VARIADIC)
 			paramType := p.consume("Expect parameter type.", tokens.DATA_TYPES...)
+			parsedParamType, err := types.ParseTokenType(paramType.Type)
+
+			if err != nil {
+				p.throw("Invalid parameter type.")
+			}
+
 			nullable := p.match(tokens.HOOK)
 			params = append(params, Parameter{
 				Name:     paramName,
-				Type:     paramType,
+				Type:     parsedParamType,
 				Variadic: variadic,
 				Nullable: nullable,
 			})
@@ -536,6 +543,37 @@ func (p *Parser) importStatement() Statement {
 	}
 }
 
+func (p *Parser) enumStatement() Statement {
+	name := p.consume("Expect enum name.", tokens.IDENTIFIER)
+
+	p.consume("Expect '{' before enum body.", tokens.LEFT_BRACE)
+
+	members := make(map[string]EnumMember)
+
+	for !p.check(tokens.RIGHT_BRACE) && !p.isAtEOF() {
+		memberName := p.consume("Expect enum member name.", tokens.IDENTIFIER)
+		var value Expression
+
+		if p.match(tokens.EQUAL) {
+			value = p.expression()
+		}
+
+		members[memberName.Lexeme] = EnumMember{
+			Name:  memberName.Lexeme,
+			Value: value,
+		}
+
+		if p.match(tokens.RIGHT_BRACE) {
+			break
+		}
+	}
+
+	return EnumStatement{
+		Name:    name,
+		Members: members,
+	}
+}
+
 func (p *Parser) printStatement(channel PrintChannel) Statement {
 	value := p.expression()
 	return PrintStatement{
@@ -651,6 +689,9 @@ func (p *Parser) statement() Statement {
 	}
 	if p.match(tokens.IMPORT) {
 		return p.importStatement()
+	}
+	if p.match(tokens.ENUM) {
+		return p.enumStatement()
 	}
 	if p.match(tokens.LEFT_BRACE) {
 		blockStatement, _ := p.block()

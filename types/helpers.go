@@ -7,82 +7,97 @@ import (
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
-func CheckType(targetType tokens.TokenType, expected interface{}, nullable bool) error {
-	typeMismatchErr := fmt.Sprintf("expected %s got %s", targetType, ParseUmbraType(expected))
-
-	if targetType == tokens.ANY_TYPE {
+func CheckPrimitiveType(targetType UmbraType, expected interface{}, nullable bool) error {
+	if targetType == ANY {
 		return nil
 	}
 
 	switch expected.(type) {
 	case nil:
-		if targetType != tokens.NULL && !nullable {
-			return exception.NewTypeError(typeMismatchErr)
+		if targetType == NULL || nullable {
+			return nil
 		}
 	case string:
-		if targetType != tokens.STR_TYPE {
-			return exception.NewTypeError(typeMismatchErr)
+		if targetType == STR {
+			return nil
 		}
 	case rune:
-		if targetType != tokens.CHAR_TYPE {
-			return exception.NewTypeError(typeMismatchErr)
+		if targetType == CHAR {
+			return nil
 		}
 	case bool:
-		if targetType != tokens.BOOL_TYPE {
-			return exception.NewTypeError(typeMismatchErr)
+		if targetType == BOOL {
+			return nil
 		}
 	case float64:
-		if targetType != tokens.NUM_TYPE {
-			return exception.NewTypeError(typeMismatchErr)
+		if targetType == NUM {
+			return nil
 		}
 	case map[interface{}]interface{}:
-		if targetType != tokens.HASHMAP_TYPE {
-			return exception.NewTypeError(typeMismatchErr)
+		if targetType == HASHMAP {
+			return nil
 		}
 	case []interface{}:
-		if targetType != tokens.ARR_TYPE {
-			return exception.NewTypeError(typeMismatchErr)
+		if targetType == ARR {
+			return nil
 		}
 	}
-	return nil
+
+	expectedType, err := ParseUmbraType(expected)
+
+	if err != nil {
+		return exception.NewTypeError(fmt.Sprintf("type %s is invalid", expected))
+	}
+
+	return exception.NewTypeError(fmt.Sprintf("expected %s got %s", targetType, expectedType))
 }
 
-func ParseUmbraType(value interface{}) UmbraType {
+func ParseUmbraType(value interface{}) (UmbraType, error) {
 	switch value.(type) {
 	case string:
-		return STR
+		return STR, nil
 	case rune:
-		return CHAR
+		return CHAR, nil
 	case bool:
-		return BOOL
+		return BOOL, nil
 	case float64:
-		return NUM
+		return NUM, nil
 	case nil:
-		return NULL
+		return NULL, nil
 	case map[interface{}]interface{}:
-		return HASHMAP
+		return HASHMAP, nil
 	case []interface{}:
-		return ARR
+		return ARR, nil
 	default:
-		return UNKNOWN
+		return UNKNOWN, exception.NewTypeError("unknown type")
 	}
 }
 
-func ParseTokenType(value tokens.TokenType) UmbraType {
+func SafeParseUmbraType(value interface{}) UmbraType {
+	umbraType, err := ParseUmbraType(value)
+	if err != nil {
+		return UNKNOWN
+	}
+	return umbraType
+}
+
+func ParseTokenType(value tokens.TokenType) (UmbraType, error) {
 	switch value {
 	case tokens.STR_TYPE:
-		return STR
+		return STR, nil
 	case tokens.CHAR_TYPE:
-		return CHAR
+		return CHAR, nil
 	case tokens.BOOL_TYPE:
-		return BOOL
+		return BOOL, nil
 	case tokens.NUM_TYPE:
-		return NUM
+		return NUM, nil
 	case tokens.HASHMAP_TYPE:
-		return HASHMAP
+		return HASHMAP, nil
 	case tokens.ARR_TYPE:
-		return ARR
+		return ARR, nil
+	case tokens.ANY_TYPE:
+		return ANY, nil
 	default:
-		return UNKNOWN
+		return UNKNOWN, exception.NewTypeError("unknown type")
 	}
 }

@@ -1,0 +1,15 @@
+import "io"
+
+enum Direction {
+  North
+  South
+  East
+  West
+}
+
+const teste Direction = Direction.North
+io::printLn("North:", Direction.North)
+
+## Next Steps
+# - [] Add support for generic enums
+# - [] Add enum pattern matching
