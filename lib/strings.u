@@ -1,42 +1,63 @@
 import "io"
 
+def join(array arr, separator str) str {
+  if (~array == 0) {
+    return ""
+  }
+
+  mut totalLength num = 0
+
+  for mut i num = 0, ~array - 1 {
+    totalLength = totalLength + ~array[i]
+  }
+
+  totalLength = totalLength + (~separator * (~array - 1))
+
+  mut buffer arr = []
+
+  mut index num = 0
+  for mut i num = 0, ~array - 1 {
+    for mut j num = 0, ~array[i] - 1 {
+      buffer[index] = (range array[i])[j]
+      index = index + 1
+    }
+
+    if (i < ~array - 1) {
+      for mut k num = 0, ~separator - 1 {
+        buffer[index] = (range separator)[k]
+        index = index + 1
+      }
+    }
+  }
+
+  return str(buffer)
+}
+
 def substring(string str, start num, end num) {
-  mut result str = ""
+  mut result arr = []
   if (start < 0 or end > ~string or start > end) {
-    return result
+    return ""
   }
 
-  for mut i num = 0, ~range string - 1 {
-    if (i < start) {
-      continue
-    }
-
-    if (i >= end) {
-      break
-    }
-    
-    result = result + (range string)[i]
+  for mut i num = start, end - 1 {
+    result[~result] = (range string)[i]
   }
 
-  return result
+  return join(result, "")
 }
 
 def split(string str, separator char) {
   mut result arr = []
   mut start num = 0
-  mut end num = 0
 
   for mut i num = 0, ~range string - 1 {
     if (char((range string)[i]) == separator) {
-      result[~result] = substring(string, start, end)
+      result[~result] = substring(string, start, i)
       start = i + 1
-      end = i + 1
-    } else {
-      end = i + 1
     }
   }
 
-  result[~result] = substring(string, start, end)
+  result[~result] = substring(string, start, ~range string)
   return result
 }
 
@@ -71,4 +92,5 @@ pub {
   split
   toUpper
   toLower
+  join
 }

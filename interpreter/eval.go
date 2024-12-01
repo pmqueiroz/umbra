@@ -512,7 +512,12 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			return nil, err
 		}
 
-		defaultError := exception.NewRuntimeError("RT028", types.SafeParseUmbraType(value), types.SafeParseUmbraType(expr.Type.Type))
+		expectedType, err := types.ParseTokenType(expr.Type.Type)
+		if err != nil {
+			return nil, err
+		}
+
+		defaultError := exception.NewRuntimeError("RT028", types.SafeParseUmbraType(value), expectedType)
 
 		switch expr.Type.Type {
 		case tokens.STR_TYPE:
@@ -523,6 +528,16 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				return strconv.FormatFloat(v, 'f', -1, 64), nil
 			case bool:
 				return strconv.FormatBool(v), nil
+			case []interface{}:
+				var strElements []string
+				for _, elem := range v {
+					strElem, ok := elem.(string)
+					if !ok {
+						return nil, exception.NewRuntimeError("RT028", types.SafeParseUmbraType(elem), "<str>")
+					}
+					strElements = append(strElements, strElem)
+				}
+				return strings.Join(strElements, ""), nil
 			}
 			return nil, defaultError
 		case tokens.CHAR_TYPE:
