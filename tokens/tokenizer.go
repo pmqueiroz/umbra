@@ -259,6 +259,8 @@ func (t *Tokenizer) scan() error {
 		t.addNonLiteralToken(TILDE)
 	case '?':
 		t.addNonLiteralToken(HOOK)
+	case '|':
+		t.addNonLiteralToken(PIPE)
 	case '.':
 		if t.match('.') {
 			if t.match('.') {

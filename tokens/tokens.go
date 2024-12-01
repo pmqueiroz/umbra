@@ -69,6 +69,7 @@ const (
 	TYPE_OF            TokenType = "TYPE_OF"
 	ENUM               TokenType = "ENUM"
 	MATCH              TokenType = "MATCH"
+	PIPE               TokenType = "PIPE"
 )
 
 var PRIMITIVE_TYPES = []TokenType{

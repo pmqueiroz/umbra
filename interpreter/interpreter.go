@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/pmqueiroz/umbra/ast"
@@ -299,7 +300,43 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			false,
 		)
 		return nil
+	case ast.MatchStatement:
+		value, err := Evaluate(stmt.Expression, env)
+		if err != nil {
+			return err
+		}
+
+		for _, matchCase := range stmt.Cases {
+			expr, err := Evaluate(matchCase.Expression, env)
+
+			if err != nil {
+				return err
+			}
+
+			if checkMatch(expr, value) {
+				caseEnv := environment.NewEnvironment(env)
+
+				for i, param := range matchCase.Parameters {
+					arg := value.(ast.EnumMember).Arguments[i]
+
+					caseEnv.Create(param.Name.Lexeme, arg.Value, types.ANY, false, false)
+				}
+
+				for _, stmt := range matchCase.Body {
+					err := Interpret(stmt, caseEnv)
+
+					if err != nil {
+						return err
+					}
+				}
+
+				return nil
+			}
+		}
+
+		return nil
 	default:
-		return exception.NewRuntimeError("RT000", litter.Sdump(statement))
+		litter.Dump("statement", statement)
+		return exception.NewRuntimeError("RT000", reflect.TypeOf(statement).Name())
 	}
 }

@@ -360,7 +360,6 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			result, err := parsedCallee(args)
 			return result, err
 		case ast.EnumMember:
-			litter.Dump(parsedCallee)
 			enrichedArgs := make([]ast.EnumArgument, len(parsedCallee.Arguments))
 			for i, arg := range parsedCallee.Arguments {
 				argValue, err := Evaluate(expr.Arguments[i], env)

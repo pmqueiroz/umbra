@@ -30,6 +30,21 @@ type FunctionStatement struct {
 	Body       []Statement
 }
 
+type MatchCaseParameter struct {
+	Name tokens.Token
+}
+
+type MatchCase struct {
+	Expression Expression
+	Parameters []MatchCaseParameter
+	Body       []Statement
+}
+
+type MatchStatement struct {
+	Expression Expression
+	Cases      []MatchCase
+}
+
 type IfStatement struct {
 	Condition  Expression
 	ThenBranch Statement

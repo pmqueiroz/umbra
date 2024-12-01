@@ -2,14 +2,33 @@ import "io"
 
 enum Event {
   Keyboard(str)
+  Click(num, num)
+  Close
 }
 
-const event Event = Event.Keyboard("k")
+const events arr = [
+  Event.Click(123, 321),
+  Event.Keyboard("k"),
+  Event.Close
+]
 
-io::printLn(event)
+for mut i num = 0, ~events - 1 {
+  match events[i] {
+    Event.Keyboard |key| {
+      io::printLn("keyboard event with key:", key)
+    }
+    Event.Click |x, y| {
+      io::printLn("click event at x:", x, "y:", y)
+    }
+    Event.Close {
+      io::printLn("close event")
+    }
+  }
+}
+
 
 ## Todo
 # - [x] Declare enums
 # - [x] Enum with arguments
-# - [ ] Enum pattern matching
+# - [x] Enum pattern matching
 # - [ ] Support for generic enums

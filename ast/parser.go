@@ -593,6 +593,53 @@ func (p *Parser) enumStatement() Statement {
 	}
 }
 
+func (p *Parser) matchStatement() Statement {
+	expr := p.expression()
+
+	p.consume("Expect '{' before match body.", tokens.LEFT_BRACE)
+
+	var cases []MatchCase
+
+	for !p.check(tokens.RIGHT_BRACE) && !p.isAtEOF() {
+		caseExpr := p.expression()
+
+		var params []MatchCaseParameter
+
+		if p.match(tokens.PIPE) && !p.check(tokens.LEFT_BRACE) {
+			for {
+				paramName := p.consume("Expect parameter name.", tokens.IDENTIFIER)
+
+				params = append(params, MatchCaseParameter{
+					Name: paramName,
+				})
+
+				if !p.match(tokens.COMMA) {
+					break
+				}
+			}
+
+			p.consume("Expect '|' after case parameters", tokens.PIPE)
+		}
+
+		p.consume("Expect '{' before case body", tokens.LEFT_BRACE)
+
+		_, body := p.block()
+
+		cases = append(cases, MatchCase{
+			Expression: caseExpr,
+			Parameters: params,
+			Body:       body,
+		})
+	}
+
+	p.consume("Expect '}' after match body", tokens.RIGHT_BRACE)
+
+	return MatchStatement{
+		Expression: expr,
+		Cases:      cases,
+	}
+}
+
 func (p *Parser) printStatement(channel PrintChannel) Statement {
 	value := p.expression()
 	return PrintStatement{
@@ -711,6 +758,9 @@ func (p *Parser) statement() Statement {
 	}
 	if p.match(tokens.ENUM) {
 		return p.enumStatement()
+	}
+	if p.match(tokens.MATCH) {
+		return p.matchStatement()
 	}
 	if p.match(tokens.LEFT_BRACE) {
 		blockStatement, _ := p.block()
