@@ -4,7 +4,7 @@ def print(values ...any) {
   }
 }
 
-def printLn(values ...any) {
+def println(values ...any) {
   for mut i num = 0, ~values - 1 {
     stdout values[i]
     if (i != ~values - 1) {
