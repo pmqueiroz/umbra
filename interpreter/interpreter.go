@@ -112,7 +112,13 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			}
 		}
 
-		env.Create(stmt.Name.Lexeme, value, types.SafeParseUmbraType(stmt.Type.Type), stmt.Nullable, false)
+		varType, err := types.ParseTokenType(stmt.Type.Type)
+
+		if err != nil {
+			return err
+		}
+
+		env.Create(stmt.Name.Lexeme, value, varType, stmt.Nullable, false)
 		return nil
 	case ast.BlockStatement:
 		newEnv := environment.NewEnvironment(env)
