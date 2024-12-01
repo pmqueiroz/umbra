@@ -39,4 +39,5 @@ var Messages = map[string]string{
 	"RT035": "cannot use '%s' as a type",
 	"RT036": "enum member expects to be called with arguments",
 	"GN001": "cannot find module '%s'",
+	"GN002": "unable to load file '%s'. module does not exits. path: %s",
 }

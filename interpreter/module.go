@@ -6,6 +6,7 @@ import (
 
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/environment"
+	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/helpers"
 	"github.com/pmqueiroz/umbra/native"
 	"github.com/pmqueiroz/umbra/tokens"
@@ -17,9 +18,15 @@ type Module struct {
 }
 
 func ResolveModule(module string) (string, error) {
-	content, err := helpers.ReadFile(fmt.Sprintf("%s/lib/%s.u", os.Getenv("UMBRA_PATH"), module))
+	path := fmt.Sprintf("%s/lib/%s.u", os.Getenv("UMBRA_PATH"), module)
 
-	return content, err
+	content, err := helpers.ReadFile(path)
+
+	if err != nil {
+		return content, exception.NewGenericError("GN002", module, path)
+	}
+
+	return content, nil
 }
 
 func LoadInternalModule(name string, namespace *environment.Environment) error {
@@ -34,7 +41,7 @@ func LoadBuiltInModule(path string, namespace *environment.Environment) error {
 	content, err := ResolveModule(path)
 
 	if err != nil {
-		return fmt.Errorf("unable to include %s. module does not exits", path)
+		return err
 	}
 
 	tokens, err := tokens.Tokenize(content)
