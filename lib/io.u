@@ -21,7 +21,7 @@ def printErr(values ...any) {
   }
 }
 
-def printErrLn(values ...any) {
+def printErrln(values ...any) {
   for mut i num = 0, ~values - 1 {
     stdout values[i]
     if (i != ~values - 1) {
@@ -34,7 +34,7 @@ def printErrLn(values ...any) {
 
 pub {
   print
-  printLn
+  println
   printErr
-  printErrLn
+  printErrln
 }

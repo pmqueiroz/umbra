@@ -15,13 +15,13 @@ const events arr = [
 for mut i num = 0, ~events - 1 {
   match events[i] {
     Event.Keyboard |key| {
-      io::printLn("keyboard event with key:", key)
+      io::println("keyboard event with key:", key)
     }
     Event.Click |x, y| {
-      io::printLn("click event at x:", x, "y:", y)
+      io::println("click event at x:", x, "y:", y)
     }
     Event.Close {
-      io::printLn("close event")
+      io::println("close event")
     }
   }
 }

@@ -3,21 +3,21 @@ Umbra has various value types including strings (`str`), numbers (`num`), boolea
 Strings, which can be added together with +.
 
 ```u title="values.u"
-io::printLn("umbra" + "lang")
+io::println("umbra" + "lang")
 ```
 Numbers.
 
 ```u title="values.u"
-io::printLn("1+1 =", 1+1)
-io::printLn("7/3 =", 7/3)
+io::println("1+1 =", 1+1)
+io::println("7/3 =", 7/3)
 ```
 
 Booleans, with boolean operators as you’d expect.
 
 ```u title="values.u"
-io::printLn(true and false)
-io::printLn(true or false)
-io::printLn(!true)
+io::println(true and false)
+io::println(true or false)
+io::println(!true)
 ```
 
 ```sh

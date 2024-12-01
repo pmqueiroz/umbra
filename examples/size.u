@@ -1,4 +1,4 @@
 import "io"
 
-io::printLn(~[0, 1, 2])
-io::printLn(~"string")
+io::println(~[0, 1, 2])
+io::println(~"string")

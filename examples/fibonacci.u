@@ -7,4 +7,4 @@ def fib(n num) num {
 
 # i do not recommend going above 38
 # unless you want to wait a while
-io::printLn(fib(38))
+io::println(fib(38))

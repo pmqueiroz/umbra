@@ -5,7 +5,7 @@ This example demonstrates how to print a message to the terminal using the Umbra
 ```u title="hello-world.u" hl_lines="3"
 import "io"
 
-io::printLn("Hello world")
+io::println("Hello world")
 ```
 
 ### How to Run

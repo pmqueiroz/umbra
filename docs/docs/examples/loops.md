@@ -6,7 +6,7 @@ The initialized `for` loop has an initializer, stop condition, and an optional s
 
 ```u title="loops.u"
 for mut i num = 0, 10, 2 {
-  io::printLn(i)
+  io::println(i)
 }
 ```
 where `i` starts at `0`, runs until `10`, and increments by `2` on each iteration, resulting in
@@ -57,7 +57,7 @@ for mut i num = 0, 100 {
     break
   }
 
-  io::printLn(i)
+  io::println(i)
 }
 ```
 

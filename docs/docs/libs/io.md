@@ -13,7 +13,7 @@ Prints the provided values to the standard output without a newline at the end.
 - **Parameters:**
   - `values`: A variadic parameter of any type, representing the values to be printed.
 
-### `printLn(values ...any)`
+### `println(values ...any)`
 
 Prints the provided values to the standard output with a space between each value and a newline at the end.
 

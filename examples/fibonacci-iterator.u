@@ -16,4 +16,4 @@ def fibonacci(n num) num {
   return b
 }
 
-io::printLn(fibonacci(47))
+io::println(fibonacci(47))
