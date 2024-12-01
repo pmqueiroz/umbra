@@ -21,13 +21,13 @@ def substring(string str, start num, end num) {
   return result
 }
 
-def split(string str, separator str) {
+def split(string str, separator char) {
   mut result arr = []
   mut start num = 0
   mut end num = 0
 
   for mut i num = 0, ~range string - 1 {
-    if ((range string)[i] == separator) {
+    if (char((range string)[i]) == separator) {
       result[~result] = substring(string, start, end)
       start = i + 1
       end = i + 1
