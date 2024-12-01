@@ -30,7 +30,7 @@ var Messages = map[string]string{
 	"RT026": "cannot operate comparison with type %s",
 	"RT027": "cannot subtract value of type %s with a type %s",
 	"RT028": "cannot convert value of type %s to type %s",
-	"RT029": "<str> should have only on char to be converted to type <char>",
+	"RT029": "<str> should have only one char to be converted to type <char>",
 	"RT030": "convert into char failed",
 	"RT031": "invalid internal function call",
 	"RT032": "cannot %s file: %s",
