@@ -97,6 +97,8 @@ func ParseTokenType(value tokens.TokenType) (UmbraType, error) {
 		return ARR, nil
 	case tokens.ANY_TYPE:
 		return ANY, nil
+	case tokens.VOID_TYPE:
+		return VOID, nil
 	default:
 		return UNKNOWN, exception.NewTypeError("unknown type")
 	}

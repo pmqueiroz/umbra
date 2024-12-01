@@ -10,7 +10,6 @@ import (
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/environment"
 	"github.com/pmqueiroz/umbra/exception"
-	"github.com/pmqueiroz/umbra/tokens"
 	"github.com/pmqueiroz/umbra/types"
 	"github.com/sanity-io/litter"
 )
@@ -38,6 +37,11 @@ func (r Continue) Error() string {
 type FunctionDeclaration struct {
 	Itself      *ast.FunctionStatement
 	Environment *environment.Environment
+	// temp solution while UmbraType is only a string
+	ReturnType struct {
+		Type   types.UmbraType
+		Parent ast.EnumStatement
+	}
 }
 
 func extractVarName(stmt ast.Statement) string {
@@ -85,38 +89,19 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 				return err
 			}
 
-			parsedType, enum, parseTypeErr := func() (types.UmbraType, ast.EnumStatement, error) {
-				switch stmt.Type.Type {
-				case tokens.IDENTIFIER:
-					value, ok := env.Get(stmt.Type.Lexeme, true)
-					if !ok {
-						return types.UNKNOWN, ast.EnumStatement{}, exception.NewRuntimeError("RT002", stmt.Type.Lexeme)
-					}
+			parsedType, enum, err := parseRuntimeType(stmt.Type, env)
 
-					if enum, ok := value.Data.(ast.EnumStatement); ok {
-						return types.ENUM, enum, nil
-					}
-
-					return types.UNKNOWN, ast.EnumStatement{}, exception.NewRuntimeError("RT035", stmt.Type.Lexeme)
-				default:
-					t, e := types.ParseTokenType(stmt.Type.Type)
-					return t, ast.EnumStatement{}, e
-				}
-			}()
-
-			if parseTypeErr != nil {
-				return parseTypeErr
+			if err != nil {
+				return err
 			}
 
 			switch parsedType {
 			case types.ENUM:
 				if member, ok := value.(ast.EnumMember); ok {
-					if ok := enum.ValidMember(member); ok {
-						return nil
+					if ok := enum.ValidMember(member); !ok {
+						return exception.NewTypeError(fmt.Sprintf("expected %s got %s", enum.Name.Lexeme, value))
 					}
 				}
-
-				return exception.NewTypeError(fmt.Sprintf("expected %s got %s", enum.Name.Lexeme, value))
 			default:
 				typeErr := types.CheckPrimitiveType(parsedType, value, stmt.Nullable)
 
@@ -124,7 +109,6 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 					return typeErr
 				}
 			}
-
 		}
 
 		env.Create(stmt.Name.Lexeme, value, types.SafeParseUmbraType(stmt.Type.Type), stmt.Nullable, false)
@@ -163,9 +147,18 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 		}
 		return Return{value: value}
 	case ast.FunctionStatement:
+		parsedReturnType, parentEnum, err := parseRuntimeType(stmt.ReturnType, env)
+
+		if err != nil {
+			return err
+		}
+
 		env.Create(
 			stmt.Name.Lexeme,
-			FunctionDeclaration{Itself: &stmt, Environment: env},
+			FunctionDeclaration{Itself: &stmt, Environment: env, ReturnType: struct {
+				Type   types.UmbraType
+				Parent ast.EnumStatement
+			}{Type: parsedReturnType, Parent: parentEnum}},
 			types.FUN,
 			false,
 			false,

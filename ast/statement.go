@@ -67,9 +67,14 @@ type ImportStatement struct {
 	Path    tokens.Token
 }
 
+type EnumArgument struct {
+	Type  types.UmbraType
+	Value interface{}
+}
+
 type EnumMember struct {
 	Name      string
-	Value     Expression
+	Arguments []EnumArgument
 	Signature string
 }
 

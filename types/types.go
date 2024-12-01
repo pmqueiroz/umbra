@@ -14,4 +14,5 @@ const (
 	NULL    UmbraType = "<null>"
 	ENUM    UmbraType = "<enum>"
 	UNKNOWN UmbraType = "<unknown>"
+	VOID    UmbraType = "<void>"
 )

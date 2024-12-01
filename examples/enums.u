@@ -1,15 +1,15 @@
 import "io"
 
-enum Direction {
-  North
-  South
-  East
-  West
+enum Event {
+  Keyboard(str)
 }
 
-const teste Direction = Direction.North
-io::printLn("North:", Direction.North)
+const event Event = Event.Keyboard("k")
 
-## Next Steps
-# - [] Add support for generic enums
-# - [] Add enum pattern matching
+io::printLn(event)
+
+## Todo
+# - [x] Declare enums
+# - [x] Enum with arguments
+# - [ ] Enum pattern matching
+# - [ ] Support for generic enums

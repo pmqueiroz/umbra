@@ -35,7 +35,8 @@ var Messages = map[string]string{
 	"RT031": "invalid internal function call",
 	"RT032": "cannot %s file: %s",
 	"RT033": "all paths must be strings",
-	"RT034": "enum member '%s' does not exits",
+	"RT034": "enum member '%s' does not exits in '%s'",
 	"RT035": "cannot use '%s' as a type",
+	"RT036": "enum member expects to be called with arguments",
 	"GN001": "cannot find module '%s'",
 }

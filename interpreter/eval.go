@@ -292,10 +292,11 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			return nil, err
 		}
 
-		if function, ok := callee.(FunctionDeclaration); ok {
-			funcEnv := environment.NewEnvironment(function.Environment)
+		switch parsedCallee := callee.(type) {
+		case FunctionDeclaration:
+			funcEnv := environment.NewEnvironment(parsedCallee.Environment)
 
-			for i, param := range function.Itself.Params {
+			for i, param := range parsedCallee.Itself.Params {
 				if param.Variadic {
 					var variadicArgs []interface{}
 					for j := i; j < len(expr.Arguments); j++ {
@@ -329,7 +330,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			}
 
 			var result interface{}
-			for _, stmt := range function.Itself.Body {
+			for _, stmt := range parsedCallee.Itself.Body {
 				if err := Interpret(stmt, funcEnv); err != nil {
 					if returnValue, ok := err.(Return); ok {
 						result = returnValue.value
@@ -341,7 +342,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			}
 
 			return result, nil
-		} else if goFunc, ok := callee.(native.InternalModuleFn); ok {
+		case native.InternalModuleFn:
 			var args []interface{}
 			for _, arg := range expr.Arguments {
 				argValue, err := Evaluate(arg, env)
@@ -356,11 +357,36 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					err = exception.NewRuntimeError("RT031")
 				}
 			}()
-			result, err := goFunc(args)
+			result, err := parsedCallee(args)
 			return result, err
+		case ast.EnumMember:
+			litter.Dump(parsedCallee)
+			enrichedArgs := make([]ast.EnumArgument, len(parsedCallee.Arguments))
+			for i, arg := range parsedCallee.Arguments {
+				argValue, err := Evaluate(expr.Arguments[i], env)
+				if err != nil {
+					return nil, err
+				}
+
+				typeErr := types.CheckPrimitiveType(arg.Type, argValue, false)
+				if typeErr != nil {
+					return nil, typeErr
+				}
+
+				enrichedArgs[i] = ast.EnumArgument{
+					Type:  arg.Type,
+					Value: argValue,
+				}
+			}
+			return ast.EnumMember{
+				Name:      parsedCallee.Name,
+				Arguments: enrichedArgs,
+				Signature: parsedCallee.Signature,
+			}, nil
+		default:
+			return nil, exception.NewRuntimeError("RT014", expr.Callee)
 		}
 
-		return nil, exception.NewRuntimeError("RT014", expr.Callee)
 	case ast.LogicalExpression:
 		left, err := Evaluate(expr.Left, env)
 		if err != nil {
@@ -459,7 +485,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			if prop, ok := expr.Property.(ast.VariableExpression); ok {
 				member, ok := obj.Get(prop.Name)
 				if !ok {
-					return nil, exception.NewRuntimeError("RT034", prop.Name.Lexeme)
+					return nil, exception.NewRuntimeError("RT034", prop.Name.Lexeme, obj.Name.Lexeme)
 				}
 
 				return member, nil

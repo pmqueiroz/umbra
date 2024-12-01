@@ -552,15 +552,34 @@ func (p *Parser) enumStatement() Statement {
 
 	for !p.check(tokens.RIGHT_BRACE) && !p.isAtEOF() {
 		memberName := p.consume("Expect enum member name.", tokens.IDENTIFIER)
-		var value Expression
+		var args []EnumArgument
 
-		if p.match(tokens.EQUAL) {
-			value = p.expression()
+		if p.match(tokens.LEFT_PARENTHESIS) {
+			if !p.check(tokens.RIGHT_PARENTHESIS) {
+				for {
+					paramType := p.consume("Expect enum argument type.", tokens.DATA_TYPES...)
+					parsedParamType, err := types.ParseTokenType(paramType.Type)
+
+					if err != nil {
+						p.throw("Invalid enum argument type.")
+					}
+
+					args = append(args, EnumArgument{
+						Type: parsedParamType,
+					})
+
+					if !p.match(tokens.COMMA) {
+						break
+					}
+				}
+
+				p.consume("Expect ')' after enum arguments.", tokens.RIGHT_PARENTHESIS)
+			}
 		}
 
 		members[memberName.Lexeme] = EnumMember{
-			Name:  memberName.Lexeme,
-			Value: value,
+			Name:      memberName.Lexeme,
+			Arguments: args,
 		}
 
 		if p.match(tokens.RIGHT_BRACE) {
