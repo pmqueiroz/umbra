@@ -70,13 +70,16 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 		var output string
 
-		if str, ok := value.(string); ok {
-			str = strings.ReplaceAll(str, "\\n", "\n")
-			str = strings.ReplaceAll(str, "\\t", "\t")
-			str = strings.ReplaceAll(str, "\\\"", "\"")
-			str = strings.ReplaceAll(str, "\\\\", "\\")
-			output = fmt.Sprint(str)
-		} else {
+		switch v := value.(type) {
+		case string:
+			v = strings.ReplaceAll(v, "\\n", "\n")
+			v = strings.ReplaceAll(v, "\\t", "\t")
+			v = strings.ReplaceAll(v, "\\\"", "\"")
+			v = strings.ReplaceAll(v, "\\\\", "\\")
+			output = fmt.Sprint(v)
+		case float64:
+			output = fmt.Sprintf("%.f", v)
+		default:
 			output = fmt.Sprint(value)
 		}
 		channel.Write([]byte(output))
