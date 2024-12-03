@@ -370,7 +370,7 @@ func (p *Parser) unary() Expression {
 func (p *Parser) multiplication() Expression {
 	expr := p.unary()
 
-	for p.match(tokens.SLASH, tokens.STAR, tokens.PERCENT) {
+	for p.match(tokens.SLASH, tokens.STAR, tokens.PERCENT, tokens.ENUMOF) {
 		expr = BinaryExpression{
 			Left:     expr,
 			Operator: p.previous(),

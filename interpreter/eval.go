@@ -255,6 +255,17 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			}
 		case tokens.BANG_EQUAL:
 			return left != right, nil
+		case tokens.ENUMOF:
+			leftVal, ok := left.(ast.EnumMember)
+			if !ok {
+				return nil, exception.NewRuntimeError("RT037")
+			}
+			rightVal, ok := right.(ast.EnumMember)
+			if !ok {
+				return nil, exception.NewRuntimeError("RT038")
+			}
+
+			return leftVal.Signature == rightVal.Signature && leftVal.Name == rightVal.Name, nil
 		default:
 			return nil, exception.NewRuntimeError("RT010", expr.Operator.Lexeme)
 		}

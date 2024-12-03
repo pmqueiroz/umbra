@@ -26,6 +26,9 @@ for mut i num = 0, ~events - 1 {
   }
 }
 
+io::println(Event.Keyboard("a") enumof Event.Keyboard) # true
+io::println(Event.Keyboard("a") == Event.Keyboard("a")) # true
+io::println(Event.Keyboard("a") == Event.Keyboard("b")) # false
 
 ## Todo
 # - [x] Declare enums
