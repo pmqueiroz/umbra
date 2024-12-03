@@ -233,7 +233,26 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			}
 			return leftVal <= rightVal, nil
 		case tokens.EQUAL_EQUAL:
-			return left == right, nil
+			switch leftVal := left.(type) {
+			case ast.EnumMember:
+				if rightVal, ok := right.(ast.EnumMember); ok {
+					if leftVal.Signature == rightVal.Signature && leftVal.Name == rightVal.Name {
+						for i, arg := range leftVal.Arguments {
+							if arg.Value != rightVal.Arguments[i].Value {
+								return false, nil
+							}
+						}
+
+						return true, nil
+					}
+
+					return false, nil
+				}
+
+				return nil, exception.NewRuntimeError("RT026", types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
+			default:
+				return left == right, nil
+			}
 		case tokens.BANG_EQUAL:
 			return left != right, nil
 		default:
