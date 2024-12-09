@@ -578,7 +578,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					}
 					strElements = append(strElements, strElem)
 				}
-				return strings.Join(strElements, ""), nil
+				return "[" + strings.Join(strElements, ",") + "]", nil
 			default:
 				return strPrimitiveConversion(value)
 			}
