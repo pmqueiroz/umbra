@@ -40,6 +40,7 @@ var Messages = map[string]string{
 	"RT036": "enum member expects to be called with arguments",
 	"RT037": "left operand in enumof should be an enum member",
 	"RT038": "right operand in enumof should be an enum member",
+	"RT039": "cannot destruct type %s",
 	"GN001": "cannot find module '%s'",
 	"GN002": "unable to load file '%s'. module does not exits. path: %s",
 }

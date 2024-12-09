@@ -478,19 +478,49 @@ func (p *Parser) varDeclaration() Statement {
 	variableType := p.consume("Expect variable type.", tokens.DATA_TYPES...)
 	nullable := p.match(tokens.HOOK)
 
-	var initializer Expression
+	declaration := VarStatement{
+		Name:     name,
+		Mutable:  isMutable,
+		Type:     variableType,
+		Nullable: nullable,
+	}
+
+	if p.match(tokens.COMMA) {
+		var declarations []VarStatement
+		declarations = append(declarations, declaration)
+
+		if !p.check(tokens.EQUAL) {
+			for {
+				name := p.consume("Expect variable name.", tokens.IDENTIFIER)
+				variableType := p.consume("Expect variable type.", tokens.DATA_TYPES...)
+				nullable := p.match(tokens.HOOK)
+
+				declarations = append(declarations, VarStatement{
+					Name:     name,
+					Mutable:  isMutable,
+					Type:     variableType,
+					Nullable: nullable,
+				})
+
+				if !p.match(tokens.COMMA) {
+					break
+				}
+			}
+		}
+
+		p.consume("Expect '=' after destructuring declarations.", tokens.EQUAL)
+
+		return ArrayDestructuringStatement{
+			Declarations: declarations,
+			Expr:         p.expression(),
+		}
+	}
 
 	if p.match(tokens.EQUAL) {
-		initializer = p.expression()
+		declaration.Initializer = p.expression()
 	}
 
-	return VarStatement{
-		Name:        name,
-		Initializer: initializer,
-		Mutable:     isMutable,
-		Type:        variableType,
-		Nullable:    nullable,
-	}
+	return declaration
 }
 
 func (p *Parser) breakStatement() Statement {

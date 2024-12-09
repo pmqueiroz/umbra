@@ -117,6 +117,11 @@ type VarStatement struct {
 	Nullable    bool
 }
 
+type ArrayDestructuringStatement struct {
+	Declarations []VarStatement
+	Expr         Expression
+}
+
 type InitializedForStatement struct {
 	Start Statement
 	Stop  Expression

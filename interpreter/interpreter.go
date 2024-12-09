@@ -11,6 +11,7 @@ import (
 	"github.com/pmqueiroz/umbra/ast"
 	"github.com/pmqueiroz/umbra/environment"
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/tokens"
 	"github.com/pmqueiroz/umbra/types"
 	"github.com/sanity-io/litter"
 )
@@ -54,6 +55,48 @@ func extractVarName(stmt ast.Statement) string {
 	}
 }
 
+func checkDeclarationType(t tokens.Token, nullable bool, value interface{}, env *environment.Environment) error {
+	parsedType, enum, err := parseRuntimeType(t, env)
+
+	if err != nil {
+		return err
+	}
+
+	switch parsedType {
+	case types.ENUM:
+		if member, ok := value.(ast.EnumMember); ok {
+			if ok := enum.ValidMember(member); !ok {
+				return exception.NewTypeError(fmt.Sprintf("expected %s got %s", enum.Name.Lexeme, value))
+			}
+		}
+	default:
+		typeErr := types.CheckPrimitiveType(parsedType, value, nullable)
+
+		if typeErr != nil {
+			return typeErr
+		}
+	}
+
+	return nil
+}
+
+func resolveVarDeclaration(stmt ast.VarStatement, value interface{}, env *environment.Environment) error {
+	err := checkDeclarationType(stmt.Type, stmt.Nullable, value, env)
+
+	if err != nil {
+		return err
+	}
+
+	varType, err := types.ParseTokenType(stmt.Type.Type)
+
+	if err != nil {
+		return err
+	}
+
+	env.Create(stmt.Name.Lexeme, value, varType, stmt.Nullable, false)
+	return nil
+}
+
 func Interpret(statement ast.Statement, env *environment.Environment) error {
 	switch stmt := statement.(type) {
 	case ast.PrintStatement:
@@ -92,37 +135,29 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			if err != nil {
 				return err
 			}
-
-			parsedType, enum, err := parseRuntimeType(stmt.Type, env)
-
-			if err != nil {
-				return err
-			}
-
-			switch parsedType {
-			case types.ENUM:
-				if member, ok := value.(ast.EnumMember); ok {
-					if ok := enum.ValidMember(member); !ok {
-						return exception.NewTypeError(fmt.Sprintf("expected %s got %s", enum.Name.Lexeme, value))
-					}
-				}
-			default:
-				typeErr := types.CheckPrimitiveType(parsedType, value, stmt.Nullable)
-
-				if typeErr != nil {
-					return typeErr
-				}
-			}
 		}
 
-		varType, err := types.ParseTokenType(stmt.Type.Type)
-
+		return resolveVarDeclaration(stmt, value, env)
+	case ast.ArrayDestructuringStatement:
+		value, err := Evaluate(stmt.Expr, env)
 		if err != nil {
 			return err
 		}
 
-		env.Create(stmt.Name.Lexeme, value, varType, stmt.Nullable, false)
-		return nil
+		if result, ok := value.([]interface{}); ok {
+
+			for i, declaration := range stmt.Declarations {
+				err := resolveVarDeclaration(declaration, result[i], env)
+
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		}
+
+		return exception.NewRuntimeError("RT039", types.SafeParseUmbraType(value))
 	case ast.BlockStatement:
 		newEnv := environment.NewEnvironment(env)
 		for _, stmt := range stmt.Statements {
