@@ -296,6 +296,8 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				return float64(len(parsedRight)), nil
 			case string:
 				return float64(len(parsedRight)), nil
+			case map[interface{}]interface{}:
+				return float64(len(parsedRight)), nil
 			default:
 				return nil, exception.NewRuntimeError("RT011", types.SafeParseUmbraType(parsedRight))
 			}
