@@ -172,7 +172,7 @@ func (p *Parser) hashmap() Expression {
 
 	if !p.check(tokens.RIGHT_BRACE) {
 		for {
-			name := p.consume("Expect property name.", tokens.IDENTIFIER)
+			name := p.consume("Expect property name.", tokens.IDENTIFIER, tokens.STRING)
 			p.consume("Expect ':' after property identifier in hashmap", tokens.COLON)
 
 			properties[LiteralExpression{Value: name.Lexeme}] = p.expression()
