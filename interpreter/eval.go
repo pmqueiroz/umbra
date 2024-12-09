@@ -48,6 +48,21 @@ func toFloat64(value interface{}) (float64, error) {
 	}
 }
 
+func strPrimitiveConversion(value interface{}) (string, error) {
+	switch v := value.(type) {
+	case rune:
+		return string(v), nil
+	case float64:
+		return strconv.FormatFloat(v, 'f', -1, 64), nil
+	case bool:
+		return strconv.FormatBool(v), nil
+	case string:
+		return v, nil
+	}
+
+	return "", exception.NewRuntimeError("RT028", types.SafeParseUmbraType(value), "<str>")
+}
+
 func Evaluate(expression ast.Expression, env *environment.Environment) (interface{}, error) {
 	switch expr := expression.(type) {
 	case ast.LiteralExpression:
@@ -554,24 +569,19 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 		switch expr.Type.Type {
 		case tokens.STR_TYPE:
 			switch v := value.(type) {
-			case rune:
-				return string(v), nil
-			case float64:
-				return strconv.FormatFloat(v, 'f', -1, 64), nil
-			case bool:
-				return strconv.FormatBool(v), nil
 			case []interface{}:
 				var strElements []string
 				for _, elem := range v {
-					strElem, ok := elem.(string)
-					if !ok {
-						return nil, exception.NewRuntimeError("RT028", types.SafeParseUmbraType(elem), "<str>")
+					strElem, err := strPrimitiveConversion(elem)
+					if err != nil {
+						return nil, err
 					}
 					strElements = append(strElements, strElem)
 				}
 				return strings.Join(strElements, ""), nil
+			default:
+				return strPrimitiveConversion(value)
 			}
-			return nil, defaultError
 		case tokens.CHAR_TYPE:
 			switch v := value.(type) {
 			case float64:
