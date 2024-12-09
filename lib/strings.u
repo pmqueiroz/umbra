@@ -5,32 +5,17 @@ def join(array arr, separator str) str {
     return ""
   }
 
-  mut totalLength num = 0
+  mut buffer str = ""
 
   for mut i num = 0, ~array - 1 {
-    totalLength = totalLength + ~array[i]
-  }
-
-  totalLength = totalLength + (~separator * (~array - 1))
-
-  mut buffer arr = []
-
-  mut index num = 0
-  for mut i num = 0, ~array - 1 {
-    for mut j num = 0, ~array[i] - 1 {
-      buffer[index] = (range array[i])[j]
-      index = index + 1
-    }
+    buffer = buffer + str(array[i])
 
     if (i < ~array - 1) {
-      for mut k num = 0, ~separator - 1 {
-        buffer[index] = (range separator)[k]
-        index = index + 1
-      }
+      buffer = buffer + separator
     }
   }
 
-  return str(buffer)
+  return buffer
 }
 
 def substring(string str, start num, end num) {
