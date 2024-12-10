@@ -1,0 +1,11 @@
+def map(input arr, fn fun) arr {
+  const result arr = []
+  for mut i num = 0, ~input - 1 {
+    result[~result] = fn(input[i])
+  }
+  return result
+}
+
+pub {
+  map
+}
