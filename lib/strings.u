@@ -1,5 +1,3 @@
-import "io"
-
 def join(array arr, separator str) str {
   if (~array == 0) {
     return ""
@@ -46,7 +44,7 @@ def split(string str, separator char) {
   return result
 }
 
-def toUpper(string str) {
+def to_upper(string str) {
   mut buffer str = ""
   for mut i num = 0, ~range string - 1 {
 
@@ -60,7 +58,7 @@ def toUpper(string str) {
   return buffer
 }
 
-def toLower(string str) {
+def to_lower(string str) {
   mut buffer str = ""
   for mut i num = 0, ~range string - 1 {
     if string[i] >= 'A' and string[i] <= 'Z' {
@@ -72,10 +70,30 @@ def toLower(string str) {
   return buffer
 }
 
+def trim(input str) str {
+  const start num = 0
+  const end num = ~input - 1
+  const buffer str = ""
+
+  for start <= end and (input[start] == ' ' or input[start] == '\t' or input[start] == '\n') {
+    start = start + 1
+  }
+  for end >= start and (input[end] == ' ' or input[end] == '\t' or input[end] == '\n') {
+    end = end - 1
+  }
+
+  for mut i num = start, end {
+    buffer = buffer + input[i]
+  }
+
+  return buffer
+}
+
 pub {
   substring
   split
-  toUpper
-  toLower
+  to_upper
+  to_lower
   join
+  trim
 }
