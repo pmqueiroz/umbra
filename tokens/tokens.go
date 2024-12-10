@@ -116,7 +116,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"arr":      ARR_TYPE,
 	"hashmap":  HASHMAP_TYPE,
 	"void":     VOID_TYPE,
-	"func":     FUN_TYPE,
+	"fun":      FUN_TYPE,
 	"const":    CONST,
 	"mut":      MUT,
 	"break":    BREAK,

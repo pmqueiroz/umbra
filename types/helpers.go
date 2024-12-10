@@ -2,10 +2,17 @@ package types
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/tokens"
 )
+
+func isFunctionDeclaration(value interface{}) bool {
+	// Check if the value is an ast.FunctionDeclaration
+	// TODO: Find a better way to do this preventing circular dependencies
+	return reflect.TypeOf(value).Name() == "FunctionDeclaration"
+}
 
 func CheckPrimitiveType(targetType UmbraType, expected interface{}, nullable bool) error {
 	if targetType == ANY {
@@ -41,6 +48,12 @@ func CheckPrimitiveType(targetType UmbraType, expected interface{}, nullable boo
 		if targetType == ARR {
 			return nil
 		}
+	default:
+		if isFunctionDeclaration(expected) {
+			if targetType == FUN {
+				return nil
+			}
+		}
 	}
 
 	expectedType, err := ParseUmbraType(expected)
@@ -69,6 +82,10 @@ func ParseUmbraType(value interface{}) (UmbraType, error) {
 	case []interface{}:
 		return ARR, nil
 	default:
+		if isFunctionDeclaration("FunctionDeclaration") {
+			return FUN, nil
+		}
+
 		return UNKNOWN, exception.NewTypeError("unknown type")
 	}
 }
@@ -99,6 +116,8 @@ func ParseTokenType(value tokens.TokenType) (UmbraType, error) {
 		return ANY, nil
 	case tokens.VOID_TYPE:
 		return VOID, nil
+	case tokens.FUN_TYPE:
+		return FUN, nil
 	default:
 		return UNKNOWN, exception.NewTypeError("unknown type")
 	}

@@ -145,7 +145,6 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 		}
 
 		if result, ok := value.([]interface{}); ok {
-
 			for i, declaration := range stmt.Declarations {
 				err := resolveVarDeclaration(declaration, result[i], env)
 

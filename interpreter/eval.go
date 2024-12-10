@@ -362,6 +362,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type, param.Nullable, false)
 					break
 				} else {
+
 					argValue, err := Evaluate(expr.Arguments[i], env)
 					if err != nil {
 						return nil, err
