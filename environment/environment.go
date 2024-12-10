@@ -12,6 +12,7 @@ type Variable struct {
 	Data     interface{}
 	DataType types.UmbraType
 	Nullable bool
+	Mutable  bool
 	private  bool
 	native   bool
 }
@@ -51,7 +52,7 @@ func (env *Environment) Get(name string, allowPrivate bool) (Variable, bool) {
 
 func (env *Environment) Set(name string, value interface{}) bool {
 	if val, exists := env.values[name]; exists {
-		env.values[name] = Variable{Data: value, DataType: val.DataType, private: val.private, Nullable: val.Nullable}
+		env.values[name] = Variable{Data: value, DataType: val.DataType, private: val.private, Nullable: val.Nullable, Mutable: val.Mutable}
 		return true
 	}
 	if env.parent != nil {
@@ -60,13 +61,13 @@ func (env *Environment) Set(name string, value interface{}) bool {
 	return false
 }
 
-func (env *Environment) Create(name string, value interface{}, dataType types.UmbraType, nullable bool, internal bool) bool {
+func (env *Environment) Create(name string, value interface{}, dataType types.UmbraType, nullable bool, internal bool, mutable bool) bool {
 	if _, exists := env.Get(name, true); exists {
 		fmt.Println(exception.NewRuntimeError("RT001", name))
 		os.Exit(1)
 		return false
 	}
-	env.values[name] = Variable{Data: value, DataType: dataType, private: true, Nullable: nullable, native: internal}
+	env.values[name] = Variable{Data: value, DataType: dataType, private: true, Nullable: nullable, native: internal, Mutable: mutable}
 	return true
 }
 

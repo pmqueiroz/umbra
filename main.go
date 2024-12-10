@@ -66,7 +66,7 @@ func main() {
 
 		env := environment.NewEnvironment(nil)
 
-		env.Create("__FILE__", __FILE__, types.STR, false, false)
+		env.Create("__FILE__", __FILE__, types.STR, false, false, false)
 
 		run(content, RunOptions{
 			Options: args.Options,

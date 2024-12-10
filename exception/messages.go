@@ -41,6 +41,7 @@ var Messages = map[string]string{
 	"RT037": "left operand in enumof should be an enum member",
 	"RT038": "right operand in enumof should be an enum member",
 	"RT039": "cannot destruct type %s",
+	"RT040": "cannot reassign value to constant %s",
 	"GN001": "cannot find module '%s'",
 	"GN002": "unable to load file '%s'. module does not exits. path: %s",
 }

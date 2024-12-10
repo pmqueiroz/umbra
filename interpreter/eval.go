@@ -91,6 +91,10 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				return nil, exception.NewRuntimeError("RT002", target.Name.Lexeme)
 			}
 
+			if !variable.Mutable {
+				return nil, exception.NewRuntimeError("RT040", target.Name.Lexeme)
+			}
+
 			typeErr := types.CheckPrimitiveType(variable.DataType, value, variable.Nullable)
 
 			if typeErr != nil {
@@ -359,7 +363,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 
 						variadicArgs = append(variadicArgs, argValue)
 					}
-					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type, param.Nullable, false)
+					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type, param.Nullable, false, false)
 					break
 				} else {
 
@@ -373,7 +377,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 						return nil, typeErr
 					}
 
-					funcEnv.Create(param.Name.Lexeme, argValue, param.Type, param.Nullable, false)
+					funcEnv.Create(param.Name.Lexeme, argValue, param.Type, param.Nullable, false, false)
 				}
 			}
 

@@ -93,7 +93,7 @@ func resolveVarDeclaration(stmt ast.VarStatement, value interface{}, env *enviro
 		return err
 	}
 
-	env.Create(stmt.Name.Lexeme, value, varType, stmt.Nullable, false)
+	env.Create(stmt.Name.Lexeme, value, varType, stmt.Nullable, false, stmt.Mutable)
 	return nil
 }
 
@@ -204,6 +204,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 				Parent ast.EnumStatement
 			}{Type: parsedReturnType, Parent: parentEnum}},
 			types.FUN,
+			false,
 			false,
 			false,
 		)
@@ -341,6 +342,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			types.ENUM,
 			false,
 			false,
+			false,
 		)
 		return nil
 	case ast.MatchStatement:
@@ -362,7 +364,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 				for i, param := range matchCase.Parameters {
 					arg := value.(ast.EnumMember).Arguments[i]
 
-					caseEnv.Create(param.Name.Lexeme, arg.Value, types.ANY, false, false)
+					caseEnv.Create(param.Name.Lexeme, arg.Value, types.ANY, false, false, false)
 				}
 
 				for _, stmt := range matchCase.Body {
