@@ -454,14 +454,33 @@ func (p *Parser) or() Expression {
 func (p *Parser) expression() Expression {
 	expr := p.or()
 
-	if p.match(tokens.EQUAL) {
+	if p.match(tokens.EQUAL, tokens.PLUS_EQUAL, tokens.MINUS_EQUAL) {
+		operator := p.previous()
 		value := p.expression()
+		var finalValue Expression
+
+		switch operator.Type {
+		case tokens.EQUAL:
+			finalValue = value
+		case tokens.PLUS_EQUAL:
+			finalValue = BinaryExpression{
+				Left:     expr,
+				Operator: tokens.Token{Type: tokens.PLUS},
+				Right:    value,
+			}
+		case tokens.MINUS_EQUAL:
+			finalValue = BinaryExpression{
+				Left:     expr,
+				Operator: tokens.Token{Type: tokens.MINUS},
+				Right:    value,
+			}
+		}
 
 		switch target := expr.(type) {
 		case VariableExpression, MemberExpression:
 			return AssignExpression{
 				Target: target,
-				Value:  value,
+				Value:  finalValue,
 			}
 		default:
 			p.throw("Invalid assignment target.")

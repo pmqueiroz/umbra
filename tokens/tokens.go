@@ -27,6 +27,8 @@ const (
 	PERCENT            TokenType = "PERCENT"
 	STAR               TokenType = "STAR"
 	EQUAL              TokenType = "EQUAL"
+	PLUS_EQUAL         TokenType = "PLUS_EQUAL"
+	MINUS_EQUAL        TokenType = "MINUS_EQUAL"
 	EQUAL_EQUAL        TokenType = "EQUAL_EQUAL"
 	BANG_EQUAL         TokenType = "BANG_EQUAL"
 	GREATER_THAN       TokenType = "GREATER_THAN"

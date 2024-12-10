@@ -243,10 +243,6 @@ func (t *Tokenizer) scan() error {
 		t.addNonLiteralToken(RIGHT_BRACKET)
 	case ',':
 		t.addNonLiteralToken(COMMA)
-	case '-':
-		t.addNonLiteralToken(MINUS)
-	case '+':
-		t.addNonLiteralToken(PLUS)
 	case ';':
 		t.addNonLiteralToken(SEMICOLON)
 	case '*':
@@ -261,6 +257,18 @@ func (t *Tokenizer) scan() error {
 		t.addNonLiteralToken(HOOK)
 	case '|':
 		t.addNonLiteralToken(PIPE)
+	case '-':
+		if t.match('=') {
+			t.addNonLiteralToken(MINUS_EQUAL)
+		} else {
+			t.addNonLiteralToken(MINUS)
+		}
+	case '+':
+		if t.match('=') {
+			t.addNonLiteralToken(PLUS_EQUAL)
+		} else {
+			t.addNonLiteralToken(PLUS)
+		}
 	case '.':
 		if t.match('.') {
 			if t.match('.') {
