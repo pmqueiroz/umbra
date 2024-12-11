@@ -1,7 +1,7 @@
 def map(input arr, fn fun) arr {
   const result arr = []
   for mut i num = 0, ~input - 1 {
-    result[~result] = fn(input[i])
+    result[~result] = fn(input[i], i)
   }
   return result
 }
