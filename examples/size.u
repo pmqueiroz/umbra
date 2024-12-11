@@ -1,4 +1,0 @@
-import "io"
-
-io::println(~[0, 1, 2])
-io::println(~"string")
