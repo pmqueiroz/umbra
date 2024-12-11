@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.1](https://github.com/pmqueiroz/umbra/compare/v1.14.0...v1.14.1) (2024-12-11)
+
+
+### Bug Fixes
+
+* prevent range to return unknown type ([75b1bab](https://github.com/pmqueiroz/umbra/commit/75b1bab16f2ac899e95962b50e50344ceaf3deca))
+
 ## [1.14.0](https://github.com/pmqueiroz/umbra/compare/1.13.0...v1.14.0) (2024-12-11)
 
 
