@@ -452,7 +452,6 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 		default:
 			return nil, exception.NewRuntimeError("RT014", expr.Callee)
 		}
-
 	case ast.LogicalExpression:
 		left, err := Evaluate(expr.Left, env)
 		if err != nil {
@@ -643,6 +642,30 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			return math.NaN(), defaultError
 		}
 		return nil, defaultError
+	case ast.FunctionExpression:
+		parsedReturnType, parentEnum, err := parseRuntimeType(expr.ReturnType, env)
+
+		if err != nil {
+			return nil, err
+		}
+
+		fun := FunctionDeclaration{Itself: &expr, Environment: env, ReturnType: struct {
+			Type   types.UmbraType
+			Parent ast.EnumStatement
+		}{Type: parsedReturnType, Parent: parentEnum}}
+
+		if expr.Name.Lexeme != "" {
+			env.Create(
+				expr.Name.Lexeme,
+				fun,
+				types.FUN,
+				false,
+				false,
+				false,
+			)
+		}
+
+		return fun, nil
 	default:
 		return nil, exception.NewRuntimeError("RT017", litter.Sdump(expr))
 	}

@@ -139,7 +139,7 @@ func (p *Parser) function() Statement {
 
 	_, body := p.block()
 
-	return FunctionStatement{
+	return FunctionExpression{
 		Name:       name,
 		Params:     params,
 		ReturnType: returnType,
@@ -258,6 +258,10 @@ func (p *Parser) primary() Expression {
 
 	if p.match(tokens.LEFT_BRACKET) {
 		return p.array()
+	}
+
+	if p.match(tokens.PIPE) {
+		return p.inlineFunction()
 	}
 
 	if p.match(tokens.LEFT_PARENTHESIS) {
@@ -489,6 +493,60 @@ func (p *Parser) expression() Expression {
 	}
 
 	return expr
+}
+
+func (p *Parser) inlineFunction() Expression {
+	var params []Parameter
+
+	if !p.check(tokens.PIPE) {
+		for {
+			paramName := p.consume("Expect parameter name.", tokens.IDENTIFIER)
+			variadic := p.match(tokens.VARIADIC)
+			paramType := p.consume("Expect parameter type.", tokens.DATA_TYPES...)
+			parsedParamType, err := types.ParseTokenType(paramType.Type)
+
+			if err != nil {
+				p.throw("Invalid parameter type.")
+			}
+
+			nullable := p.match(tokens.HOOK)
+			params = append(params, Parameter{
+				Name:     paramName,
+				Type:     parsedParamType,
+				Variadic: variadic,
+				Nullable: nullable,
+			})
+
+			if !p.match(tokens.COMMA) {
+				break
+			}
+		}
+	}
+
+	p.consume("Expect '|' after parameters.", tokens.PIPE)
+
+	var returnType tokens.Token
+
+	if !p.check(tokens.LEFT_BRACE) {
+		returnType = p.consume("Expect return type.", append([]tokens.TokenType{tokens.VOID_TYPE}, tokens.DATA_TYPES...)...)
+	} else {
+		currentToken := p.peek()
+		returnType = tokens.Token{
+			Type:   tokens.VOID_TYPE,
+			Loc:    currentToken.Loc,
+			Lexeme: currentToken.Lexeme,
+		}
+	}
+
+	p.consume("Expect '{' before function body.", tokens.LEFT_BRACE)
+
+	_, body := p.block()
+
+	return FunctionExpression{
+		Params:     params,
+		ReturnType: returnType,
+		Body:       body,
+	}
 }
 
 func (p *Parser) varDeclaration() Statement {

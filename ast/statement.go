@@ -23,13 +23,6 @@ type Parameter struct {
 	Nullable bool
 }
 
-type FunctionStatement struct {
-	Name       tokens.Token
-	Params     []Parameter
-	ReturnType tokens.Token
-	Body       []Statement
-}
-
 type MatchCaseParameter struct {
 	Name tokens.Token
 }

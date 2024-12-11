@@ -37,7 +37,7 @@ func (r Continue) Error() string {
 }
 
 type FunctionDeclaration struct {
-	Itself      *ast.FunctionStatement
+	Itself      *ast.FunctionExpression
 	Environment *environment.Environment
 	// temp solution while UmbraType is only a string
 	ReturnType struct {
@@ -190,7 +190,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			return err
 		}
 		return Return{value: value}
-	case ast.FunctionStatement:
+	case ast.FunctionExpression:
 		parsedReturnType, parentEnum, err := parseRuntimeType(stmt.ReturnType, env)
 
 		if err != nil {

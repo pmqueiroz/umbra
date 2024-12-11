@@ -74,3 +74,10 @@ type NamespaceMemberExpression struct {
 type SizeExpression struct {
 	Value Expression
 }
+
+type FunctionExpression struct {
+	Name       tokens.Token
+	Params     []Parameter
+	ReturnType tokens.Token
+	Body       []Statement
+}
