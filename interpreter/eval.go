@@ -335,6 +335,16 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					result = append(result, []interface{}{key, value})
 				}
 				return result, nil
+			case float64:
+				if parsedRight <= 0 {
+					return []interface{}{}, nil
+				}
+
+				result := make([]interface{}, int(parsedRight))
+				for i := 0; i < int(parsedRight); i++ {
+					result[i] = float64(i)
+				}
+				return result, nil
 			default:
 				return nil, exception.NewRuntimeError("RT012", types.SafeParseUmbraType(parsedRight))
 			}
