@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.15.0](https://github.com/pmqueiroz/umbra/compare/v1.14.1...v1.15.0) (2024-12-11)
+
+
+### Features
+
+* **arrays:** pass index to map fn ([54c0872](https://github.com/pmqueiroz/umbra/commit/54c08722aa29a8ce0e62c9788200a8149708f72a))
+* inline functions ([6d56e34](https://github.com/pmqueiroz/umbra/commit/6d56e34822409dfcc03674ee39e38d4665e4fa22))
+* pattern matching case as inline functions ([fa27afb](https://github.com/pmqueiroz/umbra/commit/fa27afb8b8889a98fd6ce55dcd474195e2acc5b3))
+* **range:** range over numbers generating arrays of indexes to the count ([43ef7fd](https://github.com/pmqueiroz/umbra/commit/43ef7fd391c5530e66de7296c5166ecf6cb915db))
+
 ## [1.14.1](https://github.com/pmqueiroz/umbra/compare/v1.14.0...v1.14.1) (2024-12-11)
 
 
