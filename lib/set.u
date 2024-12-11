@@ -1,0 +1,17 @@
+def new() {
+  return {}
+}
+
+def contains(s hashmap, item any) {
+  return s[str(item)] != nil
+}
+
+def add(s hashmap, item any) {
+  s[str(item)] = true
+}
+
+pub {
+  new
+  contains
+  add
+}
