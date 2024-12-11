@@ -323,7 +323,12 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 		case tokens.RANGE:
 			switch parsedRight := right.(type) {
 			case string:
-				return strings.Split(parsedRight, ""), nil
+				runes := []rune(parsedRight)
+				result := make([]interface{}, len(runes))
+				for i, r := range runes {
+					result[i] = string(r)
+				}
+				return result, nil
 			case map[interface{}]interface{}:
 				var result [][]interface{}
 				for key, value := range parsedRight {
