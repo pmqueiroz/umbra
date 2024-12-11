@@ -359,23 +359,14 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			}
 
 			if checkMatch(expr, value) {
-				caseEnv := environment.NewEnvironment(env)
+				callback, err := processFunction(matchCase.Callback, env)
 
-				for i, param := range matchCase.Parameters {
-					arg := value.(ast.EnumMember).Arguments[i]
-
-					caseEnv.Create(param.Name.Lexeme, arg.Value, types.ANY, false, false, false)
+				if err != nil {
+					return err
 				}
 
-				for _, stmt := range matchCase.Body {
-					err := Interpret(stmt, caseEnv)
-
-					if err != nil {
-						return err
-					}
-				}
-
-				return nil
+				_, err = processFunctionCall(callback, value.(ast.EnumMember).Arguments, env)
+				return err
 			}
 		}
 

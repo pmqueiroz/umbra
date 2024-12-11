@@ -495,7 +495,7 @@ func (p *Parser) expression() Expression {
 	return expr
 }
 
-func (p *Parser) inlineFunction() Expression {
+func (p *Parser) inlineFunction() FunctionExpression {
 	var params []Parameter
 
 	if !p.check(tokens.PIPE) {
@@ -710,32 +710,13 @@ func (p *Parser) matchStatement() Statement {
 	for !p.check(tokens.RIGHT_BRACE) && !p.isAtEOF() {
 		caseExpr := p.expression()
 
-		var params []MatchCaseParameter
+		p.consume("Expect callback after case matching", tokens.PIPE)
 
-		if p.match(tokens.PIPE) && !p.check(tokens.LEFT_BRACE) {
-			for {
-				paramName := p.consume("Expect parameter name.", tokens.IDENTIFIER)
-
-				params = append(params, MatchCaseParameter{
-					Name: paramName,
-				})
-
-				if !p.match(tokens.COMMA) {
-					break
-				}
-			}
-
-			p.consume("Expect '|' after case parameters", tokens.PIPE)
-		}
-
-		p.consume("Expect '{' before case body", tokens.LEFT_BRACE)
-
-		_, body := p.block()
+		callback := p.inlineFunction()
 
 		cases = append(cases, MatchCase{
 			Expression: caseExpr,
-			Parameters: params,
-			Body:       body,
+			Callback:   callback,
 		})
 	}
 

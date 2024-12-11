@@ -360,55 +360,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 
 		switch parsedCallee := callee.(type) {
 		case FunctionDeclaration:
-			funcEnv := environment.NewEnvironment(parsedCallee.Environment)
-
-			for i, param := range parsedCallee.Itself.Params {
-				if param.Variadic {
-					var variadicArgs []interface{}
-					for j := i; j < len(expr.Arguments); j++ {
-						argValue, err := Evaluate(expr.Arguments[j], env)
-						if err != nil {
-							return nil, err
-						}
-
-						typeErr := types.CheckPrimitiveType(param.Type, argValue, param.Nullable)
-						if typeErr != nil {
-							return nil, typeErr
-						}
-
-						variadicArgs = append(variadicArgs, argValue)
-					}
-					funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type, param.Nullable, false, false)
-					break
-				} else {
-
-					argValue, err := Evaluate(expr.Arguments[i], env)
-					if err != nil {
-						return nil, err
-					}
-
-					typeErr := types.CheckPrimitiveType(param.Type, argValue, param.Nullable)
-					if typeErr != nil {
-						return nil, typeErr
-					}
-
-					funcEnv.Create(param.Name.Lexeme, argValue, param.Type, param.Nullable, false, false)
-				}
-			}
-
-			var result interface{}
-			for _, stmt := range parsedCallee.Itself.Body {
-				if err := Interpret(stmt, funcEnv); err != nil {
-					if returnValue, ok := err.(Return); ok {
-						result = returnValue.value
-						break
-					}
-
-					return nil, err
-				}
-			}
-
-			return result, nil
+			return processFunctionCall(parsedCallee, expr.Arguments, env)
 		case native.InternalModuleFn:
 			var args []interface{}
 			for _, arg := range expr.Arguments {
@@ -643,29 +595,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 		}
 		return nil, defaultError
 	case ast.FunctionExpression:
-		parsedReturnType, parentEnum, err := parseRuntimeType(expr.ReturnType, env)
-
-		if err != nil {
-			return nil, err
-		}
-
-		fun := FunctionDeclaration{Itself: &expr, Environment: env, ReturnType: struct {
-			Type   types.UmbraType
-			Parent ast.EnumStatement
-		}{Type: parsedReturnType, Parent: parentEnum}}
-
-		if expr.Name.Lexeme != "" {
-			env.Create(
-				expr.Name.Lexeme,
-				fun,
-				types.FUN,
-				false,
-				false,
-				false,
-			)
-		}
-
-		return fun, nil
+		return processFunction(expr, env)
 	default:
 		return nil, exception.NewRuntimeError("RT017", litter.Sdump(expr))
 	}

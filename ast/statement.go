@@ -29,8 +29,7 @@ type MatchCaseParameter struct {
 
 type MatchCase struct {
 	Expression Expression
-	Parameters []MatchCaseParameter
-	Body       []Statement
+	Callback   FunctionExpression
 }
 
 type MatchStatement struct {
