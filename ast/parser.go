@@ -762,8 +762,7 @@ func (p *Parser) initializedForStatement() Statement {
 	stop := p.expression()
 
 	if p.match(tokens.COMMA) {
-		p.consume("Expect step after stop.", tokens.NUMERIC)
-		step = p.numeric()
+		step = p.expression()
 	} else {
 		step = LiteralExpression{
 			Value: 1.0,
