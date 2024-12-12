@@ -262,11 +262,11 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 			bodyErr := Interpret(stmt.Body, loopEnv)
 
-			loopEnv.Set(initializedVarName, controlVar.Data.(float64)+step)
-
 			if _, ok := bodyErr.(Break); ok {
 				break
 			}
+
+			loopEnv.Set(initializedVarName, controlVar.Data.(float64)+step)
 
 			if _, ok := bodyErr.(Continue); ok {
 				continue
