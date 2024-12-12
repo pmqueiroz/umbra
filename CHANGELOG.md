@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.16.0](https://github.com/pmqueiroz/umbra/compare/v1.15.1...v1.16.0) (2024-12-12)
+
+
+### Features
+
+* support backwards loop ([8da036d](https://github.com/pmqueiroz/umbra/commit/8da036de39f2484a86ee206a9f643b57f5854b23))
+
+
+### Performance Improvements
+
+* prevent evaluating step and stop loop every run ([a5c0d85](https://github.com/pmqueiroz/umbra/commit/a5c0d85a5673da17da420a87071d285766482496))
+* prevent set loop step if break ([a5c2384](https://github.com/pmqueiroz/umbra/commit/a5c2384dcc62f857a3d8c33236b6073834a2db57))
+
 ## [1.15.1](https://github.com/pmqueiroz/umbra/compare/v1.15.0...v1.15.1) (2024-12-12)
 
 
