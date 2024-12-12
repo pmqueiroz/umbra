@@ -220,6 +220,28 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 		initializedVarName := extractVarName(stmt.Start)
 
+		stop, err := Evaluate(stmt.Stop, env)
+		if err != nil {
+			return err
+		}
+
+		var parsedStop float64
+		var ok bool
+
+		if parsedStop, ok = stop.(float64); !ok {
+			return exception.NewRuntimeError("RT022", types.SafeParseUmbraType(stop))
+		}
+
+		stepValue, err := Evaluate(stmt.Step, env)
+		if err != nil {
+			return err
+		}
+
+		step, ok := stepValue.(float64)
+		if !ok {
+			return exception.NewRuntimeError("RT023", types.SafeParseUmbraType(stepValue))
+		}
+
 		for {
 			loopEnv := environment.NewEnvironment(forEnv)
 			controlVar, exists := loopEnv.Get(initializedVarName, true)
@@ -227,30 +249,11 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 				return exception.NewRuntimeError("RT021", initializedVarName)
 			}
 
-			stop, err := Evaluate(stmt.Stop, loopEnv)
-			if err != nil {
-				return err
-			}
-
-			stepValue, err := Evaluate(stmt.Step, loopEnv)
-			if err != nil {
-				return err
-			}
-
-			step, exists := stepValue.(float64)
-			if !exists {
-				return exception.NewRuntimeError("RT023", types.SafeParseUmbraType(stepValue))
-			}
-
 			var condition bool
-			if parsedStop, ok := stop.(float64); ok {
-				if step >= 0 {
-					condition = controlVar.Data.(float64) <= parsedStop
-				} else {
-					condition = controlVar.Data.(float64) >= parsedStop
-				}
+			if step >= 0 {
+				condition = controlVar.Data.(float64) <= parsedStop
 			} else {
-				return exception.NewRuntimeError("RT022", types.SafeParseUmbraType(stop))
+				condition = controlVar.Data.(float64) >= parsedStop
 			}
 
 			if !condition {
