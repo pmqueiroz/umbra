@@ -1,0 +1,27 @@
+import "arrays"
+
+def add(queue arr, item any) arr {
+  const a arr = arrays::clone(queue)
+  a[~a] = item
+  return a
+}
+
+def pop(queue arr) arr {
+  if ~queue == 0 {
+    return queue
+  }
+
+  mut result arr = []
+
+  const item any = queue[0]
+  for mut i num = 1, ~queue - 1 {
+    result[~result] = queue[i]
+  }
+
+  return result
+}
+
+pub {
+  add
+  pop
+}
