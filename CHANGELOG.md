@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.20.0](https://github.com/pmqueiroz/umbra/compare/v1.19.0...v1.20.0) (2024-12-12)
+
+
+### Features
+
+* **arrays:** flatten fns ([918fe26](https://github.com/pmqueiroz/umbra/commit/918fe267702e6ccd175ad02a8c4524ebce9ef40f))
+* stack lib ([cd6aaf2](https://github.com/pmqueiroz/umbra/commit/cd6aaf29be945921e334947e7b27b4e6090c66b6))
+
 ## [1.19.0](https://github.com/pmqueiroz/umbra/compare/v1.18.0...v1.19.0) (2024-12-12)
 
 
