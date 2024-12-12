@@ -3,7 +3,7 @@ def new() {
 }
 
 def contains(s hashmap, item any) {
-  return s[str(item)] != nil
+  return s[str(item)] != null
 }
 
 def add(s hashmap, item any) {
