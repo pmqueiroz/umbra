@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/pmqueiroz/umbra/compare/v1.16.0...v1.16.1) (2024-12-12)
+
+
+### Bug Fixes
+
+* **set:** null typo ([514c007](https://github.com/pmqueiroz/umbra/commit/514c007fc74ee0c6200014a91361c8de8eb6b26f))
+
 ## [1.16.0](https://github.com/pmqueiroz/umbra/compare/v1.15.1...v1.16.0) (2024-12-12)
 
 
