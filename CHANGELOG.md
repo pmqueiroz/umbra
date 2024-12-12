@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/pmqueiroz/umbra/compare/v1.16.1...v1.17.0) (2024-12-12)
+
+
+### Features
+
+* **set:** remove function ([acd3287](https://github.com/pmqueiroz/umbra/commit/acd328719154bdf4848151642b1143045d1ce825))
+
 ## [1.16.1](https://github.com/pmqueiroz/umbra/compare/v1.16.0...v1.16.1) (2024-12-12)
 
 
