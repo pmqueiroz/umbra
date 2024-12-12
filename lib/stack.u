@@ -1,0 +1,33 @@
+def _clone(array arr) {
+  const result arr = []
+  for mut i num = 0, ~array - 1 {
+    result[~result] = array[i]
+  }
+  return result
+}
+
+def add(queue arr, item any) arr {
+  const a arr = _clone(queue)
+  a[~a] = item
+  return a
+}
+
+def pop(queue arr) arr {
+  if ~queue == 0 {
+    return queue
+  }
+
+  mut result arr = []
+
+  const item any = queue[0]
+  for mut i num = 0, ~queue - 2 {
+    result[~result] = queue[i]
+  }
+
+  return result
+}
+
+pub {
+  add
+  pop
+}
