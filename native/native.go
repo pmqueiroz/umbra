@@ -31,6 +31,8 @@ func Register(name string, namespace *environment.Environment) (ok bool) {
 		module = OsModule
 	case "path":
 		module = PathModule
+	case "hashmaps":
+		module = HashmapModule
 	default:
 		ok = false
 		return

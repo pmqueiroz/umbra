@@ -1,3 +1,5 @@
+import "native/hashmaps"
+
 def new() {
   return {}
 }
@@ -10,8 +12,13 @@ def add(s hashmap, item any) {
   s[str(item)] = true
 }
 
+def remove(s hashmap, item any) {
+  hashmaps::delete(s, str(item))
+}
+
 pub {
   new
   contains
   add
+  remove
 }
