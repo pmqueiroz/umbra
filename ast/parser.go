@@ -371,8 +371,23 @@ func (p *Parser) unary() Expression {
 	return p.call()
 }
 
-func (p *Parser) multiplication() Expression {
+func (p *Parser) is() Expression {
 	expr := p.unary()
+
+	for p.match(tokens.IS) {
+		paramType := p.consume("Expect is operator type.", tokens.DATA_TYPES...)
+
+		expr = IsExpression{
+			Expr:     expr,
+			Expected: paramType,
+		}
+	}
+
+	return expr
+}
+
+func (p *Parser) multiplication() Expression {
+	expr := p.is()
 
 	for p.match(tokens.SLASH, tokens.STAR, tokens.PERCENT, tokens.ENUMOF) {
 		expr = BinaryExpression{

@@ -73,6 +73,7 @@ const (
 	MATCH              TokenType = "MATCH"
 	PIPE               TokenType = "PIPE"
 	ENUMOF             TokenType = "ENUMOF"
+	IS                 TokenType = "IS"
 )
 
 var PRIMITIVE_TYPES = []TokenType{
@@ -132,6 +133,7 @@ var reservedKeywordsMap = map[string]TokenType{
 	"enum":     ENUM,
 	"match":    MATCH,
 	"enumof":   ENUMOF,
+	"is":       IS,
 }
 
 func getKeyword(lexis string) TokenType {

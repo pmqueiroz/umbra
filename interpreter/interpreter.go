@@ -13,7 +13,6 @@ import (
 	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/tokens"
 	"github.com/pmqueiroz/umbra/types"
-	"github.com/sanity-io/litter"
 )
 
 type Return struct {
@@ -379,7 +378,6 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 		return nil
 	default:
-		litter.Dump("statement", statement)
 		return exception.NewRuntimeError("RT000", reflect.TypeOf(statement).Name())
 	}
 }

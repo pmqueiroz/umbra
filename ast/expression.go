@@ -17,6 +17,11 @@ type BinaryExpression struct {
 	Right    Expression
 }
 
+type IsExpression struct {
+	Expr     Expression
+	Expected tokens.Token
+}
+
 type CallExpression struct {
 	Callee    Expression
 	Arguments []Expression

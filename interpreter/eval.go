@@ -602,6 +602,22 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 		return nil, defaultError
 	case ast.FunctionExpression:
 		return processFunction(expr, env)
+	case ast.IsExpression:
+		expected, err := types.ParseTokenType(expr.Expected.Type)
+
+		if err != nil {
+			return nil, err
+		}
+
+		value, err := Evaluate(expr.Expr, env)
+
+		if err != nil {
+			return nil, err
+		}
+
+		err = types.CheckPrimitiveType(expected, value, false)
+
+		return err == nil, nil
 	default:
 		return nil, exception.NewRuntimeError("RT017", litter.Sdump(expr))
 	}
