@@ -17,7 +17,7 @@ import (
 )
 
 type Return struct {
-	value interface{}
+	Value interface{}
 }
 
 func (r Return) Error() string {
@@ -189,7 +189,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 		if err != nil {
 			return err
 		}
-		return Return{value: value}
+		return Return{Value: value}
 	case ast.FunctionExpression:
 		parsedReturnType, parentEnum, err := parseRuntimeType(stmt.ReturnType, env)
 

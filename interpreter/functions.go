@@ -88,11 +88,6 @@ func processFunctionCall(callee FunctionDeclaration, args interface{}, env *envi
 	var result interface{}
 	for _, stmt := range callee.Itself.Body {
 		if err := Interpret(stmt, funcEnv); err != nil {
-			if returnValue, ok := err.(Return); ok {
-				result = returnValue.value
-				break
-			}
-
 			return nil, err
 		}
 	}

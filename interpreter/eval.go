@@ -360,7 +360,13 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 
 		switch parsedCallee := callee.(type) {
 		case FunctionDeclaration:
-			return processFunctionCall(parsedCallee, expr.Arguments, env)
+			value, err := processFunctionCall(parsedCallee, expr.Arguments, env)
+
+			if returnValue, ok := err.(Return); ok {
+				return returnValue.Value, nil
+			}
+
+			return value, err
 		case native.InternalModuleFn:
 			var args []interface{}
 			for _, arg := range expr.Arguments {
