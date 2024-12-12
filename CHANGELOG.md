@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.19.0](https://github.com/pmqueiroz/umbra/compare/v1.18.0...v1.19.0) (2024-12-12)
+
+
+### Features
+
+* **arrays:** reverse and clone fns ([9b485cf](https://github.com/pmqueiroz/umbra/commit/9b485cf9989cbcfc232f08a53126ffb8b9275987))
+* queue lib ([babc586](https://github.com/pmqueiroz/umbra/commit/babc5860a72595043c7dfc6412bf454e5267e2e5))
+
 ## [1.18.0](https://github.com/pmqueiroz/umbra/compare/v1.17.0...v1.18.0) (2024-12-12)
 
 
