@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.1](https://github.com/pmqueiroz/umbra/compare/v1.15.0...v1.15.1) (2024-12-12)
+
+
+### Bug Fixes
+
+* prevent pattern matching return to be supressed ([dcbb03a](https://github.com/pmqueiroz/umbra/commit/dcbb03af19c4979fadd3412e523ff5089537506d))
+
 ## [1.15.0](https://github.com/pmqueiroz/umbra/compare/v1.14.1...v1.15.0) (2024-12-11)
 
 
