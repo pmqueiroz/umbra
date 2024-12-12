@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/pmqueiroz/umbra/compare/v1.17.0...v1.18.0) (2024-12-12)
+
+
+### Features
+
+* is expression ([558b846](https://github.com/pmqueiroz/umbra/commit/558b84669e6cab7df99fd8538cdc7b7829207099))
+
 ## [1.17.0](https://github.com/pmqueiroz/umbra/compare/v1.16.1...v1.17.0) (2024-12-12)
 
 
