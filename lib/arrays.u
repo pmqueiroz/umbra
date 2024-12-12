@@ -6,6 +6,24 @@ def map(input arr, fn fun) arr {
   return result
 }
 
+def reverse(input arr) arr {
+  const result arr = []
+  for mut i num = ~input - 1, 0, -1 {
+    result[~result] = input[i]
+  }
+  return result
+}
+
+def clone(array arr) {
+  const result arr = []
+  for mut i num = 0, ~array - 1 {
+    result[~result] = array[i]
+  }
+  return result
+}
+
 pub {
   map
+  reverse
+  clone
 }
