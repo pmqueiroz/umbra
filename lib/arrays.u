@@ -1,3 +1,6 @@
+import "stack"
+import "io"
+
 def map(input arr, fn fun) arr {
   const result arr = []
   for mut i num = 0, ~input - 1 {
@@ -22,8 +25,29 @@ def clone(array arr) {
   return result
 }
 
+def flatten(input arr) arr {
+  const result arr = []
+  mut s arr = reverse(input)
+
+  for ~s != 0 {
+    const el any = s[~s -1]
+    s = stack::pop(s)
+
+    if el is arr {
+      for mut i num = ~el - 1, 0, -1 {
+        s = stack::add(s, el[i])
+      }
+    } else {
+      result[~result] = el
+    }
+  }
+
+  return result
+}
+
 pub {
   map
   reverse
   clone
+  flatten
 }
