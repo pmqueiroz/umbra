@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.1](https://github.com/pmqueiroz/umbra/compare/v1.20.0...v1.20.1) (2024-12-13)
+
+
+### Bug Fixes
+
+* arr to str conversion breaking on more than 1 deep ([0564350](https://github.com/pmqueiroz/umbra/commit/056435073c178cf06957bc40e61eec15fbb1b230))
+
 ## [1.20.0](https://github.com/pmqueiroz/umbra/compare/v1.19.0...v1.20.0) (2024-12-12)
 
 
