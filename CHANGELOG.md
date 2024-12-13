@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.0](https://github.com/pmqueiroz/umbra/compare/v1.20.1...v1.21.0) (2024-12-13)
+
+
+### Features
+
+* **math:** add min and max functions ([9ad149b](https://github.com/pmqueiroz/umbra/commit/9ad149bcc1474da57eec6556881c504fd4663cf1))
+
 ## [1.20.1](https://github.com/pmqueiroz/umbra/compare/v1.20.0...v1.20.1) (2024-12-13)
 
 
