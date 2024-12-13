@@ -106,6 +106,22 @@ def tan(x num) num {
   return sin(x) / cos(x)
 }
 
+def min(a num, b num) num {
+  if (a < b) {
+    return a
+  } else {
+    return b
+  }
+}
+
+def max(a num, b num) num {
+  if (a > b) {
+    return a
+  } else {
+    return b
+  }
+}
+
 pub {
   int
   abs
@@ -116,4 +132,6 @@ pub {
   sin
   cos
   tan
+  min
+  max
 }
