@@ -48,8 +48,18 @@ func toFloat64(value interface{}) (float64, error) {
 	}
 }
 
-func strPrimitiveConversion(value interface{}) (string, error) {
+func stringConversion(value interface{}) (string, error) {
 	switch v := value.(type) {
+	case []interface{}:
+		var strElements []string
+		for _, elem := range v {
+			stringifiedElement, err := stringConversion(elem)
+			if err != nil {
+				return "", err
+			}
+			strElements = append(strElements, stringifiedElement)
+		}
+		return "[" + strings.Join(strElements, ",") + "]", nil
 	case rune:
 		return string(v), nil
 	case float64:
@@ -545,20 +555,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 
 		switch expr.Type.Type {
 		case tokens.STR_TYPE:
-			switch v := value.(type) {
-			case []interface{}:
-				var strElements []string
-				for _, elem := range v {
-					strElem, err := strPrimitiveConversion(elem)
-					if err != nil {
-						return nil, err
-					}
-					strElements = append(strElements, strElem)
-				}
-				return "[" + strings.Join(strElements, ",") + "]", nil
-			default:
-				return strPrimitiveConversion(value)
-			}
+			return stringConversion(value)
 		case tokens.CHAR_TYPE:
 			switch v := value.(type) {
 			case float64:
