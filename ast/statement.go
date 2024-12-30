@@ -5,14 +5,30 @@ import (
 	"github.com/pmqueiroz/umbra/types"
 )
 
-type Statement interface{}
+type Statement interface {
+	Reference() string
+}
 
 type BlockStatement struct {
 	Statements []Statement
 }
 
+func (s BlockStatement) Reference() string {
+	statements := ""
+
+	for _, statement := range s.Statements {
+		statements += statement.Reference()
+	}
+
+	return "{" + statements + "}"
+}
+
 type ExpressionStatement struct {
 	Expression Expression
+}
+
+func (s ExpressionStatement) Reference() string {
+	return s.Expression.Reference()
 }
 
 type Parameter struct {
@@ -36,10 +52,18 @@ type MatchStatement struct {
 	Cases      []MatchCase
 }
 
+func (s MatchStatement) Reference() string {
+	return "match " + s.Expression.Reference() + " { ... }"
+}
+
 type IfStatement struct {
 	Condition  Expression
 	ThenBranch Statement
 	ElseBranch Statement
+}
+
+func (s IfStatement) Reference() string {
+	return "if " + s.Condition.Reference() + " { ... }"
 }
 
 type PrintChannel int
@@ -54,23 +78,60 @@ type PrintStatement struct {
 	Channel    PrintChannel
 }
 
+func (s PrintStatement) Reference() string {
+	channel := "stdout"
+
+	if s.Channel == StderrChannel {
+		channel = "stderr"
+	}
+
+	return channel + " " + s.Expression.Reference()
+}
+
 type ReturnStatement struct {
 	Keyword tokens.Token
 	Value   Expression
 }
 
+func (s ReturnStatement) Reference() string {
+	return "return " + s.Value.Reference()
+}
+
 type BreakStatement struct{}
 
+func (s BreakStatement) Reference() string {
+	return "break"
+}
+
 type ContinueStatement struct{}
+
+func (s ContinueStatement) Reference() string {
+	return "continue"
+}
 
 type PublicStatement struct {
 	Keyword     tokens.Token
 	Identifiers []tokens.Token
 }
 
+func (s PublicStatement) Reference() string {
+	identifiers := ""
+
+	for _, identifier := range s.Identifiers {
+		identifiers += identifier.Lexeme
+		identifiers += " "
+	}
+
+	return "pub {" + identifiers + "}"
+}
+
 type ImportStatement struct {
 	Keyword tokens.Token
 	Path    tokens.Token
+}
+
+func (s ImportStatement) Reference() string {
+	return "import " + s.Path.Lexeme
 }
 
 type EnumArgument struct {
@@ -88,6 +149,10 @@ type EnumStatement struct {
 	Name      tokens.Token
 	Members   map[string]EnumMember
 	Signature string
+}
+
+func (s EnumStatement) Reference() string {
+	return "enum " + s.Name.Lexeme + " { ... }"
 }
 
 func (e *EnumStatement) Get(name tokens.Token) (EnumMember, bool) {
@@ -108,9 +173,38 @@ type VarStatement struct {
 	Nullable    bool
 }
 
+func (s VarStatement) Reference() string {
+	varInit := "const"
+	initializer := ""
+
+	if s.Mutable {
+		varInit = "mut"
+	}
+
+	if s.Initializer != nil {
+		initializer = " = " + s.Initializer.Reference()
+	}
+
+	return varInit + " " + s.Name.Lexeme + " " + s.Type.Lexeme + initializer
+}
+
 type ArrayDestructuringStatement struct {
 	Declarations []VarStatement
 	Expr         Expression
+}
+
+func (s ArrayDestructuringStatement) Reference() string {
+	declarations := ""
+
+	for index, declaration := range s.Declarations {
+		declarations += declaration.Reference()
+
+		if index < len(s.Declarations)-1 {
+			declarations += ", "
+		}
+	}
+
+	return declarations + " = " + s.Expr.Reference()
 }
 
 type InitializedForStatement struct {
@@ -120,11 +214,23 @@ type InitializedForStatement struct {
 	Body  Statement
 }
 
+func (s InitializedForStatement) Reference() string {
+	return "for " + s.Start.Reference() + ", " + s.Stop.Reference() + ", " + s.Step.Reference() + " { ... }"
+}
+
 type ConditionalForStatement struct {
 	Condition Expression
 	Body      Statement
 }
 
+func (s ConditionalForStatement) Reference() string {
+	return "for " + s.Condition.Reference() + " { ... }"
+}
+
 type ModuleStatement struct {
 	Declarations []Statement
+}
+
+func (s ModuleStatement) Reference() string {
+	return "Module"
 }

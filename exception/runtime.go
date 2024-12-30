@@ -22,7 +22,7 @@ func (e *RuntimeError) Error() string {
 %s %s`, color.New(color.Bold).Sprintf("RuntimeError[%s]", e.code), e.annotation, color.RedString(strings.Repeat("^", len(e.annotation))), color.YellowString(e.message))
 	}
 
-	return fmt.Sprintf("RuntimeError[%s]: %s", e.code, e.message)
+	return fmt.Sprintf("RuntimeError[%s]: %s", e.code, color.RedString(e.message))
 }
 
 func NewRuntimeError(code string, annotation string, arguments ...any) error {

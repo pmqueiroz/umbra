@@ -792,7 +792,8 @@ func (p *Parser) initializedForStatement() Statement {
 		step = p.expression()
 	} else {
 		step = LiteralExpression{
-			Value: 1.0,
+			Lexeme: "1",
+			Value:  1.0,
 		}
 	}
 
