@@ -20,6 +20,7 @@ func processFunction(funcExpr ast.FunctionExpression, env *environment.Environme
 
 	if funcExpr.Name.Lexeme != "" {
 		env.Create(
+			funcExpr,
 			funcExpr.Name.Lexeme,
 			fun,
 			types.FUN,
@@ -73,7 +74,7 @@ func processFunctionCall(callee FunctionDeclaration, args interface{}, env *envi
 
 				variadicArgs = append(variadicArgs, parsedArgs[j])
 			}
-			funcEnv.Create(param.Name.Lexeme, variadicArgs, param.Type, param.Nullable, false, false)
+			funcEnv.Create(nil, param.Name.Lexeme, variadicArgs, param.Type, param.Nullable, false, false)
 			break
 		} else {
 			typeErr := types.CheckPrimitiveType(param.Type, parsedArgs[i], param.Nullable)
@@ -81,7 +82,7 @@ func processFunctionCall(callee FunctionDeclaration, args interface{}, env *envi
 				return nil, typeErr
 			}
 
-			funcEnv.Create(param.Name.Lexeme, parsedArgs[i], param.Type, param.Nullable, false, false)
+			funcEnv.Create(nil, param.Name.Lexeme, parsedArgs[i], param.Type, param.Nullable, false, false)
 		}
 	}
 

@@ -12,7 +12,7 @@ type InternalModule struct {
 
 func (m InternalModule) Register(namespace *environment.Environment) (ok bool) {
 	for name, symbol := range m.symbols {
-		createOk := namespace.Create(name, symbol, "", false, true, false)
+		createOk := namespace.Create(nil, name, symbol, "", false, true, false)
 		pubOk := namespace.MakePublic(name)
 
 		if !createOk || !pubOk {

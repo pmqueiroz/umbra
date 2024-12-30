@@ -44,7 +44,7 @@ func toFloat64(value interface{}, expr ast.Expression) (float64, error) {
 	case rune:
 		return float64(v), nil
 	default:
-		return 0, exception.NewRuntimeError("RT026", expr.Reference(), types.SafeParseUmbraType(value))
+		return 0, exception.NewRuntimeError("RT026", expr, types.SafeParseUmbraType(value))
 	}
 }
 
@@ -70,7 +70,7 @@ func stringConversion(value interface{}, expr ast.Expression) (string, error) {
 		return v, nil
 	}
 
-	return "", exception.NewRuntimeError("RT028", expr.Reference(), types.SafeParseUmbraType(value), "<str>")
+	return "", exception.NewRuntimeError("RT028", expr, types.SafeParseUmbraType(value), "<str>")
 }
 
 func Evaluate(expression ast.Expression, env *environment.Environment) (interface{}, error) {
@@ -82,7 +82,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 	case ast.VariableExpression:
 		value, ok := env.Get(expr.Name.Lexeme, true)
 		if !ok {
-			return nil, exception.NewRuntimeError("RT002", expr.Reference(), expr.Name.Lexeme)
+			return nil, exception.NewRuntimeError("RT002", expr, expr.Name.Lexeme)
 		}
 		return value.Data, nil
 	case ast.AssignExpression:
@@ -96,11 +96,11 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			variable, exists := env.Get(target.Name.Lexeme, true)
 
 			if !exists {
-				return nil, exception.NewRuntimeError("RT002", expr.Reference(), target.Name.Lexeme)
+				return nil, exception.NewRuntimeError("RT002", expr, target.Name.Lexeme)
 			}
 
 			if !variable.Mutable {
-				return nil, exception.NewRuntimeError("RT040", expr.Reference(), target.Name.Lexeme)
+				return nil, exception.NewRuntimeError("RT040", expr, target.Name.Lexeme)
 			}
 
 			typeErr := types.CheckPrimitiveType(variable.DataType, value, variable.Nullable)
@@ -134,10 +134,10 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				}
 				idx, ok := index.(float64)
 				if !ok {
-					return nil, exception.NewRuntimeError("RT003", expr.Reference(), index)
+					return nil, exception.NewRuntimeError("RT003", expr, index)
 				}
 				if int(idx) < 0 || int(idx) > len(obj) {
-					return nil, exception.NewRuntimeError("RT004", expr.Reference(), idx)
+					return nil, exception.NewRuntimeError("RT004", expr, idx)
 				}
 				if int(idx) == len(obj) {
 					env.Set(target.Object.(ast.VariableExpression).Name.Lexeme, append(obj, value))
@@ -146,10 +146,10 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				obj[int(idx)] = value
 				return value, nil
 			default:
-				return nil, exception.NewRuntimeError("RT005", expr.Reference(), types.SafeParseUmbraType(obj))
+				return nil, exception.NewRuntimeError("RT005", expr, types.SafeParseUmbraType(obj))
 			}
 		default:
-			return nil, exception.NewRuntimeError("RT006", expr.Reference(), types.SafeParseUmbraType(target))
+			return nil, exception.NewRuntimeError("RT006", expr, types.SafeParseUmbraType(target))
 		}
 	case ast.BinaryExpression:
 		left, err := Evaluate(expr.Left, env)
@@ -185,7 +185,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				}
 			}
 
-			return nil, exception.NewRuntimeError("RT007", expr.Reference(), types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
+			return nil, exception.NewRuntimeError("RT007", expr, types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
 		case tokens.MINUS:
 			switch leftVal := left.(type) {
 			case float64:
@@ -201,12 +201,12 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					return leftVal - rightRune, nil
 				}
 			}
-			return nil, exception.NewRuntimeError("RT027", expr.Reference(), types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
+			return nil, exception.NewRuntimeError("RT027", expr, types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
 		case tokens.STAR:
 			return left.(float64) * right.(float64), nil
 		case tokens.SLASH:
 			if right.(float64) == 0 {
-				return nil, exception.NewRuntimeError("RT008", expr.Reference())
+				return nil, exception.NewRuntimeError("RT008", expr)
 			}
 			return left.(float64) / right.(float64), nil
 		case tokens.PERCENT:
@@ -216,7 +216,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				return math.Mod(leftFloat, rightFloat), nil
 			}
 
-			return nil, exception.NewRuntimeError("RT009", expr.Reference(), types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
+			return nil, exception.NewRuntimeError("RT009", expr, types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
 		case tokens.GREATER_THAN:
 			leftVal, err := toFloat64(left, expr)
 			if err != nil {
@@ -277,7 +277,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					return false, nil
 				}
 
-				return nil, exception.NewRuntimeError("RT026", expr.Reference(), types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
+				return nil, exception.NewRuntimeError("RT026", expr, types.SafeParseUmbraType(left), types.SafeParseUmbraType(right))
 			default:
 				return left == right, nil
 			}
@@ -286,16 +286,16 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 		case tokens.ENUMOF:
 			leftVal, ok := left.(ast.EnumMember)
 			if !ok {
-				return nil, exception.NewRuntimeError("RT037", expr.Reference())
+				return nil, exception.NewRuntimeError("RT037", expr)
 			}
 			rightVal, ok := right.(ast.EnumMember)
 			if !ok {
-				return nil, exception.NewRuntimeError("RT038", expr.Reference())
+				return nil, exception.NewRuntimeError("RT038", expr)
 			}
 
 			return leftVal.Signature == rightVal.Signature && leftVal.Name == rightVal.Name, nil
 		default:
-			return nil, exception.NewRuntimeError("RT010", expr.Reference(), expr.Operator.Lexeme)
+			return nil, exception.NewRuntimeError("RT010", expr, expr.Operator.Lexeme)
 		}
 	case ast.UnaryExpression:
 		right, err := Evaluate(expr.Right, env)
@@ -308,12 +308,12 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			if rightVal, ok := right.(float64); ok {
 				return -rightVal, nil
 			}
-			return nil, exception.NewRuntimeError("RT041", expr.Reference())
+			return nil, exception.NewRuntimeError("RT041", expr)
 		case tokens.NOT:
 			if rightVal, ok := right.(bool); ok {
 				return !rightVal, nil
 			}
-			return nil, exception.NewRuntimeError("RT042", expr.Reference())
+			return nil, exception.NewRuntimeError("RT042", expr)
 		case tokens.TYPE_OF:
 			parsedType, err := types.ParseUmbraType(right)
 
@@ -333,7 +333,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			case map[interface{}]interface{}:
 				return float64(len(parsedRight)), nil
 			default:
-				return nil, exception.NewRuntimeError("RT011", expr.Reference(), types.SafeParseUmbraType(parsedRight))
+				return nil, exception.NewRuntimeError("RT011", expr, types.SafeParseUmbraType(parsedRight))
 			}
 		case tokens.RANGE:
 			switch parsedRight := right.(type) {
@@ -361,10 +361,10 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				}
 				return result, nil
 			default:
-				return nil, exception.NewRuntimeError("RT012", expr.Reference(), types.SafeParseUmbraType(parsedRight))
+				return nil, exception.NewRuntimeError("RT012", expr, types.SafeParseUmbraType(parsedRight))
 			}
 		default:
-			return nil, exception.NewRuntimeError("RT013", expr.Reference(), expr.Operator.Lexeme)
+			return nil, exception.NewRuntimeError("RT013", expr, expr.Operator.Lexeme)
 		}
 	case ast.CallExpression:
 		callee, err := Evaluate(expr.Callee, env)
@@ -394,7 +394,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 
 			defer func() {
 				if r := recover(); r != nil {
-					err = exception.NewRuntimeError("RT031", expr.Reference())
+					err = exception.NewRuntimeError("RT031", expr)
 				}
 			}()
 			result, err := parsedCallee(args)
@@ -423,7 +423,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				Signature: parsedCallee.Signature,
 			}, nil
 		default:
-			return nil, exception.NewRuntimeError("RT014", expr.Reference(), expr.Callee.Reference())
+			return nil, exception.NewRuntimeError("RT014", expr, expr.Callee.Reference())
 		}
 	case ast.LogicalExpression:
 		left, err := Evaluate(expr.Left, env)
@@ -441,7 +441,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 				return false, nil
 			}
 		default:
-			return nil, exception.NewRuntimeError("RT015", expr.Reference(), expr.Operator.Lexeme)
+			return nil, exception.NewRuntimeError("RT015", expr, expr.Operator.Lexeme)
 		}
 
 		right, err := Evaluate(expr.Right, env)
@@ -500,7 +500,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			}
 			idx, ok := index.(float64)
 			if !ok {
-				return nil, exception.NewRuntimeError("RT003", expr.Reference(), index)
+				return nil, exception.NewRuntimeError("RT003", expr, index)
 			}
 
 			value := []rune(obj)[int(idx)]
@@ -513,30 +513,30 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			}
 			idx, ok := index.(float64)
 			if !ok {
-				return nil, exception.NewRuntimeError("RT003", expr.Reference(), index)
+				return nil, exception.NewRuntimeError("RT003", expr, index)
 			}
 			if int(idx) < 0 || int(idx) >= getLength(obj) {
-				return nil, exception.NewRuntimeError("RT004", expr.Reference(), idx)
+				return nil, exception.NewRuntimeError("RT004", expr, idx)
 			}
 			return getElementAt(obj, int(idx)), nil
 		case ast.EnumStatement:
 			if prop, ok := expr.Property.(ast.VariableExpression); ok {
 				member, ok := obj.Get(prop.Name)
 				if !ok {
-					return nil, exception.NewRuntimeError("RT034", expr.Reference(), prop.Name.Lexeme, obj.Name.Lexeme)
+					return nil, exception.NewRuntimeError("RT034", expr, prop.Name.Lexeme, obj.Name.Lexeme)
 				}
 
 				return member, nil
 			}
-			return nil, exception.NewRuntimeError("RT020", expr.Reference())
+			return nil, exception.NewRuntimeError("RT020", expr)
 		default:
-			return nil, exception.NewRuntimeError("RT016", expr.Reference(), types.SafeParseUmbraType(obj))
+			return nil, exception.NewRuntimeError("RT016", expr, types.SafeParseUmbraType(obj))
 		}
 	case ast.NamespaceMemberExpression:
 		if variableExpr, ok := expr.Namespace.(ast.VariableExpression); ok {
 			namespace, ok := env.GetNamespace(variableExpr.Name.Lexeme)
 			if !ok {
-				return nil, exception.NewRuntimeError("RT018", expr.Reference(), variableExpr.Name.Lexeme)
+				return nil, exception.NewRuntimeError("RT018", expr, variableExpr.Name.Lexeme)
 			}
 
 			value, _ := namespace.Get(expr.Property.Lexeme, false)
@@ -544,7 +544,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			return value.Data, nil
 		}
 
-		return nil, exception.NewRuntimeError("RT019", expr.Reference(), litter.Sdump(expr.Namespace))
+		return nil, exception.NewRuntimeError("RT019", expr, litter.Sdump(expr.Namespace))
 	case ast.TypeConversionExpression:
 		value, err := Evaluate(expr.Value, env)
 		if err != nil {
@@ -556,7 +556,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 			return nil, err
 		}
 
-		defaultError := exception.NewRuntimeError("RT028", expr.Reference(), types.SafeParseUmbraType(value), expectedType)
+		defaultError := exception.NewRuntimeError("RT028", expr, types.SafeParseUmbraType(value), expectedType)
 
 		switch expr.Type.Type {
 		case tokens.STR_TYPE:
@@ -571,17 +571,17 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 					return []rune(v)[0], nil
 				case 2:
 					if []rune(v)[0] != '\\' {
-						return nil, exception.NewRuntimeError("RT029", expr.Reference())
+						return nil, exception.NewRuntimeError("RT029", expr)
 					}
 
 					runeStr, err := strconv.Unquote(`"` + v + `"`)
 					if err != nil {
-						return nil, exception.NewRuntimeError("RT030", expr.Reference())
+						return nil, exception.NewRuntimeError("RT030", expr)
 					}
 
 					return []rune(runeStr)[0], nil
 				default:
-					return nil, exception.NewRuntimeError("RT029", expr.Reference())
+					return nil, exception.NewRuntimeError("RT029", expr)
 				}
 			}
 			return nil, defaultError
@@ -621,7 +621,7 @@ func Evaluate(expression ast.Expression, env *environment.Environment) (interfac
 
 		return err == nil, nil
 	default:
-		return nil, exception.NewRuntimeError("RT017", expr.Reference(), litter.Sdump(expr))
+		return nil, exception.NewRuntimeError("RT017", expr, litter.Sdump(expr))
 	}
 }
 
@@ -633,7 +633,7 @@ func resolveMemberExpressionProperty(expr ast.MemberExpression, env *environment
 	} else if variable, ok := expr.Property.(ast.VariableExpression); ok {
 		property = variable.Name.Lexeme
 	} else {
-		return nil, exception.NewRuntimeError("RT020", expr.Reference())
+		return nil, exception.NewRuntimeError("RT020", expr)
 	}
 
 	if computeErr != nil {

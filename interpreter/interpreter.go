@@ -13,7 +13,6 @@ import (
 	"github.com/pmqueiroz/umbra/exception"
 	"github.com/pmqueiroz/umbra/tokens"
 	"github.com/pmqueiroz/umbra/types"
-	"github.com/sanity-io/litter"
 )
 
 type Return struct {
@@ -93,7 +92,7 @@ func resolveVarDeclaration(stmt ast.VarStatement, value interface{}, env *enviro
 		return err
 	}
 
-	env.Create(stmt.Name.Lexeme, value, varType, stmt.Nullable, false, stmt.Mutable)
+	env.Create(stmt, stmt.Name.Lexeme, value, varType, stmt.Nullable, false, stmt.Mutable)
 	return nil
 }
 
@@ -156,7 +155,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			return nil
 		}
 
-		return exception.NewRuntimeError("RT039", stmt.Reference(), types.SafeParseUmbraType(value))
+		return exception.NewRuntimeError("RT039", stmt, types.SafeParseUmbraType(value))
 	case ast.BlockStatement:
 		newEnv := environment.NewEnvironment(env)
 		for _, stmt := range stmt.Statements {
@@ -198,6 +197,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 		}
 
 		env.Create(
+			stmt,
 			stmt.Name.Lexeme,
 			FunctionDeclaration{Itself: &stmt, Environment: env, ReturnType: struct {
 				Type   types.UmbraType
@@ -229,7 +229,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 		var ok bool
 
 		if parsedStop, ok = stop.(float64); !ok {
-			return exception.NewRuntimeError("RT022", stmt.Reference(), types.SafeParseUmbraType(stop))
+			return exception.NewRuntimeError("RT022", stmt, types.SafeParseUmbraType(stop))
 		}
 
 		stepValue, err := Evaluate(stmt.Step, env)
@@ -239,14 +239,14 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 		step, ok := stepValue.(float64)
 		if !ok {
-			return exception.NewRuntimeError("RT023", stmt.Reference(), types.SafeParseUmbraType(stepValue))
+			return exception.NewRuntimeError("RT023", stmt, types.SafeParseUmbraType(stepValue))
 		}
 
 		for {
 			loopEnv := environment.NewEnvironment(forEnv)
 			controlVar, exists := loopEnv.Get(initializedVarName, true)
 			if !exists {
-				return exception.NewRuntimeError("RT021", stmt.Reference(), initializedVarName)
+				return exception.NewRuntimeError("RT021", stmt, initializedVarName)
 			}
 
 			var condition bool
@@ -279,7 +279,6 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 		return nil
 	case ast.ConditionalForStatement:
-		litter.Dump(stmt.Reference())
 		for {
 			loopEnv := environment.NewEnvironment(env)
 
@@ -290,7 +289,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 			parsedCondition, ok := condition.(bool)
 			if !ok {
-				return exception.NewRuntimeError("RT024", stmt.Reference(), types.SafeParseUmbraType(parsedCondition))
+				return exception.NewRuntimeError("RT024", stmt, types.SafeParseUmbraType(parsedCondition))
 			}
 
 			if !parsedCondition {
@@ -318,7 +317,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			success := env.MakePublic(identifier.Lexeme)
 
 			if !success {
-				return exception.NewRuntimeError("RT025", stmt.Reference(), identifier.Lexeme)
+				return exception.NewRuntimeError("RT025", stmt, identifier.Lexeme)
 			}
 
 		}
@@ -345,6 +344,7 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 		}
 
 		env.Create(
+			stmt,
 			stmt.Name.Lexeme,
 			stmt,
 			types.ENUM,
@@ -380,6 +380,6 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 
 		return nil
 	default:
-		return exception.NewRuntimeError("RT000", stmt.Reference(), reflect.TypeOf(statement).Name())
+		return exception.NewRuntimeError("RT000", stmt, reflect.TypeOf(statement).Name())
 	}
 }
