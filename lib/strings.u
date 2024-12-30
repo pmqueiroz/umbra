@@ -71,7 +71,7 @@ def to_lower(string str) {
 }
 
 def trim(input str) str {
-  const start num = 0
+  mut start num = 0
   const end num = ~input - 1
   const buffer str = ""
 
