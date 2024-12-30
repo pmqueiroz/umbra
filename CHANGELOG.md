@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.1](https://github.com/pmqueiroz/umbra/compare/v1.22.0...v1.22.1) (2024-12-30)
+
+
+### Bug Fixes
+
+* **strings:** reassign constant var ([3eec2f2](https://github.com/pmqueiroz/umbra/commit/3eec2f21369b6704a396f3a2a39d41b9aa454c5b))
+
 ## [1.22.0](https://github.com/pmqueiroz/umbra/compare/v1.21.0...v1.22.0) (2024-12-30)
 
 
