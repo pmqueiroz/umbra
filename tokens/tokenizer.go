@@ -5,6 +5,7 @@ import (
 	"unicode"
 
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/globals"
 )
 
 func isIdentifier(char rune) bool {
@@ -78,9 +79,9 @@ func (t *Tokenizer) addNonLiteralToken(tokenType TokenType) {
 		Token{
 			Type:   tokenType,
 			Lexeme: lexeme,
-			Loc: Location{
+			Loc: globals.Loc{
 				Line: t.line,
-				Range: ColumnRange{
+				Range: globals.ColumnRange{
 					From: t.column - len(lexeme) + 1,
 					To:   t.column,
 				},
@@ -118,9 +119,9 @@ func (t *Tokenizer) string() {
 		Token{
 			Type:   STRING,
 			Lexeme: lexeme,
-			Loc: Location{
+			Loc: globals.Loc{
 				Line: t.line,
-				Range: ColumnRange{
+				Range: globals.ColumnRange{
 					From: t.column - len(lexeme) + 1,
 					To:   t.column,
 				},
@@ -151,9 +152,9 @@ func (t *Tokenizer) char() {
 		Token{
 			Type:   CHAR,
 			Lexeme: lexeme,
-			Loc: Location{
+			Loc: globals.Loc{
 				Line: t.line,
-				Range: ColumnRange{
+				Range: globals.ColumnRange{
 					From: t.column - len(lexeme) + 1,
 					To:   t.column,
 				},
@@ -181,9 +182,9 @@ func (t *Tokenizer) numeric() {
 		Token{
 			Type:   NUMERIC,
 			Lexeme: lexeme,
-			Loc: Location{
+			Loc: globals.Loc{
 				Line: t.line,
-				Range: ColumnRange{
+				Range: globals.ColumnRange{
 					From: t.column - len(lexeme) + 1,
 					To:   t.column,
 				},
@@ -210,9 +211,9 @@ func (t *Tokenizer) identifier() {
 		Token{
 			Type:   IDENTIFIER,
 			Lexeme: lexeme,
-			Loc: Location{
+			Loc: globals.Loc{
 				Line: t.line,
-				Range: ColumnRange{
+				Range: globals.ColumnRange{
 					From: t.column - len(lexeme) + 1,
 					To:   t.column,
 				},
@@ -353,9 +354,9 @@ func Tokenize(source string) ([]Token, error) {
 		Token{
 			Type:   EOF,
 			Lexeme: "",
-			Loc: Location{
+			Loc: globals.Loc{
 				Line: tokenizer.line,
-				Range: ColumnRange{
+				Range: globals.ColumnRange{
 					From: tokenizer.column,
 					To:   tokenizer.column,
 				},

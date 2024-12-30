@@ -2,6 +2,8 @@ package exception
 
 import (
 	"fmt"
+	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
@@ -14,14 +16,28 @@ type RuntimeError struct {
 	node    globals.Node
 }
 
+func toLines(locs []globals.Loc) string {
+	lines := []string{}
+
+	for _, loc := range locs {
+		lines = append(lines, strconv.Itoa(loc.Line))
+	}
+
+	slices.Sort(lines)
+	return strings.Join(slices.Compact(lines), ",")
+}
+
 func (e *RuntimeError) Error() string {
 
 	if e.node != nil {
 		annotation := e.node.Reference()
+		lines := toLines(e.node.GetLocs())
+		lines += " |"
+
 		return fmt.Sprintf(`%s
 
-%s
-%s %s`, color.New(color.Bold).Sprintf("RuntimeError[%s]", e.code), annotation, color.RedString(strings.Repeat("^", len(annotation))), color.YellowString(e.message))
+%s %s
+%s %s`, color.New(color.Bold).Sprintf("RuntimeError[%s]", e.code), color.BlueString(lines), annotation, strings.Repeat(" ", len(lines)+1)+color.RedString(strings.Repeat("^", len(annotation))), color.YellowString(e.message))
 	}
 
 	return fmt.Sprintf("RuntimeError[%s]: %s", e.code, color.RedString(e.message))

@@ -1,5 +1,7 @@
 package tokens
 
+import "github.com/pmqueiroz/umbra/globals"
+
 type TokenType string
 
 const (
@@ -149,7 +151,7 @@ type ColumnRange struct {
 	To   int
 }
 
-type Location struct {
+type Loc struct {
 	Line  int
 	Range ColumnRange
 }
@@ -157,5 +159,5 @@ type Location struct {
 type Token struct {
 	Lexeme string
 	Type   TokenType
-	Loc    Location
+	Loc    globals.Loc
 }

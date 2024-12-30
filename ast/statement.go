@@ -22,12 +22,20 @@ func (s BlockStatement) Reference() string {
 	return "{" + statements + "}"
 }
 
+func (s BlockStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type ExpressionStatement struct {
 	Expression Expression
 }
 
 func (s ExpressionStatement) Reference() string {
 	return s.Expression.Reference()
+}
+
+func (s ExpressionStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type Parameter struct {
@@ -55,6 +63,10 @@ func (s MatchStatement) Reference() string {
 	return "match " + s.Expression.Reference() + " { ... }"
 }
 
+func (s MatchStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type IfStatement struct {
 	Condition  Expression
 	ThenBranch Statement
@@ -63,6 +75,10 @@ type IfStatement struct {
 
 func (s IfStatement) Reference() string {
 	return "if " + s.Condition.Reference() + " { ... }"
+}
+
+func (s IfStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type PrintChannel int
@@ -87,6 +103,10 @@ func (s PrintStatement) Reference() string {
 	return channel + " " + s.Expression.Reference()
 }
 
+func (s PrintStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type ReturnStatement struct {
 	Keyword tokens.Token
 	Value   Expression
@@ -96,16 +116,28 @@ func (s ReturnStatement) Reference() string {
 	return "return " + s.Value.Reference()
 }
 
+func (s ReturnStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type BreakStatement struct{}
 
 func (s BreakStatement) Reference() string {
 	return "break"
 }
 
+func (s BreakStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type ContinueStatement struct{}
 
 func (s ContinueStatement) Reference() string {
 	return "continue"
+}
+
+func (s ContinueStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type PublicStatement struct {
@@ -124,6 +156,10 @@ func (s PublicStatement) Reference() string {
 	return "pub {" + identifiers + "}"
 }
 
+func (s PublicStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type ImportStatement struct {
 	Keyword tokens.Token
 	Path    tokens.Token
@@ -131,6 +167,10 @@ type ImportStatement struct {
 
 func (s ImportStatement) Reference() string {
 	return "import " + s.Path.Lexeme
+}
+
+func (s ImportStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type EnumArgument struct {
@@ -152,6 +192,10 @@ type EnumStatement struct {
 
 func (s EnumStatement) Reference() string {
 	return "enum " + s.Name.Lexeme + " { ... }"
+}
+
+func (s EnumStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 func (e *EnumStatement) Get(name tokens.Token) (EnumMember, bool) {
@@ -187,6 +231,10 @@ func (s VarStatement) Reference() string {
 	return varInit + " " + s.Name.Lexeme + " " + s.Type.Lexeme + initializer
 }
 
+func (s VarStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type ArrayDestructuringStatement struct {
 	Declarations []VarStatement
 	Expr         Expression
@@ -206,6 +254,10 @@ func (s ArrayDestructuringStatement) Reference() string {
 	return declarations + " = " + s.Expr.Reference()
 }
 
+func (s ArrayDestructuringStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type InitializedForStatement struct {
 	Start Statement
 	Stop  Expression
@@ -217,6 +269,10 @@ func (s InitializedForStatement) Reference() string {
 	return "for " + s.Start.Reference() + ", " + s.Stop.Reference() + ", " + s.Step.Reference() + " { ... }"
 }
 
+func (s InitializedForStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type ConditionalForStatement struct {
 	Condition Expression
 	Body      Statement
@@ -226,10 +282,18 @@ func (s ConditionalForStatement) Reference() string {
 	return "for " + s.Condition.Reference() + " { ... }"
 }
 
+func (s ConditionalForStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type ModuleStatement struct {
 	Declarations []Statement
 }
 
 func (s ModuleStatement) Reference() string {
 	return "Module"
+}
+
+func (s ModuleStatement) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }

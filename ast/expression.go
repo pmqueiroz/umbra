@@ -18,6 +18,10 @@ func (e AssignExpression) Reference() string {
 	return e.Target.Reference() + " = " + e.Value.Reference()
 }
 
+func (e AssignExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type BinaryExpression struct {
 	Left     Expression
 	Operator tokens.Token
@@ -28,6 +32,16 @@ func (e BinaryExpression) Reference() string {
 	return fmt.Sprintf("%s %s %s", e.Left.Reference(), e.Operator.Lexeme, e.Right.Reference())
 }
 
+func (e BinaryExpression) GetLocs() []globals.Loc {
+	locs := []globals.Loc{}
+
+	locs = append(locs, e.Left.GetLocs()...)
+	locs = append(locs, e.Operator.Loc)
+	locs = append(locs, e.Right.GetLocs()...)
+
+	return locs
+}
+
 type IsExpression struct {
 	Expr     Expression
 	Expected tokens.Token
@@ -35,6 +49,10 @@ type IsExpression struct {
 
 func (e IsExpression) Reference() string {
 	return e.Expr.Reference() + " is " + e.Expected.Lexeme
+}
+
+func (e IsExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type CallExpression struct {
@@ -54,12 +72,20 @@ func (e CallExpression) Reference() string {
 	return e.Callee.Reference() + "(" + arguments + ")"
 }
 
+func (e CallExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type GroupingExpression struct {
 	Expression Expression
 }
 
 func (e GroupingExpression) Reference() string {
 	return "(" + e.Expression.Reference() + ")"
+}
+
+func (e GroupingExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type LiteralExpression struct {
@@ -71,6 +97,10 @@ func (e LiteralExpression) Reference() string {
 	return e.Lexeme
 }
 
+func (e LiteralExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type TypeConversionExpression struct {
 	Type  tokens.Token
 	Value Expression
@@ -78,6 +108,10 @@ type TypeConversionExpression struct {
 
 func (e TypeConversionExpression) Reference() string {
 	return e.Type.Lexeme + "(" + e.Value.Reference() + ")"
+}
+
+func (e TypeConversionExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type LogicalExpression struct {
@@ -90,6 +124,10 @@ func (e LogicalExpression) Reference() string {
 	return e.Left.Reference() + " " + e.Operator.Lexeme + " " + e.Right.Reference()
 }
 
+func (e LogicalExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type UnaryExpression struct {
 	Operator tokens.Token
 	Right    Expression
@@ -99,12 +137,20 @@ func (e UnaryExpression) Reference() string {
 	return e.Operator.Lexeme + e.Right.Reference()
 }
 
+func (e UnaryExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type VariableExpression struct {
 	Name tokens.Token
 }
 
 func (e VariableExpression) Reference() string {
 	return e.Name.Lexeme
+}
+
+func (e VariableExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type ArrayExpression struct {
@@ -123,6 +169,10 @@ func (e ArrayExpression) Reference() string {
 	return "[" + elements + "]"
 }
 
+func (e ArrayExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type HashmapExpression struct {
 	Pairs map[Expression]Expression
 }
@@ -139,6 +189,10 @@ func (e HashmapExpression) Reference() string {
 		index++
 	}
 	return "{" + arguments + "}"
+}
+
+func (e HashmapExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type MemberExpressionType string
@@ -163,6 +217,10 @@ func (e MemberExpression) Reference() string {
 	return e.Object.Reference() + "[" + e.Property.Reference() + "]"
 }
 
+func (e MemberExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
+}
+
 type NamespaceMemberExpression struct {
 	Namespace Expression
 	Property  tokens.Token
@@ -170,6 +228,10 @@ type NamespaceMemberExpression struct {
 
 func (e NamespaceMemberExpression) Reference() string {
 	return e.Namespace.Reference() + "::" + e.Property.Lexeme
+}
+
+func (e NamespaceMemberExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
 
 type FunctionExpression struct {
@@ -193,4 +255,8 @@ func (e FunctionExpression) Reference() string {
 	}
 
 	return "def " + e.Name.Lexeme + "(" + params + ") " + e.ReturnType.Lexeme + " { ... }"
+}
+
+func (e FunctionExpression) GetLocs() []globals.Loc {
+	return []globals.Loc{{}}
 }
