@@ -5,8 +5,7 @@ import (
 	"github.com/pmqueiroz/umbra/types"
 )
 
-type Statement interface {
-}
+type Statement interface{}
 
 type BlockStatement struct {
 	Statements []Statement

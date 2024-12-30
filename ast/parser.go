@@ -2,6 +2,7 @@ package ast
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 
@@ -175,7 +176,7 @@ func (p *Parser) hashmap() Expression {
 			name := p.consume("Expect property name.", tokens.IDENTIFIER, tokens.STRING)
 			p.consume("Expect ':' after property identifier in hashmap", tokens.COLON)
 
-			properties[LiteralExpression{Value: name.Lexeme}] = p.expression()
+			properties[LiteralExpression{Value: name.Lexeme, Lexeme: name.Lexeme}] = p.expression()
 
 			if !p.match(tokens.COMMA) || p.check(tokens.RIGHT_BRACE) {
 				break
@@ -198,26 +199,30 @@ func (p *Parser) numeric() Expression {
 	}
 
 	return LiteralExpression{
-		Value: value,
+		Lexeme: p.previous().Lexeme,
+		Value:  value,
 	}
 }
 
 func (p *Parser) primary() Expression {
 	if p.match(tokens.FALSE) {
 		return LiteralExpression{
-			Value: false,
+			Lexeme: p.previous().Lexeme,
+			Value:  false,
 		}
 	}
 
 	if p.match(tokens.TRUE) {
 		return LiteralExpression{
-			Value: true,
+			Lexeme: p.previous().Lexeme,
+			Value:  true,
 		}
 	}
 
 	if p.match(tokens.NULL) {
 		return LiteralExpression{
-			Value: nil,
+			Lexeme: p.previous().Lexeme,
+			Value:  nil,
 		}
 	}
 
@@ -226,12 +231,16 @@ func (p *Parser) primary() Expression {
 	}
 
 	if p.match(tokens.NOT_A_NUMBER) {
-		return NaNExpression{}
+		return LiteralExpression{
+			Lexeme: p.previous().Lexeme,
+			Value:  math.NaN(),
+		}
 	}
 
 	if p.match(tokens.STRING) {
 		return LiteralExpression{
-			Value: p.previous().Lexeme,
+			Lexeme: "\"" + p.previous().Lexeme + "\"",
+			Value:  p.previous().Lexeme,
 		}
 	}
 
@@ -242,7 +251,8 @@ func (p *Parser) primary() Expression {
 		}
 
 		return LiteralExpression{
-			Value: rune(char[0]),
+			Lexeme: `'` + p.previous().Lexeme + `'`,
+			Value:  rune(char[0]),
 		}
 	}
 
@@ -332,6 +342,7 @@ func (p *Parser) call() Expression {
 						Name: property,
 					},
 					Computed: false,
+					Type:     DotMember,
 				}
 			} else {
 				property := p.expression()
@@ -339,6 +350,7 @@ func (p *Parser) call() Expression {
 					Object:   expr,
 					Property: property,
 					Computed: true,
+					Type:     BracketMember,
 				}
 				p.consume("Expect ']' after expression.", tokens.RIGHT_BRACKET)
 			}

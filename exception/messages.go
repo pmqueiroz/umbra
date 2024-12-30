@@ -15,7 +15,7 @@ var Messages = map[string]string{
 	"RT011": "cannot get length of type %s",
 	"RT012": "cannot get range of type %s",
 	"RT013": "unknown unary expression: %s",
-	"RT014": "invalid function call %v",
+	"RT014": "invalid call, %s it not a function",
 	"RT015": "unknown logical operator: %s",
 	"RT016": "cannot access property of type %s",
 	"RT017": "unknown expression: %s",
@@ -42,6 +42,8 @@ var Messages = map[string]string{
 	"RT038": "right operand in enumof should be an enum member",
 	"RT039": "cannot destruct type %s",
 	"RT040": "cannot reassign value to constant %s",
+	"RT041": "expect number after minus sign",
+	"RT042": "expect boolean after not sign",
 	"GN001": "cannot find module '%s'",
 	"GN002": "unable to load file '%s'. module does not exits. path: %s",
 }

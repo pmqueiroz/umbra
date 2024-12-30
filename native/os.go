@@ -11,7 +11,7 @@ func readFile(args []interface{}) (interface{}, error) {
 	content, err := os.ReadFile(path)
 
 	if err != nil {
-		return "", exception.NewRuntimeError("RT032", "read", path)
+		return "", exception.NewRuntimeError("RT032", "", "read", path)
 	}
 
 	return string(content[:]), nil
@@ -23,7 +23,7 @@ func writeFile(args []interface{}) (interface{}, error) {
 	err := os.WriteFile(path, []byte(data), 0644)
 
 	if err != nil {
-		return nil, exception.NewRuntimeError("RT032", "write", path)
+		return nil, exception.NewRuntimeError("RT032", "", "write", path)
 	}
 
 	return nil, nil
@@ -34,7 +34,7 @@ func deleteFile(args []interface{}) (interface{}, error) {
 	err := os.Remove(path)
 
 	if err != nil {
-		return nil, exception.NewRuntimeError("RT032", "delete", path)
+		return nil, exception.NewRuntimeError("RT032", "", "delete", path)
 	}
 
 	return nil, nil
