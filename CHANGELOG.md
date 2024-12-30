@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.22.0](https://github.com/pmqueiroz/umbra/compare/v1.21.0...v1.22.0) (2024-12-30)
+
+
+### Features
+
+* add expressions lines in error annotation ([4ca0cae](https://github.com/pmqueiroz/umbra/commit/4ca0cae532315a148298b7c58047e2d13abc748d))
+* expressions error annotation ([e654f9f](https://github.com/pmqueiroz/umbra/commit/e654f9f353584859b630232f0f6cec2e3ec3cc40))
+* fill get locs ([fb37310](https://github.com/pmqueiroz/umbra/commit/fb373102190b69335f310f7a9bece7914321e6f1))
+* statements error annotations ([18102c9](https://github.com/pmqueiroz/umbra/commit/18102c987d6572b3b3df7d3cd5b6541e65a0fcfd))
+* use global node as expression and statement ([81a4516](https://github.com/pmqueiroz/umbra/commit/81a4516bff3255552107abf24bd36a33cc047f96))
+
 ## [1.21.0](https://github.com/pmqueiroz/umbra/compare/v1.20.1...v1.21.0) (2024-12-13)
 
 
