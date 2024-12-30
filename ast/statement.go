@@ -1,13 +1,12 @@
 package ast
 
 import (
+	"github.com/pmqueiroz/umbra/globals"
 	"github.com/pmqueiroz/umbra/tokens"
 	"github.com/pmqueiroz/umbra/types"
 )
 
-type Statement interface {
-	Reference() string
-}
+type Statement = globals.Node
 
 type BlockStatement struct {
 	Statements []Statement

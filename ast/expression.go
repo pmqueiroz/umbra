@@ -3,12 +3,11 @@ package ast
 import (
 	"fmt"
 
+	"github.com/pmqueiroz/umbra/globals"
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
-type Expression interface {
-	Reference() string
-}
+type Expression = globals.Node
 
 type AssignExpression struct {
 	Target Expression
