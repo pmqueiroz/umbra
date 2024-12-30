@@ -176,7 +176,7 @@ func (p *Parser) hashmap() Expression {
 			name := p.consume("Expect property name.", tokens.IDENTIFIER, tokens.STRING)
 			p.consume("Expect ':' after property identifier in hashmap", tokens.COLON)
 
-			properties[LiteralExpression{Value: name.Lexeme, Lexeme: name.Lexeme}] = p.expression()
+			properties[LiteralExpression{Loc: name.Loc, Value: name.Lexeme, Lexeme: name.Lexeme}] = p.expression()
 
 			if !p.match(tokens.COMMA) || p.check(tokens.RIGHT_BRACE) {
 				break
@@ -199,6 +199,7 @@ func (p *Parser) numeric() Expression {
 	}
 
 	return LiteralExpression{
+		Loc:    p.previous().Loc,
 		Lexeme: p.previous().Lexeme,
 		Value:  value,
 	}
@@ -207,6 +208,7 @@ func (p *Parser) numeric() Expression {
 func (p *Parser) primary() Expression {
 	if p.match(tokens.FALSE) {
 		return LiteralExpression{
+			Loc:    p.previous().Loc,
 			Lexeme: p.previous().Lexeme,
 			Value:  false,
 		}
@@ -214,6 +216,7 @@ func (p *Parser) primary() Expression {
 
 	if p.match(tokens.TRUE) {
 		return LiteralExpression{
+			Loc:    p.previous().Loc,
 			Lexeme: p.previous().Lexeme,
 			Value:  true,
 		}
@@ -221,6 +224,7 @@ func (p *Parser) primary() Expression {
 
 	if p.match(tokens.NULL) {
 		return LiteralExpression{
+			Loc:    p.previous().Loc,
 			Lexeme: p.previous().Lexeme,
 			Value:  nil,
 		}
@@ -232,6 +236,7 @@ func (p *Parser) primary() Expression {
 
 	if p.match(tokens.NOT_A_NUMBER) {
 		return LiteralExpression{
+			Loc:    p.previous().Loc,
 			Lexeme: p.previous().Lexeme,
 			Value:  math.NaN(),
 		}
@@ -239,6 +244,7 @@ func (p *Parser) primary() Expression {
 
 	if p.match(tokens.STRING) {
 		return LiteralExpression{
+			Loc:    p.previous().Loc,
 			Lexeme: "\"" + p.previous().Lexeme + "\"",
 			Value:  p.previous().Lexeme,
 		}
@@ -251,6 +257,7 @@ func (p *Parser) primary() Expression {
 		}
 
 		return LiteralExpression{
+			Loc:    p.previous().Loc,
 			Lexeme: `'` + p.previous().Lexeme + `'`,
 			Value:  rune(char[0]),
 		}
@@ -627,14 +634,6 @@ func (p *Parser) varDeclaration() Statement {
 	return declaration
 }
 
-func (p *Parser) breakStatement() Statement {
-	return BreakStatement{}
-}
-
-func (p *Parser) continueStatement() Statement {
-	return ContinueStatement{}
-}
-
 func (p *Parser) returnStatement() Statement {
 	keyword := p.previous()
 	value := p.expression()
@@ -792,6 +791,7 @@ func (p *Parser) initializedForStatement() Statement {
 		step = p.expression()
 	} else {
 		step = LiteralExpression{
+			Loc:    p.previous().Loc,
 			Lexeme: "1",
 			Value:  1.0,
 		}
@@ -813,6 +813,7 @@ func (p *Parser) conditionalForStatement() Statement {
 
 	if p.check(tokens.LEFT_BRACE) {
 		expr = LiteralExpression{
+			Loc:   p.peek().Loc,
 			Value: true,
 		}
 	} else {
@@ -860,10 +861,14 @@ func (p *Parser) statement() Statement {
 		return p.returnStatement()
 	}
 	if p.match(tokens.BREAK) {
-		return p.breakStatement()
+		return BreakStatement{
+			Loc: p.previous().Loc,
+		}
 	}
 	if p.match(tokens.CONTINUE) {
-		return p.continueStatement()
+		return ContinueStatement{
+			Loc: p.previous().Loc,
+		}
 	}
 	if p.match(tokens.PUBLIC) {
 		return p.publicStatement()

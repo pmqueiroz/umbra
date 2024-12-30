@@ -23,7 +23,12 @@ func (s BlockStatement) Reference() string {
 }
 
 func (s BlockStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+	for _, statement := range s.Statements {
+		locs = append(locs, statement.GetLocs()...)
+	}
+
+	return locs
 }
 
 type ExpressionStatement struct {
@@ -35,7 +40,7 @@ func (s ExpressionStatement) Reference() string {
 }
 
 func (s ExpressionStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return s.Expression.GetLocs()
 }
 
 type Parameter struct {
@@ -64,7 +69,11 @@ func (s MatchStatement) Reference() string {
 }
 
 func (s MatchStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, s.Expression.GetLocs()...)
+
+	return locs
 }
 
 type IfStatement struct {
@@ -78,7 +87,11 @@ func (s IfStatement) Reference() string {
 }
 
 func (s IfStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, s.Condition.GetLocs()...)
+
+	return locs
 }
 
 type PrintChannel int
@@ -104,7 +117,7 @@ func (s PrintStatement) Reference() string {
 }
 
 func (s PrintStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return s.Expression.GetLocs()
 }
 
 type ReturnStatement struct {
@@ -117,27 +130,35 @@ func (s ReturnStatement) Reference() string {
 }
 
 func (s ReturnStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{s.Keyword.Loc}
+
+	locs = append(locs, s.Value.GetLocs()...)
+
+	return locs
 }
 
-type BreakStatement struct{}
+type BreakStatement struct {
+	Loc globals.Loc
+}
 
 func (s BreakStatement) Reference() string {
 	return "break"
 }
 
 func (s BreakStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return []globals.Loc{s.Loc}
 }
 
-type ContinueStatement struct{}
+type ContinueStatement struct {
+	Loc globals.Loc
+}
 
 func (s ContinueStatement) Reference() string {
 	return "continue"
 }
 
 func (s ContinueStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return []globals.Loc{s.Loc}
 }
 
 type PublicStatement struct {
@@ -157,7 +178,7 @@ func (s PublicStatement) Reference() string {
 }
 
 func (s PublicStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return []globals.Loc{s.Keyword.Loc}
 }
 
 type ImportStatement struct {
@@ -170,7 +191,7 @@ func (s ImportStatement) Reference() string {
 }
 
 func (s ImportStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return []globals.Loc{s.Keyword.Loc}
 }
 
 type EnumArgument struct {
@@ -195,7 +216,7 @@ func (s EnumStatement) Reference() string {
 }
 
 func (s EnumStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return []globals.Loc{s.Name.Loc}
 }
 
 func (e *EnumStatement) Get(name tokens.Token) (EnumMember, bool) {
@@ -232,7 +253,12 @@ func (s VarStatement) Reference() string {
 }
 
 func (s VarStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{s.Name.Loc}
+
+	locs = append(locs, s.Initializer.GetLocs()...)
+	locs = append(locs, s.Type.Loc)
+
+	return locs
 }
 
 type ArrayDestructuringStatement struct {
@@ -255,7 +281,13 @@ func (s ArrayDestructuringStatement) Reference() string {
 }
 
 func (s ArrayDestructuringStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	for _, declaration := range s.Declarations {
+		locs = append(locs, declaration.GetLocs()...)
+	}
+
+	return locs
 }
 
 type InitializedForStatement struct {
@@ -270,7 +302,13 @@ func (s InitializedForStatement) Reference() string {
 }
 
 func (s InitializedForStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, s.Start.GetLocs()...)
+	locs = append(locs, s.Stop.GetLocs()...)
+	locs = append(locs, s.Step.GetLocs()...)
+
+	return locs
 }
 
 type ConditionalForStatement struct {
@@ -283,7 +321,11 @@ func (s ConditionalForStatement) Reference() string {
 }
 
 func (s ConditionalForStatement) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, s.Condition.GetLocs()...)
+
+	return locs
 }
 
 type ModuleStatement struct {

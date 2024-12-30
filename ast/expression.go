@@ -19,7 +19,11 @@ func (e AssignExpression) Reference() string {
 }
 
 func (e AssignExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, e.Target.GetLocs()...)
+	locs = append(locs, e.Value.GetLocs()...)
+	return locs
 }
 
 type BinaryExpression struct {
@@ -52,7 +56,11 @@ func (e IsExpression) Reference() string {
 }
 
 func (e IsExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, e.Expr.GetLocs()...)
+	locs = append(locs, e.Expr.GetLocs()...)
+	return locs
 }
 
 type CallExpression struct {
@@ -73,7 +81,17 @@ func (e CallExpression) Reference() string {
 }
 
 func (e CallExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, e.Callee.GetLocs()...)
+	arguments := []globals.Loc{}
+
+	for _, argument := range e.Arguments {
+		arguments = append(arguments, argument.GetLocs()...)
+	}
+
+	locs = append(locs, arguments...)
+	return locs
 }
 
 type GroupingExpression struct {
@@ -85,10 +103,11 @@ func (e GroupingExpression) Reference() string {
 }
 
 func (e GroupingExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return e.Expression.GetLocs()
 }
 
 type LiteralExpression struct {
+	Loc    globals.Loc
 	Lexeme string
 	Value  interface{}
 }
@@ -98,7 +117,7 @@ func (e LiteralExpression) Reference() string {
 }
 
 func (e LiteralExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return []globals.Loc{e.Loc}
 }
 
 type TypeConversionExpression struct {
@@ -111,7 +130,11 @@ func (e TypeConversionExpression) Reference() string {
 }
 
 func (e TypeConversionExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, e.Type.Loc)
+	locs = append(locs, e.Value.GetLocs()...)
+	return locs
 }
 
 type LogicalExpression struct {
@@ -125,7 +148,13 @@ func (e LogicalExpression) Reference() string {
 }
 
 func (e LogicalExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, e.Left.GetLocs()...)
+	locs = append(locs, e.Operator.Loc)
+	locs = append(locs, e.Right.GetLocs()...)
+
+	return locs
 }
 
 type UnaryExpression struct {
@@ -138,7 +167,12 @@ func (e UnaryExpression) Reference() string {
 }
 
 func (e UnaryExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	locs = append(locs, e.Operator.Loc)
+	locs = append(locs, e.Right.GetLocs()...)
+
+	return locs
 }
 
 type VariableExpression struct {
@@ -150,7 +184,7 @@ func (e VariableExpression) Reference() string {
 }
 
 func (e VariableExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	return []globals.Loc{e.Name.Loc}
 }
 
 type ArrayExpression struct {
@@ -170,7 +204,12 @@ func (e ArrayExpression) Reference() string {
 }
 
 func (e ArrayExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	for _, element := range e.Elements {
+		locs = append(locs, element.GetLocs()...)
+	}
+	return locs
 }
 
 type HashmapExpression struct {
@@ -192,7 +231,13 @@ func (e HashmapExpression) Reference() string {
 }
 
 func (e HashmapExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+
+	for key, value := range e.Pairs {
+		locs = append(locs, key.GetLocs()...)
+		locs = append(locs, value.GetLocs()...)
+	}
+	return locs
 }
 
 type MemberExpressionType string
@@ -218,7 +263,11 @@ func (e MemberExpression) Reference() string {
 }
 
 func (e MemberExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+	locs = append(locs, e.Object.GetLocs()...)
+	locs = append(locs, e.Property.GetLocs()...)
+
+	return locs
 }
 
 type NamespaceMemberExpression struct {
@@ -231,7 +280,11 @@ func (e NamespaceMemberExpression) Reference() string {
 }
 
 func (e NamespaceMemberExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+	locs = append(locs, e.Namespace.GetLocs()...)
+	locs = append(locs, e.Property.Loc)
+
+	return locs
 }
 
 type FunctionExpression struct {
@@ -258,5 +311,14 @@ func (e FunctionExpression) Reference() string {
 }
 
 func (e FunctionExpression) GetLocs() []globals.Loc {
-	return []globals.Loc{{}}
+	locs := []globals.Loc{}
+	locs = append(locs, e.Name.Loc)
+	paramsLocs := []globals.Loc{}
+	for _, param := range e.Params {
+		paramsLocs = append(paramsLocs, param.Name.Loc)
+	}
+	locs = append(locs, paramsLocs...)
+	locs = append(locs, e.ReturnType.Loc)
+
+	return locs
 }
