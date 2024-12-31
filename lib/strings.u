@@ -73,7 +73,7 @@ def to_lower(string str) {
 def trim(input str) str {
   mut start num = 0
   const end num = ~input - 1
-  const buffer str = ""
+  mut buffer str = ""
 
   for start <= end and (input[start] == ' ' or input[start] == '\t' or input[start] == '\n') {
     start = start + 1
