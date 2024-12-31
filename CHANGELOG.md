@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.23.0](https://github.com/pmqueiroz/umbra/compare/v1.22.1...v1.23.0) (2024-12-31)
+
+
+### Features
+
+* better grouping error messages ([207b7aa](https://github.com/pmqueiroz/umbra/commit/207b7aaf4f8f933683f1d1c202d2fb6c0b7f58ab))
+
+
+### Bug Fixes
+
+* **strings:** reassign to constant value ([09a88ec](https://github.com/pmqueiroz/umbra/commit/09a88ecf84c0e1575481035bb38bc00a120ec9d4))
+
 ## [1.22.1](https://github.com/pmqueiroz/umbra/compare/v1.22.0...v1.22.1) (2024-12-30)
 
 
