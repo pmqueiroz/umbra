@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/pmqueiroz/umbra/ast"
@@ -22,11 +23,11 @@ type RunOptions struct {
 	Env *environment.Environment
 }
 
-func run(content string, options RunOptions) {
+func run(content string, options RunOptions) error {
 	tokens, err := tokens.Tokenize(content)
 
 	if err != nil {
-		fmt.Printf("%s\n", err.Error())
+		return err
 	}
 
 	if options.PrintTokens {
@@ -40,8 +41,10 @@ func run(content string, options RunOptions) {
 	}
 
 	if err := interpreter.Interpret(module, options.Env); err != nil {
-		fmt.Println(err)
+		return err
 	}
+
+	return nil
 }
 
 func main() {
@@ -68,16 +71,25 @@ func main() {
 
 		env.Create(nil, "__FILE__", __FILE__, types.STR, false, false, false)
 
-		run(content, RunOptions{
+		runErr := run(content, RunOptions{
 			Options: args.Options,
 			Env:     env,
 		})
+
+		if runErr != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	} else {
 		cli.Repl(func(content string, env *environment.Environment) {
-			run(content, RunOptions{
+			runErr := run(content, RunOptions{
 				Options: args.Options,
 				Env:     env,
 			})
+
+			if runErr != nil {
+				fmt.Println(runErr)
+			}
 		})
 	}
 }
