@@ -3,7 +3,7 @@ package exception
 var Messages = map[string]string{
 	"RT000": "unknown declaration: %s",
 	"RT001": "variable %s already exists",
-	"RT002": "undefined variable: %s",
+	"RT002": "variable \"%s\" does not exist",
 	"RT003": "invalid index: %v",
 	"RT004": "array index out of bounds: %v",
 	"RT005": "cannot assign to property of type: %s",
@@ -36,7 +36,6 @@ var Messages = map[string]string{
 	"RT032": "cannot %s file: %s",
 	"RT033": "all paths must be strings",
 	"RT034": "enum member '%s' does not exits in '%s'",
-	"RT035": "cannot use '%s' as a type",
 	"RT036": "enum member expects to be called with arguments",
 	"RT037": "left operand in enumof should be an enum member",
 	"RT038": "right operand in enumof should be an enum member",
@@ -48,4 +47,5 @@ var Messages = map[string]string{
 	"GN002": "unable to load file '%s'. module does not exits. path: %s",
 	"TY000": "type %s is invalid",
 	"TY001": "expected %s got %s",
+	"TY002": "cannot use '%s' as a type",
 }

@@ -20,7 +20,7 @@ func parseRuntimeType(t tokens.Token, env *environment.Environment) (types.Umbra
 			return types.ENUM, enum, nil
 		}
 
-		return types.UNKNOWN, ast.EnumStatement{}, exception.NewUmbraError("RT035", nil, t.Lexeme)
+		return types.UNKNOWN, ast.EnumStatement{}, exception.NewUmbraError("TY002", nil, t.Lexeme)
 	default:
 		t, e := types.ParseTokenType(t.Type)
 		return t, ast.EnumStatement{}, e
