@@ -80,23 +80,6 @@ func checkDeclarationType(t tokens.Token, nullable bool, value interface{}, env 
 	return nil
 }
 
-func resolveVarDeclaration(stmt ast.VarStatement, value interface{}, env *environment.Environment) error {
-	err := checkDeclarationType(stmt.Type, stmt.Nullable, value, env, stmt)
-
-	if err != nil {
-		return err
-	}
-
-	varType, err := types.ParseTokenType(stmt.Type.Type)
-
-	if err != nil {
-		return err
-	}
-
-	env.Create(stmt, stmt.Name.Lexeme, value, varType, stmt.Nullable, false, stmt.Mutable)
-	return nil
-}
-
 func Interpret(statement ast.Statement, env *environment.Environment) error {
 	switch stmt := statement.(type) {
 	case ast.PrintStatement:
@@ -135,6 +118,8 @@ func Interpret(statement ast.Statement, env *environment.Environment) error {
 			if err != nil {
 				return err
 			}
+		} else {
+			value = zero(stmt.Type.Type)
 		}
 
 		return resolveVarDeclaration(stmt, value, env)

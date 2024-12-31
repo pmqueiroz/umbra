@@ -57,6 +57,7 @@ func annotation(e *UmbraError) string {
 }
 
 func (e *UmbraError) Error() string {
+
 	if e.node != nil {
 		return annotation(e)
 	}

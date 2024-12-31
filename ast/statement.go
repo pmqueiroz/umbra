@@ -255,7 +255,9 @@ func (s VarStatement) Reference() string {
 func (s VarStatement) GetLocs() []globals.Loc {
 	locs := []globals.Loc{s.Name.Loc}
 
-	locs = append(locs, s.Initializer.GetLocs()...)
+	if s.Initializer != nil {
+		locs = append(locs, s.Initializer.GetLocs()...)
+	}
 	locs = append(locs, s.Type.Loc)
 
 	return locs
