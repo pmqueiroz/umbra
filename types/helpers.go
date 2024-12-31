@@ -1,10 +1,10 @@
 package types
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/pmqueiroz/umbra/exception"
+	"github.com/pmqueiroz/umbra/globals"
 	"github.com/pmqueiroz/umbra/tokens"
 )
 
@@ -14,7 +14,7 @@ func isFunctionDeclaration(value interface{}) bool {
 	return reflect.TypeOf(value).Name() == "FunctionDeclaration"
 }
 
-func CheckPrimitiveType(targetType UmbraType, expected interface{}, nullable bool) error {
+func CheckPrimitiveType(targetType UmbraType, expected interface{}, nullable bool, node globals.Node) error {
 	if targetType == ANY {
 		return nil
 	}
@@ -59,10 +59,10 @@ func CheckPrimitiveType(targetType UmbraType, expected interface{}, nullable boo
 	expectedType, err := ParseUmbraType(expected)
 
 	if err != nil {
-		return exception.NewTypeError(fmt.Sprintf("type %s is invalid", expected))
+		return exception.NewUmbraError("TY000", node, expected)
 	}
 
-	return exception.NewTypeError(fmt.Sprintf("expected %s got %s", targetType, expectedType))
+	return exception.NewUmbraError("TY001", node, targetType, expectedType)
 }
 
 func ParseUmbraType(value interface{}) (UmbraType, error) {
@@ -86,7 +86,7 @@ func ParseUmbraType(value interface{}) (UmbraType, error) {
 			return FUN, nil
 		}
 
-		return UNKNOWN, exception.NewTypeError("unknown type")
+		return UNKNOWN, exception.NewUmbraError("TY000", nil, value)
 	}
 }
 
@@ -119,6 +119,6 @@ func ParseTokenType(value tokens.TokenType) (UmbraType, error) {
 	case tokens.FUN_TYPE:
 		return FUN, nil
 	default:
-		return UNKNOWN, exception.NewTypeError("unknown type")
+		return UNKNOWN, exception.NewUmbraError("TY000", nil, value)
 	}
 }

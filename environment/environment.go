@@ -64,7 +64,7 @@ func (env *Environment) Set(name string, value interface{}) bool {
 
 func (env *Environment) Create(node globals.Node, name string, value interface{}, dataType types.UmbraType, nullable bool, internal bool, mutable bool) bool {
 	if _, exists := env.Get(name, true); exists {
-		fmt.Println(exception.NewRuntimeError("RT001", node, name))
+		fmt.Println(exception.NewUmbraError("RT001", node, name))
 		os.Exit(1)
 		return false
 	}
@@ -119,7 +119,7 @@ func (env *Environment) GetNamespace(name string) (Environment, bool) {
 
 func (env *Environment) CreateNamespace(name string, namespace *Environment) bool {
 	if _, exists := env.GetNamespace(name); exists {
-		fmt.Println(exception.NewRuntimeError("RT001", nil, name))
+		fmt.Println(exception.NewUmbraError("RT001", nil, name))
 		os.Exit(1)
 		return false
 	}

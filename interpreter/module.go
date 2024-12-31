@@ -23,7 +23,7 @@ func ResolveModule(module string) (string, error) {
 	content, err := helpers.ReadFile(path)
 
 	if err != nil {
-		return content, exception.NewGenericError("GN002", module, path)
+		return content, exception.NewUmbraError("GN002", nil, module, path)
 	}
 
 	return content, nil

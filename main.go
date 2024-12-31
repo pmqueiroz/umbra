@@ -55,7 +55,7 @@ func main() {
 	if args.Path != "" {
 		__FILE__, err := filepath.Abs(args.Path)
 		if err != nil {
-			fmt.Println(exception.NewGenericError("GN001", args.Path))
+			fmt.Println(exception.NewUmbraError("GN001", nil, args.Path))
 			return
 		}
 		content, err := helpers.ReadFile(args.Path)

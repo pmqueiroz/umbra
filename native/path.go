@@ -11,7 +11,7 @@ func allString(maybeStrings []interface{}) ([]string, error) {
 	for i, p := range maybeStrings {
 		str, ok := p.(string)
 		if !ok {
-			return nil, exception.NewRuntimeError("RT033", nil)
+			return nil, exception.NewUmbraError("RT033", nil)
 		}
 		strPaths[i] = str
 	}
@@ -31,7 +31,7 @@ func resolve(paths []interface{}) (interface{}, error) {
 func dirname(args []interface{}) (interface{}, error) {
 	path, ok := args[0].(string)
 	if !ok {
-		return nil, exception.NewRuntimeError("RT033", nil)
+		return nil, exception.NewUmbraError("RT033", nil)
 	}
 
 	return filepath.Dir(path), nil

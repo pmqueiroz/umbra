@@ -46,4 +46,6 @@ var Messages = map[string]string{
 	"RT042": "expect boolean after not sign",
 	"GN001": "cannot find module '%s'",
 	"GN002": "unable to load file '%s'. module does not exits. path: %s",
+	"TY000": "type %s is invalid",
+	"TY001": "expected %s got %s",
 }

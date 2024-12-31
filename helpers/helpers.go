@@ -10,7 +10,7 @@ func ReadFile(path string) (string, error) {
 	dat, err := os.ReadFile(path)
 
 	if err != nil {
-		return "", exception.NewGenericError("GN001", path)
+		return "", exception.NewUmbraError("GN001", nil, path)
 	}
 
 	return string(dat[:]), nil

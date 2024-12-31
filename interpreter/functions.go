@@ -67,7 +67,7 @@ func processFunctionCall(callee FunctionDeclaration, args interface{}, env *envi
 		if param.Variadic {
 			var variadicArgs []interface{}
 			for j := i; j < len(parsedArgs); j++ {
-				typeErr := types.CheckPrimitiveType(param.Type, parsedArgs[j], param.Nullable)
+				typeErr := types.CheckPrimitiveType(param.Type, parsedArgs[j], param.Nullable, nil)
 				if typeErr != nil {
 					return nil, typeErr
 				}
@@ -77,7 +77,7 @@ func processFunctionCall(callee FunctionDeclaration, args interface{}, env *envi
 			funcEnv.Create(nil, param.Name.Lexeme, variadicArgs, param.Type, param.Nullable, false, false)
 			break
 		} else {
-			typeErr := types.CheckPrimitiveType(param.Type, parsedArgs[i], param.Nullable)
+			typeErr := types.CheckPrimitiveType(param.Type, parsedArgs[i], param.Nullable, nil)
 			if typeErr != nil {
 				return nil, typeErr
 			}
