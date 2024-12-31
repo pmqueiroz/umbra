@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.24.0](https://github.com/pmqueiroz/umbra/compare/v1.23.0...v1.24.0) (2024-12-31)
+
+
+### Features
+
+* zero initializer ([47dd505](https://github.com/pmqueiroz/umbra/commit/47dd5054b90471b5991f71bc60e705128e135bc6))
+
+
+### Bug Fixes
+
+* exit on error ([b32d624](https://github.com/pmqueiroz/umbra/commit/b32d624fbd50c9751d0b0961b6b7792eba01266f))
+
 ## [1.23.0](https://github.com/pmqueiroz/umbra/compare/v1.22.1...v1.23.0) (2024-12-31)
 
 
