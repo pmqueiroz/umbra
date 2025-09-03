@@ -89,6 +89,34 @@ def trim(input str) str {
   return buffer
 }
 
+def left_pad(input str, length num, pad_char char) str {
+  mut buffer str = ""
+  mut pad_len num = length - ~input
+  if (pad_len <= 0) {
+    return input
+  }
+  for mut i num = 0, pad_len - 1 {
+    buffer = buffer + pad_char
+  }
+  return buffer + input
+}
+
+def ident(input str, spaces num) str {
+  mut pad str = ""
+  for mut i num = 0, spaces - 1 {
+    pad = pad + ' '
+  }
+  mut buffer str = ""
+  mut line_start num = 0
+  for mut i num = 0, ~input - 1 {
+    if (i == 0 or input[i-1] == '\n') {
+      buffer = buffer + pad
+    }
+    buffer = buffer + input[i]
+  }
+  return buffer
+}
+
 pub {
   substring
   split
@@ -96,4 +124,6 @@ pub {
   to_lower
   join
   trim
+  left_pad
+  ident
 }
