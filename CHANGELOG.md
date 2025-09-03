@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.25.0](https://github.com/pmqueiroz/umbra/compare/v1.24.0...v1.25.0) (2025-09-03)
+
+
+### Features
+
+* implement format lib with dashcase fn ([8ec9ee7](https://github.com/pmqueiroz/umbra/commit/8ec9ee716fc3feabab6c37db5b2e1bf30d68b524))
+* implement lib to render html ([b5ceb3c](https://github.com/pmqueiroz/umbra/commit/b5ceb3c82bf94121e27950e418968816fb5bb194))
+* **native/hashmaps:** keys fn ([97eda74](https://github.com/pmqueiroz/umbra/commit/97eda74d57e55047b91353f5218f8e0f4d609a31))
+* **strings:** add leftpad and ident fn ([f793ebd](https://github.com/pmqueiroz/umbra/commit/f793ebd2642a7ffe8fa7b6eafeee8af2be220bac))
+
 ## [1.24.0](https://github.com/pmqueiroz/umbra/compare/v1.23.0...v1.24.0) (2024-12-31)
 
 
