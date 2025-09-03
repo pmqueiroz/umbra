@@ -1,0 +1,33 @@
+def dashcase(input str) str {
+  mut buffer str = ""
+  mut prev_is_dash bool = false
+
+  for mut i num = 0, ~input - 1 {
+    mut c char = input[i]
+
+    if c == '_' or c == '-' or c == ' ' {
+      if ~buffer > 0 and !prev_is_dash {
+        buffer = buffer + '-'
+        prev_is_dash = true
+      }
+      continue
+    }
+
+    if c >= 'A' and c <= 'Z' {
+      if ~buffer > 0 and !prev_is_dash {
+        buffer = buffer + '-'
+      }
+      buffer = buffer + (c + 32)
+      prev_is_dash = false
+    } else {
+      buffer = buffer + c
+      prev_is_dash = false
+    }
+  }
+
+  return buffer
+}
+
+pub {
+  dashcase
+}
