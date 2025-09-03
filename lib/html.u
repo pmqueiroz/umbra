@@ -1,0 +1,44 @@
+import "strings"
+import "native/hashmaps"
+import "arrays"
+import "format"
+
+def parseAttrs(attrs hashmap) str {
+	const keys arr = hashmaps::keys(attrs)
+	const result arr = arrays::map(keys, |k str | { return format::dashcase(k) + "=\"" + attrs[k] + "\"" })
+	return strings::join(result, " ")
+}
+
+def node(element str, slot str, attrs hashmap) str {
+	mut parsedAttrs str = parseAttrs(attrs)
+
+	if parsedAttrs != "" {
+		parsedAttrs = " " + parsedAttrs
+	}
+
+	return "<" + element + parsedAttrs + ">" + '\n' + strings::ident(slot, 2, ' ') + '\n' + "</" + element + ">"
+}
+
+def frag(slots ...str) str {
+  return strings::join(slots, str('\n'))
+}
+
+def html(slot str, attrs hashmap) str {
+  return node("html", slot, attrs)
+}
+
+def body(slot str, attrs hashmap) str {
+  return node("body", slot, attrs)
+}
+
+def div(slot str, attrs hashmap) str {
+  return node("div", slot, attrs)
+}
+
+pub {
+	node
+	frag
+	html
+	body
+	div
+}
